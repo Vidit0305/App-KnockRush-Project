@@ -43,6 +43,11 @@ namespace KnockRush.Tests.PlayMode
             yield return Wait(catalog);
             Assert.IsTrue(catalog.Result.Exists(item => item.Id == "color_purple"));
 
+            var achievements = backend.GetAchievementsAsync();
+            yield return Wait(achievements);
+            Assert.AreEqual(12, achievements.Result.Achievements.Count);
+            Assert.IsTrue(achievements.Result.Achievements.TrueForAll(a => !a.Unlocked && a.Progress == 0 && a.Target > 0), "New players start with no achievements.");
+
             var purchase = backend.PurchaseAsync("color_purple");
             yield return Wait(purchase);
             Assert.AreEqual(100, backend.Profile.Coins);

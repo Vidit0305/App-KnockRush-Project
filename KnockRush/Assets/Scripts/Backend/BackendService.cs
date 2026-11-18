@@ -57,6 +57,7 @@ namespace KnockRush.Backend
         Task RespondFriendRequestAsync(string fromUid, bool accept);
         Task LinkAccountAsync(string providerId, string providerIdToken);
         Task<FriendsResponse> GetFriendsAsync();
+        Task<AchievementsResponse> GetAchievementsAsync();
         Task<SeasonResponse> GetSeasonAsync();
         Task BuyPremiumPassAsync();
         Task<TierReward> ClaimSeasonRewardAsync(int tier, bool premium);
@@ -197,6 +198,8 @@ namespace KnockRush.Backend
         }
 
         public Task<FriendsResponse> GetFriendsAsync() => client.CallAsync<FriendsResponse>("getFriends", null);
+
+        public Task<AchievementsResponse> GetAchievementsAsync() => client.CallAsync<AchievementsResponse>("getAchievements", null);
 
         public Task<SeasonResponse> GetSeasonAsync() => client.CallAsync<SeasonResponse>("getSeason", null);
 

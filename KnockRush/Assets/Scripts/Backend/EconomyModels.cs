@@ -91,4 +91,19 @@ namespace KnockRush.Backend
         [JsonProperty("friends")] public List<FriendEntry> Friends = new List<FriendEntry>();
         [JsonProperty("requests")] public List<FriendEntry> Requests = new List<FriendEntry>();
     }
+
+    public sealed class AchievementEntry
+    {
+        [JsonProperty("id")] public string Id;
+        [JsonProperty("title")] public string Title;
+        [JsonProperty("description")] public string Description;
+        [JsonProperty("target")] public int Target;
+        [JsonProperty("progress")] public int Progress;
+        [JsonProperty("unlocked")] public bool Unlocked;
+    }
+
+    public sealed class AchievementsResponse
+    {
+        [JsonProperty("achievements")] public List<AchievementEntry> Achievements = new List<AchievementEntry>();
+    }
 }
