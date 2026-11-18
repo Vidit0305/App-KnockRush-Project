@@ -3,42 +3,23 @@
  * match history and leaderboards. Clients call the callables with their Firebase ID token; the
  * dedicated game server reports results with a server key. Firestore rules deny direct writes.
  */
-import { initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
-import { FieldValue, getFirestore, Transaction } from "firebase-admin/firestore";
-import { HttpsError, onCall, onRequest, CallableRequest } from "firebase-functions/v2/https";
+import { FieldValue, Transaction } from "firebase-admin/firestore";
+import { HttpsError, onCall, onRequest } from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
-import { setGlobalOptions } from "firebase-functions/v2";
 import {
   computeReward, levelForXp, xpForLevel, validateUsername, nextDailyClaim, utcDayNumber, newAchievements,
   validateMatchReport, STARTING_COINS, STARTING_GEMS, PlayerStats,
 } from "./rules.js";
-import { CATALOG, findItem, STARTER_ITEMS } from "./catalog.js";
+import { CATALOG, findItem, STARTER_ITEMS, SHOP_ITEMS } from "./catalog.js";
+import { db, requireUid, userRef, walletRef, progressRef, missionsRef, ledger } from "./common.js";
+import { dailyMissions, applyMissionProgress, SEASON } from "./season.js";
 
-initializeApp();
-setGlobalOptions({ region: "europe-west1", maxInstances: 20 });
-const db = getFirestore();
+export * from "./progression.js";
+export * from "./store.js";
+
 const MATCH_REPORT_KEY = defineSecret("MATCH_REPORT_KEY");
-
-// -------------------------------------------------------------------------------------------
-// Helpers
-// -------------------------------------------------------------------------------------------
-function requireUid(request: CallableRequest<unknown>): string {
-  const uid = request.auth?.uid;
-  if (!uid) {
-    throw new HttpsError("unauthenticated", "Sign in first.");
-  }
-
-  return uid;
-}
-
-const userRef = (uid: string) => db.collection("users").doc(uid);
-const walletRef = (uid: string) => userRef(uid).collection("private").doc("wallet");
-const progressRef = (uid: string) => userRef(uid).collection("private").doc("progress");
-
-function ledger(tx: Transaction, entry: Record<string, unknown>) {
-  tx.create(db.collection("ledger").doc(), { ...entry, at: FieldValue.serverTimestamp() });
-}
+void Transaction;
 
 async function readProfile(uid: string) {
   const [user, wallet, progress, inventory] = await Promise.all([
@@ -82,12 +63,12 @@ export const ensureProfile = onCall(async request => {
       displayName: guestName,
       username: null,
       level: 1,
-      equipped: { body: "default_bean", color: "default_orange", hat: "none", emote: "emote_celebrate" },
+      equipped: { body: "default_bean", color: "default_orange", hat: "hat_none", pattern: "pattern_none", emote: "emote_celebrate" },
       stats: { matches: 0, wins: 0, roundsCleared: 0, crowns: 0 },
       createdAt: FieldValue.serverTimestamp(),
     });
     tx.create(walletRef(uid), { coins: STARTING_COINS, gems: STARTING_GEMS });
-    tx.create(progressRef(uid), { xp: 0, achievements: [], dailyStreak: 0 });
+    tx.create(progressRef(uid), { xp: 0, achievements: [], dailyStreak: 0, seasonId: SEASON.id, seasonXp: 0, premiumPass: false, claimedFree: [], claimedPremium: [] });
     for (const itemId of STARTER_ITEMS) {
       tx.create(userRef(uid).collection("inventory").doc(itemId), { source: "starter", acquiredAt: FieldValue.serverTimestamp() });
     }
@@ -148,12 +129,17 @@ export const setUsername = onCall(async request => {
 // Economy
 // -------------------------------------------------------------------------------------------
 export const getCatalog = onCall(() => ({ items: CATALOG.filter(item => !item.starter) }));
+void SHOP_ITEMS;
 
 export const purchaseShopItem = onCall(async request => {
   const uid = requireUid(request);
   const item = findItem((request.data as { itemId?: unknown })?.itemId);
   if (!item || item.starter) {
     throw new HttpsError("not-found", "Unknown item.");
+  }
+
+  if (item.exclusive) {
+    throw new HttpsError("permission-denied", "This item is only available from the season pass or events.");
   }
 
   return db.runTransaction(async tx => {
@@ -179,16 +165,11 @@ export const purchaseShopItem = onCall(async request => {
 export const equipItems = onCall(async request => {
   const uid = requireUid(request);
   const equipped = (request.data as { equipped?: Record<string, string> })?.equipped ?? {};
-  const allowedSlots = ["body", "color", "hat", "emote"];
+  const allowedSlots = ["body", "color", "hat", "pattern", "emote"];
   const update: Record<string, string> = {};
   for (const [slot, itemId] of Object.entries(equipped)) {
     if (!allowedSlots.includes(slot)) {
       throw new HttpsError("invalid-argument", `Unknown slot ${slot}.`);
-    }
-
-    if (itemId === "none" && slot === "hat") {
-      update[`equipped.${slot}`] = itemId;
-      continue;
     }
 
     const item = findItem(itemId);
@@ -265,12 +246,14 @@ export const reportMatchResult = onRequest({ secrets: [MATCH_REPORT_KEY] }, asyn
       user: await tx.get(userRef(p.uid)),
       wallet: await tx.get(walletRef(p.uid)),
       progress: await tx.get(progressRef(p.uid)),
+      missions: await tx.get(missionsRef(p.uid)),
     })));
+    const today = utcDayNumber(Date.now());
 
     tx.create(matchRef, { ...body, processedAt: FieldValue.serverTimestamp() });
 
     humans.forEach((p: { uid: string; placement: number; roundsCleared: number; won: boolean; isBot: boolean }, i: number) => {
-      const { user, wallet, progress } = snapshots[i];
+      const { user, wallet, progress, missions } = snapshots[i];
       if (!user.exists) {
         return; // unknown player (e.g. deleted account): result stored, no rewards
       }
@@ -294,7 +277,19 @@ export const reportMatchResult = onRequest({ secrets: [MATCH_REPORT_KEY] }, asyn
         level: levelForXp(xp),
       });
       tx.update(walletRef(p.uid), { coins: (wallet.get("coins") ?? 0) + reward.coins });
-      tx.update(progressRef(p.uid), { xp, achievements: [...owned, ...unlocked] });
+      const seasonXp = (progress.get("seasonId") === SEASON.id ? progress.get("seasonXp") ?? 0 : 0) + reward.xp;
+      tx.update(progressRef(p.uid), { xp, achievements: [...owned, ...unlocked], seasonId: SEASON.id, seasonXp });
+
+      const todays = dailyMissions(today, p.uid);
+      const previous = missions.exists && missions.get("day") === today ? missions.get("progress") ?? {} : {};
+      const claimed = missions.exists && missions.get("day") === today ? missions.get("claimed") ?? [] : [];
+      tx.set(missionsRef(p.uid), {
+        day: today,
+        claimed,
+        progress: applyMissionProgress(previous, todays, {
+          matches: 1, roundsCleared: p.roundsCleared, wins: p.won ? 1 : 0, finals: p.roundsCleared >= 3 ? 1 : 0,
+        }),
+      });
       tx.set(userRef(p.uid).collection("matchHistory").doc(body.matchId), {
         modeId: body.modeId, placement: p.placement, roundsCleared: p.roundsCleared, won: p.won,
         reward, achievements: unlocked, at: FieldValue.serverTimestamp(),

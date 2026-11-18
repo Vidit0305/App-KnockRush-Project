@@ -15,9 +15,9 @@ before(async () => {
 
   await env.withSecurityRulesDisabled(async context => {
     const db = context.firestore();
-    await setDoc(doc(db, "users/alice"), { displayName: "Alice", level: 3, equipped: { body: "default_bean", color: "default_orange", hat: "none", emote: "emote_celebrate" } });
+    await setDoc(doc(db, "users/alice"), { displayName: "Alice", level: 3, equipped: { body: "default_bean", color: "default_orange", hat: "hat_none", pattern: "pattern_none", emote: "emote_celebrate" } });
     await setDoc(doc(db, "users/alice/private/wallet"), { coins: 500, gems: 0 });
-    for (const item of ["default_bean", "default_orange", "emote_celebrate", "color_purple"]) {
+    for (const item of ["default_bean", "default_orange", "emote_celebrate", "color_purple", "hat_none", "pattern_none"]) {
       await setDoc(doc(db, `users/alice/inventory/${item}`), { source: "test" });
     }
     await setDoc(doc(db, "ledger/entry1"), { uid: "alice", coins: 500 });
@@ -44,7 +44,7 @@ test("profiles are public to signed-in players only", async () => {
 
 test("owners can equip owned cosmetics only, and nothing else", async () => {
   const alice = env.authenticatedContext("alice").firestore();
-  const owned = { body: "default_bean", color: "color_purple", hat: "none", emote: "emote_celebrate" };
+  const owned = { body: "default_bean", color: "color_purple", hat: "hat_none", pattern: "pattern_none", emote: "emote_celebrate" };
   await assertSucceeds(updateDoc(doc(alice, "users/alice"), { equipped: owned }));
   await assertFails(updateDoc(doc(alice, "users/alice"), { equipped: { ...owned, body: "body_dino" } }));
   await assertFails(updateDoc(doc(alice, "users/alice"), { level: 99 }));

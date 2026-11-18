@@ -19,12 +19,13 @@ service cloud.firestore {
       return exists(/databases/$(database)/documents/users/$(uid)/inventory/$(itemId));
     }
 
-    // Each equip slot must hold an item the player owns ("none" allowed for the hat).
+    // Each equip slot must hold an item the player owns ("hat_none"/"pattern_none" are starter items).
     function equipValid(uid, equipped) {
-      return equipped.keys().hasOnly(['body', 'color', 'hat', 'emote'])
+      return equipped.keys().hasOnly(['body', 'color', 'hat', 'pattern', 'emote'])
         && ownsItem(uid, equipped.body)
         && ownsItem(uid, equipped.color)
-        && (equipped.hat == 'none' || ownsItem(uid, equipped.hat))
+        && ownsItem(uid, equipped.hat)
+        && ownsItem(uid, equipped.pattern)
         && ownsItem(uid, equipped.emote);
     }
 
