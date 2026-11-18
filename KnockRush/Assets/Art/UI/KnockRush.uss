@@ -1,0 +1,324 @@
+/* KnockRush UI theme (UI Toolkit). Brand: Rush Orange #FF6A1A, Knock Purple #5B2EFF,
+   Sunny #FFD12B, Mint #22C58B, Bubblegum #FF4F9A, Deep Night #1E145C.
+   Fonts are applied from code (AppUI) so this file stays asset-path independent. */
+
+.kr-root {
+    flex-grow: 1;
+    color: rgb(255, 255, 255);
+    font-size: 26px;
+}
+
+.kr-safe {
+    position: absolute;
+    left: 0; top: 0; right: 0; bottom: 0;
+}
+
+.kr-screen {
+    position: absolute;
+    left: 0; top: 0; right: 0; bottom: 0;
+    padding: 28px 40px;
+    opacity: 1;
+    translate: 0 0;
+    transition-property: opacity, translate;
+    transition-duration: 0.22s;
+    transition-timing-function: ease-out-cubic;
+}
+
+.kr-screen--hidden {
+    opacity: 0;
+    translate: 0 40px;
+}
+
+.kr-backdrop {
+    background-color: rgba(30, 20, 92, 0.86);
+}
+
+.kr-title {
+    font-size: 64px;
+    color: rgb(255, 209, 43);
+    -unity-text-outline-width: 2px;
+    -unity-text-outline-color: rgb(30, 20, 92);
+    -unity-text-align: middle-center;
+}
+
+.kr-heading {
+    font-size: 40px;
+    color: rgb(255, 255, 255);
+    -unity-text-outline-width: 1.5px;
+    -unity-text-outline-color: rgb(30, 20, 92);
+}
+
+.kr-subtle {
+    font-size: 22px;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.kr-row {
+    flex-direction: row;
+    align-items: center;
+}
+
+.kr-col {
+    flex-direction: column;
+}
+
+.kr-grow {
+    flex-grow: 1;
+}
+
+.kr-spacer {
+    flex-grow: 1;
+}
+
+.kr-center {
+    align-items: center;
+    justify-content: center;
+}
+
+/* ---------- Buttons ---------- */
+.kr-btn {
+    background-color: rgb(91, 46, 255);
+    border-width: 0;
+    border-bottom-width: 6px;
+    border-color: rgb(55, 24, 170);
+    border-radius: 18px;
+    padding: 10px 26px;
+    margin: 6px;
+    color: rgb(255, 255, 255);
+    font-size: 28px;
+    -unity-text-align: middle-center;
+    transition-property: scale, background-color;
+    transition-duration: 0.08s;
+}
+
+.kr-btn:hover {
+    background-color: rgb(110, 70, 255);
+}
+
+.kr-btn:active {
+    scale: 0.95 0.95;
+    border-bottom-width: 2px;
+}
+
+.kr-btn:disabled {
+    opacity: 0.45;
+}
+
+.kr-btn--primary {
+    background-color: rgb(255, 106, 26);
+    border-color: rgb(196, 70, 6);
+    font-size: 46px;
+    padding: 16px 56px;
+}
+
+.kr-btn--primary:hover {
+    background-color: rgb(255, 130, 60);
+}
+
+.kr-btn--good {
+    background-color: rgb(34, 197, 139);
+    border-color: rgb(18, 140, 96);
+}
+
+.kr-btn--danger {
+    background-color: rgb(232, 58, 58);
+    border-color: rgb(160, 30, 30);
+}
+
+.kr-btn--ghost {
+    background-color: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.kr-btn--small {
+    font-size: 22px;
+    padding: 6px 16px;
+    border-bottom-width: 4px;
+    border-radius: 12px;
+}
+
+.kr-btn--icon {
+    width: 84px;
+    height: 84px;
+    padding: 0;
+    border-radius: 24px;
+    font-size: 20px;
+}
+
+/* ---------- Cards / panels ---------- */
+.kr-panel {
+    background-color: rgba(30, 20, 92, 0.78);
+    border-radius: 24px;
+    padding: 20px;
+    border-width: 3px;
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.kr-card {
+    background-color: rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    padding: 12px;
+    margin: 8px;
+    border-width: 3px;
+    border-color: rgba(255, 255, 255, 0.10);
+    align-items: center;
+}
+
+.kr-card--selected {
+    border-color: rgb(255, 209, 43);
+    background-color: rgba(255, 209, 43, 0.22);
+}
+
+.kr-card--locked {
+    opacity: 0.55;
+}
+
+.kr-swatch {
+    width: 92px;
+    height: 92px;
+    border-radius: 46px;
+    border-width: 4px;
+    border-color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 6px;
+}
+
+.kr-rarity-common { border-color: rgb(180, 190, 210); }
+.kr-rarity-rare { border-color: rgb(45, 156, 255); }
+.kr-rarity-epic { border-color: rgb(181, 94, 255); }
+.kr-rarity-legendary { border-color: rgb(255, 209, 43); }
+
+/* ---------- Top bar / currencies ---------- */
+.kr-topbar {
+    flex-direction: row;
+    align-items: center;
+    height: 92px;
+}
+
+.kr-pill {
+    flex-direction: row;
+    align-items: center;
+    background-color: rgba(30, 20, 92, 0.75);
+    border-radius: 30px;
+    padding: 6px 18px 6px 8px;
+    margin-left: 12px;
+    font-size: 28px;
+}
+
+.kr-coin {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    background-color: rgb(255, 209, 43);
+    border-width: 3px;
+    border-color: rgb(214, 160, 20);
+    margin-right: 8px;
+}
+
+.kr-gem {
+    width: 38px;
+    height: 38px;
+    rotate: 45deg;
+    border-radius: 8px;
+    background-color: rgb(255, 79, 154);
+    border-width: 3px;
+    border-color: rgb(196, 40, 110);
+    margin-right: 10px;
+}
+
+.kr-level {
+    width: 64px;
+    height: 64px;
+    border-radius: 32px;
+    background-color: rgb(34, 197, 139);
+    border-width: 4px;
+    border-color: rgb(255, 255, 255);
+    -unity-text-align: middle-center;
+    font-size: 28px;
+}
+
+/* ---------- Progress bars ---------- */
+.kr-bar {
+    height: 22px;
+    border-radius: 11px;
+    background-color: rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+}
+
+.kr-bar__fill {
+    height: 100%;
+    border-radius: 11px;
+    background-color: rgb(255, 209, 43);
+}
+
+/* ---------- Tabs ---------- */
+.kr-tab {
+    background-color: rgba(255, 255, 255, 0.10);
+    border-width: 0;
+    border-radius: 16px;
+    margin: 4px;
+    padding: 8px 20px;
+    color: rgb(255, 255, 255);
+    font-size: 24px;
+}
+
+.kr-tab--active {
+    background-color: rgb(255, 106, 26);
+}
+
+/* ---------- HUD ---------- */
+.kr-hud-banner {
+    font-size: 110px;
+    color: rgb(255, 209, 43);
+    -unity-text-outline-width: 3px;
+    -unity-text-outline-color: rgb(30, 20, 92);
+    -unity-text-align: middle-center;
+    scale: 1 1;
+    transition-property: scale, opacity;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-out-back;
+}
+
+.kr-hud-banner--pop {
+    scale: 1.25 1.25;
+}
+
+.kr-hud-banner--bad {
+    color: rgb(255, 90, 90);
+}
+
+.kr-hud-chip {
+    background-color: rgba(30, 20, 92, 0.75);
+    border-radius: 24px;
+    padding: 6px 22px;
+    font-size: 30px;
+}
+
+.kr-toast {
+    background-color: rgba(30, 20, 92, 0.92);
+    border-radius: 20px;
+    padding: 12px 24px;
+    font-size: 26px;
+    border-width: 3px;
+    border-color: rgb(255, 209, 43);
+}
+
+.kr-input {
+    font-size: 30px;
+    min-width: 260px;
+}
+
+.kr-input > #unity-text-input {
+    background-color: rgba(255, 255, 255, 0.92);
+    color: rgb(30, 20, 92);
+    border-radius: 14px;
+    padding: 8px 14px;
+}
+
+.kr-scroll {
+    flex-grow: 1;
+}
+
+.kr-wrap {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
