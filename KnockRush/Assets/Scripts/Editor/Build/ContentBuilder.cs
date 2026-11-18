@@ -63,6 +63,11 @@ namespace KnockRush.EditorTools.Build
 
             // Phase 5: game modes, catalog (modes + map pool), MatchController prefab.
             GameModeContentBuilder.Build();
+
+            // Phase 7: backend connection settings (development = Firebase Emulator Suite).
+            KnockRush.EditorTools.Common.EditorAssetUtility.LoadOrCreate(
+                "Assets/ScriptableObjects/Config/Resources/BackendConfig.asset",
+                ScriptableObject.CreateInstance<KnockRush.Backend.BackendConfig>);
             AssetDatabase.SaveAssets();
             Debug.Log("[KnockRush Build] Content build complete.");
         }

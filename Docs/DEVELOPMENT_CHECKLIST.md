@@ -87,13 +87,16 @@ Rule: a phase is **complete** only when every item is `[x]` and its milestone te
 - [ ] Addressables delivery of maps (moved to Phase 9)
 - [ ] Hand-authored bot routes (Phase 9 polish)
 
-## PHASE 7: Firebase backend and player progression  ← **NEXT**
-- [ ] Firebase projects (dev/staging/prod), Unity SDK, Auth (guest, Google, Apple, linking)
-- [ ] Firestore data model + security rules + emulator tests
-- [ ] Cloud Functions: results reporting, XP/levels, match history, stats, leaderboards, friends
-- [ ] App Check
+## PHASE 7: Firebase backend and player progression: ✅ IMPLEMENTED (emulator-verified; deploy needs your Firebase project)
+- [x] Cloud Functions: profiles, usernames, shop, equip, daily rewards, match results (server key, idempotent), XP/levels, achievements, match history, leaderboards, friends
+- [x] Photon custom authentication with Firebase ID tokens (verified UIDs in matches)
+- [x] Firestore security rules (deny by default; server-only economy)
+- [x] Unity REST client + BackendService (guest sign-in, session restore, account linking API), auto-registered via AppRoot installers
+- [x] Dedicated-server match reporting; matchmaking uses Firebase identity
+- [x] Tests: functions unit 7/7, emulator integration 12/12, Unity client vs emulator, PlayMode 38/38
+- [ ] Firebase project + deploy (yours) · Google/Apple sign-in plugins (Phase 10) · App Check
 
-## PHASE 8: UI, customisation, shop and monetisation
+## PHASE 8: UI, customisation, shop and monetisation  ← **NEXT**
 - [ ] UI framework (screen stack, safe area), all 22 screens
 - [ ] Customisation: 20 costumes, 15 colourways, 10 emotes; equip flow
 - [ ] Economy: coins/gems, shop, daily rewards, missions, achievements, season pass
