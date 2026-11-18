@@ -33,7 +33,39 @@ namespace KnockRush.Core
     {
         private const string Tag = nameof(AppRoot);
 
+        private static readonly List<Action<ServiceRegistry>> Installers = new List<Action<ServiceRegistry>>();
         private readonly List<IGameService> orderedServices = new List<IGameService>();
+
+        /// <summary>
+        /// Lets feature assemblies (backend, audio, ...) add services without Core depending on
+        /// them. Call from [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)].
+        /// Installers run after the core services, in registration order.
+        /// </summary>
+        public static void RegisterInstaller(Action<ServiceRegistry> installer)
+        {
+            if (installer != null && !Installers.Contains(installer))
+            {
+                Installers.Add(installer);
+            }
+        }
+
+        /// <summary>Handed to installers to register services with the app.</summary>
+        public sealed class ServiceRegistry
+        {
+            private readonly AppRoot root;
+
+            internal ServiceRegistry(AppRoot root)
+            {
+                this.root = root;
+            }
+
+            public GameConfig Config => root.Config;
+
+            public void Add<TService>(TService service) where TService : class
+            {
+                root.Add(service);
+            }
+        }
 
         public static AppRoot Instance { get; private set; }
 
@@ -60,6 +92,7 @@ namespace KnockRush.Core
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatics()
         {
+            Installers.Clear();
             Instance = null;
             InitializationTask = Task.CompletedTask;
             IsInitialized = false;
@@ -104,7 +137,12 @@ namespace KnockRush.Core
                 Add<ILocalSettingsService>(new LocalSettingsService());
                 Add<ISceneLoader>(new SceneLoader(cancellationToken));
 
-                // Phase 7+: Add<IAuthService>(...), Add<IProfileService>(...), etc.
+                // Feature services (backend, ...) registered by their assemblies.
+                var registry = new ServiceRegistry(this);
+                foreach (var installer in Installers)
+                {
+                    installer(registry);
+                }
 
                 foreach (var service in orderedServices)
                 {

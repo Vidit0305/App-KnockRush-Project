@@ -12,7 +12,8 @@
         "KnockRush.CameraRig",
         "Fusion.Unity",
         "Photon.Realtime",
-        "KnockRush.Obstacles"
+        "KnockRush.Obstacles",
+        "KnockRush.Backend"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

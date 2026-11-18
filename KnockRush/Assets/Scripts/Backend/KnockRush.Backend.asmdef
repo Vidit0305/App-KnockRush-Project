@@ -1,0 +1,19 @@
+{
+    "name": "KnockRush.Backend",
+    "rootNamespace": "KnockRush.Backend",
+    "references": [
+        "KnockRush.Core",
+        "KnockRush.Utilities"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

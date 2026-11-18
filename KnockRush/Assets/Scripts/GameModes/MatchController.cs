@@ -32,6 +32,8 @@ namespace KnockRush.GameModes
 
         private readonly Dictionary<int, NetworkCharacter> characters = new Dictionary<int, NetworkCharacter>();
         private readonly HashSet<int> playedMaps = new HashSet<int>();
+        private readonly Dictionary<int, string> userIds = new Dictionary<int, string>();
+        private bool reported;
         private GameModeCatalog catalog;
         private System.Random random;
         private bool startRequested;
@@ -145,6 +147,12 @@ namespace KnockRush.GameModes
             if (RoomOwner == PlayerRef.None)
             {
                 RoomOwner = player;
+            }
+
+            var userId = Runner.GetPlayerUserId(player);
+            if (!string.IsNullOrEmpty(userId))
+            {
+                userIds[slot] = userId;
             }
 
             if (sceneReady)
@@ -441,6 +449,7 @@ namespace KnockRush.GameModes
                 Phase = MatchPhase.MatchResults;
                 Timer = TickTimer.CreateFromSeconds(Runner, MatchResultsSeconds);
                 Log.Info(Tag, $"Match over. Winner slot {WinnerSlot}, qualifiers {qualifiedSlots.Count}.");
+                ReportResults();
                 return;
             }
 
@@ -455,6 +464,62 @@ namespace KnockRush.GameModes
 
             RoundIndex++;
             LoadRound();
+        }
+
+        /// <summary>
+        /// Sends final placements to the backend (dedicated servers only: the server key is never
+        /// present on clients or peer hosts, so rewards cannot be self-granted).
+        /// </summary>
+        private void ReportResults()
+        {
+            if (reported || !KnockRush.Backend.MatchReportClient.CanReport)
+            {
+                return;
+            }
+
+            reported = true;
+            var report = new KnockRush.Backend.MatchReport
+            {
+                MatchId = $"{Runner.SessionInfo.Name}-{Runner.Tick.Raw}".Replace(' ', '_'),
+                ModeId = Mode.ModeId
+            };
+
+            var ranked = new List<int>();
+            for (var slot = 0; slot < MaxRecords; slot++)
+            {
+                if (Records.Get(slot).InUse)
+                {
+                    ranked.Add(slot);
+                }
+            }
+
+            ranked.Sort((a, b) =>
+            {
+                if (a == WinnerSlot) return -1;
+                if (b == WinnerSlot) return 1;
+                var ra = Records.Get(a);
+                var rb = Records.Get(b);
+                var byRounds = (rb.RoundsCleared + (rb.Status == RecordStatus.Qualified ? 1 : 0)).CompareTo(ra.RoundsCleared + (ra.Status == RecordStatus.Qualified ? 1 : 0));
+                return byRounds != 0 ? byRounds : ra.RoundPlacement.CompareTo(rb.RoundPlacement);
+            });
+
+            for (var i = 0; i < ranked.Count; i++)
+            {
+                var slot = ranked[i];
+                var record = Records.Get(slot);
+                userIds.TryGetValue(slot, out var uid);
+                var isBot = record.IsBot || string.IsNullOrEmpty(uid);
+                report.Players.Add(new KnockRush.Backend.MatchReportPlayer
+                {
+                    Uid = isBot ? null : uid,
+                    IsBot = isBot,
+                    Placement = i + 1,
+                    RoundsCleared = Mathf.Min(5, record.RoundsCleared + (record.Status == RecordStatus.Qualified ? 1 : 0)),
+                    Won = slot == WinnerSlot
+                });
+            }
+
+            _ = KnockRush.Backend.MatchReportClient.ReportAsync(report);
         }
 
         // -------------------------------------------------------------------------------------
