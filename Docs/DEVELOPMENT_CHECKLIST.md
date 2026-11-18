@@ -96,11 +96,13 @@ Rule: a phase is **complete** only when every item is `[x]` and its milestone te
 - [x] Tests: functions unit 7/7, emulator integration 12/12, Unity client vs emulator, PlayMode 38/38
 - [ ] Firebase project + deploy (yours) · Google/Apple sign-in plugins (Phase 10) · App Check
 
-## PHASE 8: UI, customisation, shop and monetisation  ← **NEXT**
-- [ ] UI framework (screen stack, safe area), all 22 screens
-- [ ] Customisation: 20 costumes, 15 colourways, 10 emotes; equip flow
-- [ ] Economy: coins/gems, shop, daily rewards, missions, achievements, season pass
-- [ ] Unity IAP + server receipt validation; rewarded ads with SSV
+## PHASE 8: UI, customisation, shop and monetisation  ← **NEARLY DONE** (see PHASE_8_UI_MONETIZATION.md)
+- [x] UI framework (UI Toolkit app shell, screen stack, safe area, theme + OFL fonts), all 22 screens
+- [x] Customisation: 20 costumes, 15 colourways, 10 emotes; locker with live 3D preview; equip flow (local + backend)
+- [x] Economy UI: coins/gems, daily shop + bundles, daily reward, missions, season pass (free + premium)
+- [x] Unity IAP gem packs with server receipt validation (Google Play; Apple in Phase 10)
+- [ ] Rewarded ads: abstraction + server-side SSV done; Google Mobile Ads SDK + ad unit ids still needed
+- [ ] Achievements screen (backend stores achievements; no UI yet)
 
 ## PHASE 9: Audio, visual effects and optimisation
 - [ ] Audio mixer, music, SFX set; settings integration
