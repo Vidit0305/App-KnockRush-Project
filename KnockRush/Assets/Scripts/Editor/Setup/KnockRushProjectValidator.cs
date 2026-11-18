@@ -84,6 +84,7 @@ namespace KnockRush.EditorTools.Setup
             CheckBuildScenes(results);
             CheckPlayerSettings(results);
             CheckVersionControlSettings(results);
+            CheckLayers(results);
 
             return results;
         }
@@ -237,6 +238,16 @@ namespace KnockRush.EditorTools.Setup
             results.Add(PlayerSettings.colorSpace == ColorSpace.Linear
                 ? new Result(Severity.Pass, "Colour space: Linear.")
                 : new Result(Severity.Fail, "Colour space must be Linear."));
+        }
+
+        private static void CheckLayers(List<Result> results)
+        {
+            var ok = LayerMask.LayerToName(KnockRush.Core.GameLayers.Player) == KnockRush.Core.GameLayers.PlayerName &&
+                     LayerMask.LayerToName(KnockRush.Core.GameLayers.Obstacle) == KnockRush.Core.GameLayers.ObstacleName &&
+                     LayerMask.LayerToName(KnockRush.Core.GameLayers.Trigger) == KnockRush.Core.GameLayers.TriggerName;
+            results.Add(ok
+                ? new Result(Severity.Pass, "Physics layers: Player (6), Obstacle (7), Trigger (8).")
+                : new Result(Severity.Fail, "Physics layers missing. Run KnockRush > Setup (EnsureLayers)."));
         }
 
         private static void CheckVersionControlSettings(List<Result> results)

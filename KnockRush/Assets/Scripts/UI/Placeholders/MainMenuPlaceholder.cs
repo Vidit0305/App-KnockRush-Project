@@ -62,7 +62,7 @@ namespace KnockRush.UI.Placeholders
             var scale = Screen.height / 720f;
             GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(scale, scale, 1f));
             var width = Screen.width / scale;
-            var panel = new Rect((width - 520f) * 0.5f, 150f, 520f, 440f);
+            var panel = new Rect((width - 520f) * 0.5f, 110f, 520f, 560f);
 
             GUILayout.BeginArea(panel);
             GUILayout.Label("KNOCKRUSH", titleStyle);
@@ -83,9 +83,16 @@ namespace KnockRush.UI.Placeholders
             GUILayout.Space(8f);
 
             GUI.enabled = !sceneLoader.IsLoading;
+            if (GUILayout.Button("Movement Playground", buttonStyle, GUILayout.Height(56f)))
+            {
+                Load(SceneNames.Playground);
+            }
+
+            GUILayout.Space(8f);
+
             if (GUILayout.Button("Reload via Boot Scene", buttonStyle, GUILayout.Height(56f)))
             {
-                LoadBoot();
+                Load(SceneNames.Boot);
             }
 
             GUI.enabled = true;
@@ -94,11 +101,11 @@ namespace KnockRush.UI.Placeholders
             GUI.matrix = Matrix4x4.identity;
         }
 
-        private async void LoadBoot()
+        private async void Load(string sceneName)
         {
             try
             {
-                await sceneLoader.LoadSceneAsync(SceneNames.Boot);
+                await sceneLoader.LoadSceneAsync(sceneName);
             }
             catch (OperationCanceledException)
             {

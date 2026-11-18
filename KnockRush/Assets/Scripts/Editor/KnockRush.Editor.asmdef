@@ -4,7 +4,12 @@
     "references": [
         "KnockRush.Core",
         "KnockRush.Utilities",
-        "KnockRush.UI"
+        "KnockRush.UI",
+        "KnockRush.Movement",
+        "KnockRush.CameraRig",
+        "KnockRush.Player",
+        "Unity.InputSystem",
+        "UnityEngine.UI"
     ],
     "includePlatforms": [
         "Editor"

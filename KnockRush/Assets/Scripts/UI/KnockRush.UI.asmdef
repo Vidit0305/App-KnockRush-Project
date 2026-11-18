@@ -3,7 +3,11 @@
     "rootNamespace": "KnockRush.UI",
     "references": [
         "KnockRush.Core",
-        "KnockRush.Utilities"
+        "KnockRush.Utilities",
+        "KnockRush.Movement",
+        "KnockRush.Player",
+        "Unity.InputSystem",
+        "UnityEngine.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

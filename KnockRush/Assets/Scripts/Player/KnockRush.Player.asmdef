@@ -1,0 +1,20 @@
+{
+    "name": "KnockRush.Player",
+    "rootNamespace": "KnockRush.Player",
+    "references": [
+        "KnockRush.Core",
+        "KnockRush.Utilities",
+        "KnockRush.Movement",
+        "KnockRush.CameraRig",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

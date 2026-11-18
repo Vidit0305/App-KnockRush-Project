@@ -29,18 +29,23 @@ Rule: a phase is **complete** only when every item is `[x]` and its milestone te
 - [x] Android development APK builds: `KnockRush/Builds/Android/KnockRush-dev.apk` (50.8 MB, IL2CPP ARM64, 0 errors)
 - [ ] On-device smoke test (no device was connected during automation): `adb install -r KnockRush/Builds/Android/KnockRush-dev.apk`, check landscape, splash → MainMenu, overlay about 60 FPS
 
-## PHASE 2: Character modelling, rigging, movement and animations  ← **NEXT**
-- [ ] Movement settings ScriptableObject + deterministic kinematic motor (pure C#)
-- [ ] Ground detection, gravity, jump (coyote/buffer), air control, dive, stumble, knockback impulses
-- [ ] Mobile controls: virtual joystick, Jump/Dive/Grab buttons (Input System), keyboard/gamepad for editor
-- [ ] Cinemachine 3 third-person camera, touch-drag look, sensitivity from settings, collision
-- [ ] Placeholder bean character (capsule) → original Blender bean model with shared rig `KR_Bean_Rig`
-- [ ] 13 animations: idle, walk, run, jump, dive, fall, land, hit, stumble, grab, eliminated, celebrate, victory dance
-- [ ] Animator driven purely from sim state
-- [ ] Falling / respawn at checkpoint
-- [ ] Movement test scene ("Playground") + PlayMode tests for the motor
+## PHASE 2: Character modelling, rigging, movement and animations: ✅ COMPLETE (2026-11-18)
+- [x] Movement settings ScriptableObject + deterministic kinematic motor (pure C#, explicit PhysicsScene)
+- [x] Ground detection/snapping, slopes, gravity, variable jump, coyote time, jump buffer, air control, dive → slide → recover, stumble, knockback impulses, grab slow-down, moving-surface hooks
+- [x] Input: keyboard/mouse, gamepad, on-screen joystick + JUMP/DIVE/GRAB, touch-drag look (latched taps)
+- [x] Custom third-person orbit camera with collision, sensitivity and invert-Y from settings
+- [x] Original Bean character generated in Blender 4.5 LTS from `ArtSource/Characters/build_bean.py`, shared rig `BeanRig`
+- [x] 13 animations: idle, walk, run, jump, fall, land, dive, hit, stumble, grab, eliminated, celebrate, victory dance
+- [x] `KnockRush/Toon` URP shader (vertex-colour tint mask for player colours)
+- [x] Animator driven purely from motor state (+ one-shot events)
+- [x] Falling / respawn at kill height
+- [x] Playground test scene + main-menu entry; mobile controls prefab
+- [x] Physics layers Player/Obstacle/Trigger + validator check
+- [x] Tests: EditMode 19/19, PlayMode 12/12 (9 motor simulation tests)
+- [x] Batch scene capture tool for visual verification (`Tools/unity.sh capture`)
+- [x] Android development APK builds
 
-## PHASE 3: Physics, obstacles and first playable map
+## PHASE 3: Physics, obstacles and first playable map  ← **NEXT**
 - [ ] Interaction layer: impulses, kill volumes, checkpoints, surfaces (slippery/bouncy/conveyor)
 - [ ] Time-driven obstacle framework (category A) + event-driven (category B)
 - [ ] Obstacles: rotating hammer, spinner bar, pendulum, moving platform, bounce pad, falling tile, disappearing bridge

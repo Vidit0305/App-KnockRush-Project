@@ -8,5 +8,8 @@ namespace KnockRush.Core.SceneManagement
     {
         public const string Boot = "Boot";
         public const string MainMenu = "MainMenu";
+
+        /// <summary>Development movement test scene (Assets/Scenes/Dev/Playground.unity).</summary>
+        public const string Playground = "Playground";
     }
 }

@@ -1,0 +1,17 @@
+{
+    "name": "KnockRush.CameraRig",
+    "rootNamespace": "KnockRush.CameraRig",
+    "references": [
+        "KnockRush.Core",
+        "KnockRush.Utilities"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

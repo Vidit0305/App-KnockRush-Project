@@ -182,6 +182,39 @@ namespace KnockRush.EditorTools.Setup
         // 3. Player / Editor settings
         // ------------------------------------------------------------------
         [MenuItem(Menu + "3. Apply Recommended Player Settings", priority = 3)]
+        // ------------------------------------------------------------------
+        // Physics layers (see KnockRush.Core.GameLayers)
+        // ------------------------------------------------------------------
+        public static void EnsureLayers()
+        {
+            var tagManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
+            var layers = tagManager.FindProperty("layers");
+
+            void SetLayer(int index, string name)
+            {
+                var property = layers.GetArrayElementAtIndex(index);
+                if (property.stringValue == name)
+                {
+                    return;
+                }
+
+                if (!string.IsNullOrEmpty(property.stringValue))
+                {
+                    Debug.LogWarning($"[KnockRush Setup] Layer {index} was '{property.stringValue}', renaming to '{name}'.");
+                }
+
+                property.stringValue = name;
+            }
+
+            SetLayer(KnockRush.Core.GameLayers.Player, KnockRush.Core.GameLayers.PlayerName);
+            SetLayer(KnockRush.Core.GameLayers.Obstacle, KnockRush.Core.GameLayers.ObstacleName);
+            SetLayer(KnockRush.Core.GameLayers.Trigger, KnockRush.Core.GameLayers.TriggerName);
+            tagManager.ApplyModifiedPropertiesWithoutUndo();
+
+            // Characters are kinematic and resolve their own collisions; they must not push each other via PhysX.
+            Physics.IgnoreLayerCollision(KnockRush.Core.GameLayers.Player, KnockRush.Core.GameLayers.Player, true);
+        }
+
         /// <summary>True for empty identifiers and the defaults Unity / project templates generate.</summary>
         public static bool IsPlaceholderIdentifier(string identifier)
         {
@@ -382,6 +415,7 @@ namespace KnockRush.EditorTools.Setup
         public static void RunSteps2To4()
         {
             CreateFolderStructure();
+            EnsureLayers();
             ApplyPlayerSettings();
             CreateConfigAndScenes();
             KnockRushProjectValidator.ValidateFromMenu();
@@ -398,6 +432,7 @@ namespace KnockRush.EditorTools.Setup
             try
             {
                 CreateFolderStructure();
+                EnsureLayers();
                 ApplyPlayerSettings();
                 CreateConfigAndScenes();
                 AssetDatabase.SaveAssets();

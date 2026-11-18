@@ -5,7 +5,8 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "KnockRush.Core",
-        "KnockRush.Utilities"
+        "KnockRush.Utilities",
+        "KnockRush.Movement"
     ],
     "includePlatforms": [
         "Editor"

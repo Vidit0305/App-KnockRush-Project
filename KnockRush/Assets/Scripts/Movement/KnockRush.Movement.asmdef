@@ -1,0 +1,16 @@
+{
+    "name": "KnockRush.Movement",
+    "rootNamespace": "KnockRush.Movement",
+    "references": [
+        "KnockRush.Utilities"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
