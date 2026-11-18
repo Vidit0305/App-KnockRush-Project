@@ -6,6 +6,10 @@
 # Usage: Tools/backend-test.sh [--skip-unity]
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# The Functions emulator gives user code 10 s to load by default; a busy machine (Unity
+# importing, builds running) can exceed that and every integration test then fails.
+export FUNCTIONS_DISCOVERY_TIMEOUT="${FUNCTIONS_DISCOVERY_TIMEOUT:-60}"
 cd "$ROOT/Backend/firebase/functions"
 
 # Windows: firebase emulators:exec can leave the Firestore emulator's Java process running,
