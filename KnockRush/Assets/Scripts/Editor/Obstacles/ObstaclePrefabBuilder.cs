@@ -53,6 +53,10 @@ namespace KnockRush.EditorTools.Obstacles
             RotatingDisc();
             WindmillHammer();
             Hurdle();
+            RollingBall();
+            CollapseTile();
+            HangingHammer();
+            ArenaSweeper();
             AssetDatabase.SaveAssets();
             Debug.Log("[KnockRush Build] Obstacle prefabs built.");
         }
@@ -195,6 +199,55 @@ namespace KnockRush.EditorTools.Obstacles
             var root = new GameObject("Hurdle");
             Part(root.transform, PrimitiveType.Cube, "Bar", new Vector3(0f, 0.3f, 0f), new Vector3(4f, 0.6f, 0.4f), Quaternion.identity, hazard, GameLayers.Default);
             Part(root.transform, PrimitiveType.Cube, "Stripe", new Vector3(0f, 0.45f, 0f), new Vector3(4.02f, 0.12f, 0.42f), Quaternion.identity, tile, GameLayers.Default, keepCollider: false);
+            Save(root);
+        }
+
+        /// <summary>3 m ball that rolls down a slope on a loop (set travel per placement).</summary>
+        private static void RollingBall()
+        {
+            var root = new GameObject("RollingBall");
+            Kinematic(root);
+            root.layer = GameLayers.Obstacle;
+            root.AddComponent<LoopingMover>().Configure(new Vector3(0f, -6f, -30f), 5f, 38f);
+            Part(root.transform, PrimitiveType.Sphere, "Ball", Vector3.zero, Vector3.one * 3f, Quaternion.identity, bumper, GameLayers.Obstacle);
+            Part(root.transform, PrimitiveType.Cube, "Stripe", Vector3.zero, new Vector3(3.05f, 0.5f, 0.5f), Quaternion.identity, tile, GameLayers.Obstacle, keepCollider: false);
+            Hitbox(root.transform, Vector3.zero, new Vector3(3.6f, 3.6f, 3.6f), ImpulseMode.ObstacleVelocity, 9f, 5f, Vector3.up);
+            Save(root);
+        }
+
+        /// <summary>2.6 m tile that collapses at a scheduled round time (Last Platform).</summary>
+        private static void CollapseTile()
+        {
+            var root = new GameObject("CollapseTile");
+            root.AddComponent<TimedCollapse>().Configure(30f, 2.5f);
+            Part(root.transform, PrimitiveType.Cube, "Deck", new Vector3(0f, -0.25f, 0f), new Vector3(2.55f, 0.5f, 2.55f), Quaternion.identity, hazard, GameLayers.Default);
+            Part(root.transform, PrimitiveType.Cube, "Top", new Vector3(0f, 0.005f, 0f), new Vector3(2.35f, 0.02f, 2.35f), Quaternion.identity, tile, GameLayers.Default, keepCollider: false);
+            Save(root);
+        }
+
+        /// <summary>Pendulum hammer hanging from a floating pivot (no posts), for arenas.</summary>
+        private static void HangingHammer()
+        {
+            var root = new GameObject("HangingHammer");
+            Part(root.transform, PrimitiveType.Sphere, "Pivot", new Vector3(0f, 6.8f, 0f), Vector3.one * 0.9f, Quaternion.identity, metal, GameLayers.Default, keepCollider: false);
+            var arm = Pivot(root.transform, "Arm", new Vector3(0f, 6.8f, 0f));
+            arm.gameObject.AddComponent<PendulumObstacle>().Configure(Vector3.forward, 75f, 2.6f);
+            Part(arm, PrimitiveType.Cylinder, "Handle", new Vector3(0f, -2.75f, 0f), new Vector3(0.35f, 2.75f, 0.35f), Quaternion.identity, wood, GameLayers.Obstacle);
+            Part(arm, PrimitiveType.Cylinder, "Head", new Vector3(0f, -5.6f, 0f), new Vector3(1.7f, 1.5f, 1.7f), Quaternion.Euler(0f, 0f, 90f), hammerHead, GameLayers.Obstacle);
+            Hitbox(arm, new Vector3(0f, -5.6f, 0f), new Vector3(3.5f, 2.2f, 2.2f), ImpulseMode.ObstacleVelocity, 11f, 5f, Vector3.up);
+            Save(root);
+        }
+
+        /// <summary>30 m ground sweeper for circular arenas (Spin Attack, Last Platform).</summary>
+        private static void ArenaSweeper()
+        {
+            var root = new GameObject("ArenaSweeper");
+            Kinematic(root);
+            root.layer = GameLayers.Obstacle;
+            root.AddComponent<RotatingObstacle>().Configure(Vector3.up, 70f);
+            Part(root.transform, PrimitiveType.Cylinder, "Hub", new Vector3(0f, 0.7f, 0f), new Vector3(2f, 0.7f, 2f), Quaternion.identity, hazard, GameLayers.Obstacle);
+            Part(root.transform, PrimitiveType.Cube, "Bar", new Vector3(0f, 0.55f, 0f), new Vector3(30f, 0.55f, 0.6f), Quaternion.identity, hammerHead, GameLayers.Obstacle);
+            Hitbox(root.transform, new Vector3(0f, 0.7f, 0f), new Vector3(30.4f, 1.1f, 1.4f), ImpulseMode.ObstacleVelocity, 8f, 6f, Vector3.up);
             Save(root);
         }
 
