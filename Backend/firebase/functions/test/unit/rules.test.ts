@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  computeReward, levelForXp, xpForLevel, validateUsername, nextDailyClaim, newAchievements, validateMatchReport,
+  computeReward, levelForXp, xpForLevel, validateUsername, nextDailyClaim, newAchievements, validateMatchReport, ACHIEVEMENTS,
 } from "../../src/rules.js";
 
 test("champion earns most, participation always earns XP", () => {
@@ -56,6 +56,15 @@ test("achievements unlock once", () => {
   const unlocked = newAchievements({ matches: 0, wins: 0, roundsCleared: 0 }, { matches: 1, wins: 1, roundsCleared: 2 }, []);
   assert.deepEqual(unlocked.sort(), ["first_match", "first_round", "first_win"]);
   assert.deepEqual(newAchievements({ matches: 1, wins: 1, roundsCleared: 2 }, { matches: 2, wins: 1, roundsCleared: 3 }, unlocked), []);
+  // Crossing several thresholds in one match unlocks each of them exactly once.
+  const big = newAchievements({ matches: 9, wins: 4, roundsCleared: 9 }, { matches: 10, wins: 5, roundsCleared: 10 }, ["first_match", "first_round", "first_win"]);
+  assert.deepEqual(big.sort(), ["matches_10", "rounds_10", "wins_5"]);
+});
+
+test("achievement ids are unique and targets positive", () => {
+  const ids = ACHIEVEMENTS.map(a => a.id);
+  assert.equal(new Set(ids).size, ids.length);
+  assert.ok(ACHIEVEMENTS.every(a => a.target > 0 && a.title.length > 0 && a.description.length > 0));
 });
 
 test("match report validation rejects tampering", () => {

@@ -98,29 +98,43 @@ export function nextDailyClaim(lastClaimDay: number | undefined, streak: number 
   return { claimable: true, newStreak, reward };
 }
 
-export interface Achievement {
-  id: string;
-  title: string;
-}
-
-export const ACHIEVEMENTS: ReadonlyArray<Achievement & { test: (s: PlayerStats) => boolean }> = [
-  { id: "first_match", title: "Into the Rush", test: s => s.matches >= 1 },
-  { id: "first_round", title: "Survivor", test: s => s.roundsCleared >= 1 },
-  { id: "first_win", title: "Crowned", test: s => s.wins >= 1 },
-  { id: "matches_25", title: "Regular", test: s => s.matches >= 25 },
-  { id: "rounds_50", title: "Seasoned", test: s => s.roundsCleared >= 50 },
-  { id: "wins_10", title: "Royalty", test: s => s.wins >= 10 },
-];
-
 export interface PlayerStats {
   matches: number;
   wins: number;
   roundsCleared: number;
 }
 
+/** Data-driven achievement: unlocked when a lifetime stat reaches its target (lets the UI show progress). */
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  stat: keyof PlayerStats;
+  target: number;
+}
+
+export const ACHIEVEMENTS: ReadonlyArray<Achievement> = [
+  { id: "first_match", title: "Into the Rush", description: "Play your first match", stat: "matches", target: 1 },
+  { id: "matches_10", title: "Warming Up", description: "Play 10 matches", stat: "matches", target: 10 },
+  { id: "matches_25", title: "Regular", description: "Play 25 matches", stat: "matches", target: 25 },
+  { id: "matches_100", title: "Rush Veteran", description: "Play 100 matches", stat: "matches", target: 100 },
+  { id: "first_round", title: "Survivor", description: "Qualify from a round", stat: "roundsCleared", target: 1 },
+  { id: "rounds_10", title: "Steady Feet", description: "Qualify from 10 rounds", stat: "roundsCleared", target: 10 },
+  { id: "rounds_50", title: "Seasoned", description: "Qualify from 50 rounds", stat: "roundsCleared", target: 50 },
+  { id: "rounds_250", title: "Unstoppable", description: "Qualify from 250 rounds", stat: "roundsCleared", target: 250 },
+  { id: "first_win", title: "Crowned", description: "Win a match", stat: "wins", target: 1 },
+  { id: "wins_5", title: "Crown Collector", description: "Win 5 matches", stat: "wins", target: 5 },
+  { id: "wins_10", title: "Royalty", description: "Win 10 matches", stat: "wins", target: 10 },
+  { id: "wins_50", title: "Legend of the Rush", description: "Win 50 matches", stat: "wins", target: 50 },
+];
+
+export function achievementReached(achievement: Achievement, stats: PlayerStats): boolean {
+  return (stats[achievement.stat] ?? 0) >= achievement.target;
+}
+
 export function newAchievements(before: PlayerStats, after: PlayerStats, owned: ReadonlyArray<string>): string[] {
   return ACHIEVEMENTS
-    .filter(a => !owned.includes(a.id) && !a.test(before) && a.test(after))
+    .filter(a => !owned.includes(a.id) && !achievementReached(a, before) && achievementReached(a, after))
     .map(a => a.id);
 }
 
