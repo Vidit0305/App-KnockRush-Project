@@ -77,14 +77,17 @@ Rule: a phase is **complete** only when every item is `[x]` and its milestone te
 - [x] Tests: EditMode 25/25, PlayMode 28/28 (full Quick Race match with 23 bots on a Fusion runner)
 - [ ] Online matchmaking test across devices (needs Photon App ID)
 
-## PHASE 6: Eight maps and three game modes  ← **NEXT**
-- [ ] Hammer Rush, Slime Mountain, Sky High (race)
-- [ ] Spin Attack, Falling Tiles, Pendulum Panic (survival)
-- [ ] Crown Climber, Last Platform (final)
-- [ ] Classic Knockout, Quick Race, Private Party
-- [ ] Bot paths for every map; Addressables groups for maps
+## PHASE 6: Eight maps and three game modes: ✅ COMPLETE (2026-11-18)
+- [x] Hammer Rush, Slime Mountain, Sky High (race)
+- [x] Spin Attack, Falling Tiles, Pendulum Panic (survival)
+- [x] Crown Climber, Last Platform (final)
+- [x] Classic Knockout, Quick Race, Private Party
+- [x] New obstacles: LoopingMover, TimedCollapse; prefabs RollingBall, CollapseTile, HangingHammer, ArenaSweeper
+- [x] Map integrity tests ×8; full Classic Knockout across 4 maps verified; PlayMode 37/37
+- [ ] Addressables delivery of maps (moved to Phase 9)
+- [ ] Hand-authored bot routes (Phase 9 polish)
 
-## PHASE 7: Firebase backend and player progression
+## PHASE 7: Firebase backend and player progression  ← **NEXT**
 - [ ] Firebase projects (dev/staging/prod), Unity SDK, Auth (guest, Google, Apple, linking)
 - [ ] Firestore data model + security rules + emulator tests
 - [ ] Cloud Functions: results reporting, XP/levels, match history, stats, leaderboards, friends
