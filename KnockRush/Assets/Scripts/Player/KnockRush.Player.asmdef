@@ -6,7 +6,8 @@
         "KnockRush.Utilities",
         "KnockRush.Movement",
         "KnockRush.CameraRig",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "KnockRush.Interaction"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

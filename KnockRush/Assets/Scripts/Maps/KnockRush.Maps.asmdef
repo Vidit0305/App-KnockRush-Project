@@ -1,0 +1,20 @@
+{
+    "name": "KnockRush.Maps",
+    "rootNamespace": "KnockRush.Maps",
+    "references": [
+        "KnockRush.Obstacles",
+        "KnockRush.Interaction",
+        "KnockRush.Movement",
+        "KnockRush.Core",
+        "KnockRush.Utilities"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

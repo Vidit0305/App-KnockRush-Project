@@ -9,7 +9,10 @@
         "KnockRush.CameraRig",
         "KnockRush.Player",
         "Unity.InputSystem",
-        "UnityEngine.UI"
+        "UnityEngine.UI",
+        "KnockRush.Interaction",
+        "KnockRush.Obstacles",
+        "KnockRush.Maps"
     ],
     "includePlatforms": [
         "Editor"

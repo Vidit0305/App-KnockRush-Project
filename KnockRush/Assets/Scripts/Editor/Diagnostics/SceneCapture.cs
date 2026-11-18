@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using KnockRush.Maps;
 using KnockRush.Player;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -67,8 +68,17 @@ namespace KnockRush.EditorTools.Diagnostics
             }
 
             var bounds = ComputeLevelBounds();
-            var wideFrom = bounds.center + new Vector3(-bounds.extents.x * 0.9f, bounds.extents.magnitude * 0.55f, -bounds.extents.z * 1.1f);
+            var size = Mathf.Max(bounds.size.x, bounds.size.z);
+            var wideFrom = bounds.center + new Vector3(-size * 0.45f, size * 0.38f, -size * 0.05f);
             Render(camera, wideFrom, bounds.center, Path.Combine(outputFolder, $"{sceneName}_overview.png"));
+
+            // One shot per checkpoint, looking down the course (validates every section).
+            foreach (var checkpoint in Object.FindObjectsByType<Checkpoint>(FindObjectsSortMode.None).OrderBy(c => c.Order))
+            {
+                var position = checkpoint.transform.position;
+                Render(camera, position + new Vector3(0f, 4.5f, -6f), position + new Vector3(0f, 0f, 12f),
+                    Path.Combine(outputFolder, $"{sceneName}_checkpoint{checkpoint.Order}.png"));
+            }
         }
 
         private static void PosePlayer(PlayerCharacter player, string clipName)
@@ -84,16 +94,17 @@ namespace KnockRush.EditorTools.Diagnostics
 
         private static Bounds ComputeLevelBounds()
         {
-            var renderers = Object.FindObjectsByType<MeshRenderer>(FindObjectsSortMode.None);
-            if (renderers.Length == 0)
+            // Gameplay geometry only (solid colliders): ignores sky decor, clouds and the sea.
+            var colliders = Object.FindObjectsByType<Collider>(FindObjectsSortMode.None).Where(c => !c.isTrigger).ToArray();
+            if (colliders.Length == 0)
             {
                 return new Bounds(Vector3.zero, Vector3.one * 20f);
             }
 
-            var bounds = renderers[0].bounds;
-            foreach (var renderer in renderers)
+            var bounds = colliders[0].bounds;
+            foreach (var collider in colliders)
             {
-                bounds.Encapsulate(renderer.bounds);
+                bounds.Encapsulate(collider.bounds);
             }
 
             return bounds;

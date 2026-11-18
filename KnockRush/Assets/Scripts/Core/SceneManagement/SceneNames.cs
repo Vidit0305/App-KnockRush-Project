@@ -11,5 +11,8 @@ namespace KnockRush.Core.SceneManagement
 
         /// <summary>Development movement test scene (Assets/Scenes/Dev/Playground.unity).</summary>
         public const string Playground = "Playground";
+
+        /// <summary>First playable map (Assets/Scenes/Maps/HammerRush.unity).</summary>
+        public const string HammerRush = "HammerRush";
     }
 }

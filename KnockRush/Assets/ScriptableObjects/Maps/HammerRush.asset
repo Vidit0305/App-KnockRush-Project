@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b56268b9e70188d48afcaa0252839d1e, type: 3}
+  m_Name: HammerRush
+  m_EditorClassIdentifier: KnockRush.Maps::KnockRush.Maps.MapDefinition
+  mapId: hammer_rush
+  displayName: Hammer Rush
+  description: Dodge giant swinging hammers, leap the sweepers and ride the moving
+    platforms to the finish.
+  category: 0
+  fallRule: 0
+  sceneName: HammerRush
+  difficulty: 2
+  minPlayers: 2
+  maxPlayers: 32
+  timeLimit: 180
+  themeColor: {r: 1, g: 0.69803923, b: 0.24705882, a: 1}

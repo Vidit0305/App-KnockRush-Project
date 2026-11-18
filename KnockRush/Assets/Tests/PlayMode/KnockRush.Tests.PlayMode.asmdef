@@ -6,7 +6,11 @@
         "UnityEditor.TestRunner",
         "KnockRush.Core",
         "KnockRush.Utilities",
-        "KnockRush.Movement"
+        "KnockRush.Movement",
+        "KnockRush.Interaction",
+        "KnockRush.Obstacles",
+        "KnockRush.Maps",
+        "KnockRush.Player"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

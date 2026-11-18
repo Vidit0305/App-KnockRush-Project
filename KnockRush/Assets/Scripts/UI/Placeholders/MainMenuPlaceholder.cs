@@ -62,7 +62,7 @@ namespace KnockRush.UI.Placeholders
             var scale = Screen.height / 720f;
             GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(scale, scale, 1f));
             var width = Screen.width / scale;
-            var panel = new Rect((width - 520f) * 0.5f, 110f, 520f, 560f);
+            var panel = new Rect((width - 520f) * 0.5f, 80f, 520f, 620f);
 
             GUILayout.BeginArea(panel);
             GUILayout.Label("KNOCKRUSH", titleStyle);
@@ -83,6 +83,13 @@ namespace KnockRush.UI.Placeholders
             GUILayout.Space(8f);
 
             GUI.enabled = !sceneLoader.IsLoading;
+            if (GUILayout.Button("Play Hammer Rush (offline)", buttonStyle, GUILayout.Height(56f)))
+            {
+                Load(SceneNames.HammerRush);
+            }
+
+            GUILayout.Space(8f);
+
             if (GUILayout.Button("Movement Playground", buttonStyle, GUILayout.Height(56f)))
             {
                 Load(SceneNames.Playground);

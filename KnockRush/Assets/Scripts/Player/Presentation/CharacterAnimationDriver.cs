@@ -66,6 +66,7 @@ namespace KnockRush.Player.Presentation
             if (character != null)
             {
                 character.MotorEventsRaised += OnMotorEvents;
+                character.Finished += OnFinished;
             }
         }
 
@@ -74,6 +75,7 @@ namespace KnockRush.Player.Presentation
             if (character != null)
             {
                 character.MotorEventsRaised -= OnMotorEvents;
+                character.Finished -= OnFinished;
             }
         }
 
@@ -101,7 +103,7 @@ namespace KnockRush.Player.Presentation
             var speed01 = Mathf.Clamp01(state.HorizontalVelocity.magnitude / maxSpeed);
             animator.SetFloat(SpeedParameter, speed01, 0.08f, Time.deltaTime);
 
-            if (speed01 > 0.15f || state.Mode != MotorMode.Grounded)
+            if (!character.HasFinished && (speed01 > 0.15f || state.Mode != MotorMode.Grounded))
             {
                 emote = CharacterEmote.None;
             }
@@ -150,6 +152,11 @@ namespace KnockRush.Player.Presentation
                             return Locomotion;
                     }
             }
+        }
+
+        private void OnFinished()
+        {
+            emote = CharacterEmote.Celebrate;
         }
 
         private void OnMotorEvents(MotorEvents events)

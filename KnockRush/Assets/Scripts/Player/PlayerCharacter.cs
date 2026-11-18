@@ -1,6 +1,7 @@
 using System;
 using KnockRush.CameraRig;
 using KnockRush.Core.Events;
+using KnockRush.Interaction;
 using KnockRush.Movement;
 using KnockRush.Player.Controls;
 using UnityEngine;
@@ -17,7 +18,7 @@ namespace KnockRush.Player
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(CapsuleCollider))]
-    public sealed class PlayerCharacter : MonoBehaviour
+    public sealed class PlayerCharacter : MonoBehaviour, ICourseParticipant
     {
         [SerializeField] private MovementSettings settings;
 
@@ -40,9 +41,33 @@ namespace KnockRush.Player
         private Vector3 spawnPosition;
         private float spawnYaw;
         private Func<MotorInput> externalInput;
+        private int checkpointOrder = -1;
+        private bool hasFinished;
+        private bool inputLocked;
 
         /// <summary>Raised after every simulation tick that produced events.</summary>
         public event Action<MotorEvents> MotorEventsRaised;
+
+        /// <summary>Raised once when the character crosses the finish line.</summary>
+        public event Action Finished;
+
+        public Vector3 Position => state.Position;
+
+        public int CheckpointOrder
+        {
+            get => checkpointOrder;
+            set => checkpointOrder = value;
+        }
+
+        public bool HasFinished => hasFinished;
+
+        public bool InputLocked
+        {
+            get => inputLocked;
+            set => inputLocked = value;
+        }
+
+        public int ParticipantId => GetInstanceID();
 
         public MotorState State => state;
 
@@ -62,6 +87,23 @@ namespace KnockRush.Player
             externalInput = source;
         }
 
+        public void SetRespawnPoint(Vector3 position, float yaw)
+        {
+            SetSpawnPoint(position, yaw);
+        }
+
+        public void MarkFinished()
+        {
+            if (hasFinished)
+            {
+                return;
+            }
+
+            hasFinished = true;
+            inputLocked = true;
+            Finished?.Invoke();
+        }
+
         public void SetSpawnPoint(Vector3 position, float yaw)
         {
             spawnPosition = position;
@@ -78,6 +120,21 @@ namespace KnockRush.Player
             }
 
             DispatchEvents();
+        }
+
+        /// <summary>Moves the character without changing its respawn point (debug tools, tests, server corrections).</summary>
+        public void Teleport(Vector3 position)
+        {
+            state.Position = position;
+            state.Velocity = Vector3.zero;
+            state.IsGrounded = false;
+            if (state.Mode == MotorMode.Grounded)
+            {
+                state.Mode = MotorMode.Airborne;
+            }
+
+            ApplyTransform(snapVisual: true);
+            Physics.SyncTransforms();
         }
 
         public void ApplyImpulse(Vector3 impulse)
@@ -135,6 +192,10 @@ namespace KnockRush.Player
             var input = externalInput != null
                 ? externalInput()
                 : inputReader != null ? inputReader.ConsumeInput() : MotorInput.None;
+            if (inputLocked)
+            {
+                input = MotorInput.None;
+            }
 
             CharacterMotor.Step(ref state, input, settings, Time.fixedDeltaTime, gameObject.scene.GetPhysicsScene(), shape);
 

@@ -1,5 +1,7 @@
 using System;
 using KnockRush.EditorTools.Characters;
+using KnockRush.EditorTools.Maps;
+using KnockRush.EditorTools.Obstacles;
 using KnockRush.EditorTools.Scenes;
 using KnockRush.EditorTools.Setup;
 using KnockRush.EditorTools.UI;
@@ -39,8 +41,13 @@ namespace KnockRush.EditorTools.Build
             var player = CharacterAssetBuilder.BuildPlayerPrefab(movement, controller);
             var controls = MobileControlsBuilder.Build();
             PlaygroundSceneBuilder.Build(player, controls, cameraSettings);
+
+            // Phase 3: obstacle library, race HUD, first playable map.
+            ObstaclePrefabBuilder.BuildAll();
+            HudBuilder.BuildRaceHud();
+            HammerRushBuilder.Build(cameraSettings);
             AssetDatabase.SaveAssets();
-            Debug.Log("[KnockRush Build] Phase 2 content build complete.");
+            Debug.Log("[KnockRush Build] Content build complete.");
         }
 
         public static void BuildBatch()

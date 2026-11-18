@@ -14,6 +14,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Dev/Playground.unity
     guid: f3a928f05a6514c40a419b5bfca8d2a4
+  - enabled: 1
+    path: Assets/Scenes/Maps/HammerRush.unity
+    guid: a1aeb7b18f764fb428cf5b8596f1f69a
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

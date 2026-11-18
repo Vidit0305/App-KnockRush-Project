@@ -45,14 +45,15 @@ Rule: a phase is **complete** only when every item is `[x]` and its milestone te
 - [x] Batch scene capture tool for visual verification (`Tools/unity.sh capture`)
 - [x] Android development APK builds
 
-## PHASE 3: Physics, obstacles and first playable map  ← **NEXT**
-- [ ] Interaction layer: impulses, kill volumes, checkpoints, surfaces (slippery/bouncy/conveyor)
-- [ ] Time-driven obstacle framework (category A) + event-driven (category B)
-- [ ] Obstacles: rotating hammer, spinner bar, pendulum, moving platform, bounce pad, falling tile, disappearing bridge
-- [ ] MapDefinition ScriptableObject, modular map kit
-- [ ] **Hammer Rush** first playable map (offline, single player) start → finish
+## PHASE 3: Physics, obstacles and first playable map: ✅ COMPLETE (2026-11-18)
+- [x] Interaction layer: knockback/course contracts, ImpulseZone (velocity/radial/directional), SurfaceModifier (slippery/sticky/conveyor)
+- [x] Time-driven obstacle framework (category A) + central ObstacleSimulation (network-ready) + FallingTile (category B)
+- [x] Obstacle library: swinging hammer, sweeper bar, moving platform, bumper, bounce pad, falling tile, cycling tile, rotating disc, windmill hammer, hurdle
+- [x] MapDefinition, MapController, checkpoints, finish line, kill volume, offline race session, race HUD
+- [x] **Hammer Rush** playable offline start → finish (5 sections, 5 checkpoints, 32 spawns, scenery)
+- [x] Tests: EditMode 19/19, PlayMode 24/24 (incl. real hammer knockback + finish qualification)
 
-## PHASE 4: Multiplayer networking and 32-player testing
+## PHASE 4: Multiplayer networking and 32-player testing  ← **NEXT**
 - [ ] Photon account, App ID (dev), Fusion 2.1.x imported & configured
 - [ ] Network runner lifecycle (Host for dev, Server mode for prod), player spawning
 - [ ] Motor running in FixedUpdateNetwork with prediction; obstacles tick-driven
