@@ -62,6 +62,18 @@ namespace KnockRush.Tests.PlayMode
             Assert.AreEqual(expectedQuota, match.Quota);
             Assert.AreEqual(match.PlayerCount(), Object.FindObjectsByType<NetworkCharacter>(FindObjectsSortMode.None).Length);
 
+            // Cosmetics: the local player's loadout and the bots' random outfits are replicated and applied.
+            yield return null;
+            foreach (var character in Object.FindObjectsByType<NetworkCharacter>(FindObjectsSortMode.None))
+            {
+                Assert.Greater(character.LoadoutColor, 0, "Every character should have a replicated colour.");
+                Assert.IsTrue(character.GetComponentInChildren<KnockRush.Inventory.CosmeticApplier>().HasApplied, "Loadout not applied.");
+            }
+
+            var localCharacter = Object.FindObjectsByType<NetworkCharacter>(FindObjectsSortMode.None).First(c => c.HasInputAuthority);
+            Assert.AreEqual(KnockRush.Inventory.LocalLoadoutStore.Current.Color,
+                localCharacter.GetComponentInChildren<KnockRush.Inventory.CosmeticApplier>().Current.Color);
+
             yield return WaitUntil(() => match.Phase == MatchPhase.Playing, "playing");
 
             // Send the local human across the finish line.

@@ -15,7 +15,8 @@
         "KnockRush.CameraRig",
         "Fusion.Unity",
         "KnockRush.GameModes",
-        "KnockRush.Backend"
+        "KnockRush.Backend",
+        "KnockRush.Inventory"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

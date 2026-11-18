@@ -12,7 +12,8 @@
         "KnockRush.CameraRig",
         "Unity.InputSystem",
         "Fusion.Unity",
-        "Photon.Realtime"
+        "Photon.Realtime",
+        "KnockRush.Inventory"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

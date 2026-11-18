@@ -262,13 +262,13 @@ Transform:
   - {fileID: 3095083982453936676}
   - {fileID: 362138529833482807}
   - {fileID: 8237313106386005564}
-  - {fileID: 1531871004476827924}
+  - {fileID: 966237001927061945}
   - {fileID: 1571281762803304639}
   - {fileID: 7807064950428570091}
-  - {fileID: 966237001927061945}
+  - {fileID: 3047765193187807585}
   - {fileID: 6080250348345159601}
   - {fileID: 3019301127172184334}
-  - {fileID: 8908518001123887341}
+  - {fileID: 6852104729912901958}
   m_Father: {fileID: 3897803013152579910}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &314825223642416055
@@ -651,6 +651,152 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &3082475704774878762
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3047765193187807585}
+  - component: {fileID: 3579253242847653493}
+  - component: {fileID: 2383551075411891977}
+  m_Layer: 8
+  m_Name: Hitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3047765193187807585
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3082475704774878762}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0.86602545, w: 0.49999997}
+  m_LocalPosition: {x: 3.377499, y: 1.9500005, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2770080966275551593}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &3579253242847653493
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3082475704774878762}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 2, z: 2.2}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2383551075411891977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3082475704774878762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8ac3eb2861a28e4a8e52db9e93daaff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: KnockRush.Interaction::KnockRush.Interaction.ImpulseZone
+  mode: 0
+  strength: 10
+  velocityScale: 0.6
+  upwardBoost: 5
+  localDirection: {x: 0, y: 1, z: 0}
+  minimumObstacleSpeed: 0.75
+  cooldown: 0.4
+--- !u!1 &4642692280130112697
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6852104729912901958}
+  - component: {fileID: 1667646425415090831}
+  - component: {fileID: 9088969691907038964}
+  m_Layer: 8
+  m_Name: Hitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6852104729912901958
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4642692280130112697}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0.8660254, w: -0.50000006}
+  m_LocalPosition: {x: -3.3774996, y: 1.95, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2770080966275551593}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1667646425415090831
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4642692280130112697}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 2, z: 2.2}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &9088969691907038964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4642692280130112697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8ac3eb2861a28e4a8e52db9e93daaff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: KnockRush.Interaction::KnockRush.Interaction.ImpulseZone
+  mode: 0
+  strength: 10
+  velocityScale: 0.6
+  upwardBoost: 5
+  localDirection: {x: 0, y: 1, z: 0}
+  minimumObstacleSpeed: 0.75
+  cooldown: 0.4
 --- !u!1 &4758072205890645881
 GameObject:
   m_ObjectHideFlags: 0
@@ -877,79 +1023,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &5458639715063466928
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1531871004476827924}
-  - component: {fileID: 4277333092205740056}
-  - component: {fileID: 9030647430942346250}
-  m_Layer: 8
-  m_Name: Hitbox
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1531871004476827924
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5458639715063466928}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -3.9, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2770080966275551593}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &4277333092205740056
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5458639715063466928}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2, y: 2, z: 2.2}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &9030647430942346250
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5458639715063466928}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8ac3eb2861a28e4a8e52db9e93daaff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: KnockRush.Interaction::KnockRush.Interaction.ImpulseZone
-  mode: 0
-  strength: 10
-  velocityScale: 0.6
-  upwardBoost: 5
-  localDirection: {x: 0, y: 1, z: 0}
-  minimumObstacleSpeed: 0.75
-  cooldown: 0.4
 --- !u!1 &6232788062226776790
 GameObject:
   m_ObjectHideFlags: 0
@@ -976,8 +1049,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6232788062226776790}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.86602545, w: 0.49999997}
-  m_LocalPosition: {x: 3.377499, y: 1.9500005, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -3.9, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1056,79 +1129,6 @@ Transform:
   - {fileID: 2770080966275551593}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &8518310528589564949
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8908518001123887341}
-  - component: {fileID: 8800611352047573904}
-  - component: {fileID: 6164909846712335467}
-  m_Layer: 8
-  m_Name: Hitbox
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8908518001123887341
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8518310528589564949}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.8660254, w: -0.50000006}
-  m_LocalPosition: {x: -3.3774996, y: 1.95, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2770080966275551593}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &8800611352047573904
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8518310528589564949}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2, y: 2, z: 2.2}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &6164909846712335467
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8518310528589564949}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8ac3eb2861a28e4a8e52db9e93daaff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: KnockRush.Interaction::KnockRush.Interaction.ImpulseZone
-  mode: 0
-  strength: 10
-  velocityScale: 0.6
-  upwardBoost: 5
-  localDirection: {x: 0, y: 1, z: 0}
-  minimumObstacleSpeed: 0.75
-  cooldown: 0.4
 --- !u!1 &8690343824034793777
 GameObject:
   m_ObjectHideFlags: 0

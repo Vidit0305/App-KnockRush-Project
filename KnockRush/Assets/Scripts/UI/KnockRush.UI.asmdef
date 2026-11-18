@@ -13,7 +13,9 @@
         "KnockRush.Multiplayer",
         "KnockRush.GameModes",
         "KnockRush.Matchmaking",
-        "Fusion.Unity"
+        "Fusion.Unity",
+        "KnockRush.Inventory",
+        "KnockRush.Backend"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

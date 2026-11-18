@@ -4,7 +4,10 @@
     "references": [
         "KnockRush.Core",
         "KnockRush.Utilities",
-        "KnockRush.Player"
+        "KnockRush.Player",
+        "KnockRush.Backend",
+        "KnockRush.Interaction",
+        "KnockRush.Movement"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

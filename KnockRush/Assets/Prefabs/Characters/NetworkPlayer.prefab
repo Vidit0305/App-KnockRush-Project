@@ -264,6 +264,11 @@ MonoBehaviour:
   _NetworkInputLocked:
     RawValue: 0
   _ColorIndex: 0
+  _LoadoutBody: 0
+  _LoadoutColor: 0
+  _LoadoutPattern: 0
+  _LoadoutHat: 0
+  _LoadoutEmote: 0
   _IsBot:
     RawValue: 0
 --- !u!1001 &5809058474715240418

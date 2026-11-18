@@ -45,8 +45,9 @@ tests() {
 import sys, xml.etree.ElementTree as ET
 root = ET.parse(sys.argv[1]).getroot()
 cases = list(root.iter('test-case'))
-failed = [c for c in cases if c.get('result') != 'Passed']
-print(f"[unity.sh] {len(cases) - len(failed)}/{len(cases)} passed")
+failed = [c for c in cases if c.get('result') not in ('Passed', 'Skipped')]
+skipped = [c for c in cases if c.get('result') == 'Skipped']
+print(f"[unity.sh] {len(cases) - len(failed) - len(skipped)}/{len(cases)} passed, {len(skipped)} skipped")
 for c in failed:
     msg = (c.findtext('failure/message') or '').strip().replace('\n', ' ')[:400]
     print(f"  FAIL {c.get('fullname')}: {msg}")

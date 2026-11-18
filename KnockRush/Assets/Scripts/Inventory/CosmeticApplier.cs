@@ -26,6 +26,21 @@ namespace KnockRush.Inventory
 
         public bool HasApplied { get; private set; }
 
+        /// <summary>Offline characters controlled on this device wear the player's own loadout.</summary>
+        private void Start()
+        {
+            if (HasApplied)
+            {
+                return;
+            }
+
+            var view = GetComponentInParent<KnockRush.Player.ICharacterView>();
+            if (view is KnockRush.Player.PlayerCharacter offline && offline.IsLocallyControlled)
+            {
+                Apply(LocalLoadoutStore.Current);
+            }
+        }
+
         public IReadOnlyList<GameObject> SpawnedAccessories => spawnedAccessories;
 
         public void Apply(Loadout loadout)

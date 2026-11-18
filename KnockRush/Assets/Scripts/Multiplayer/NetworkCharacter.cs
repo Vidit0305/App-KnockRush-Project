@@ -3,6 +3,7 @@ using Fusion;
 using KnockRush.CameraRig;
 using KnockRush.Core.Events;
 using KnockRush.Interaction;
+using KnockRush.Inventory;
 using KnockRush.Maps;
 using KnockRush.Movement;
 using KnockRush.Player;
@@ -31,6 +32,8 @@ namespace KnockRush.Multiplayer
         private CapsuleCollider shape;
         private MotorState presentationState;
         private bool finishedRaised;
+        private int appliedLoadoutHash;
+        private CosmeticApplier cosmetics;
 
         [Networked] public NetworkMotorState Motor { get; set; }
         [Networked] public NetworkButtons PreviousButtons { get; set; }
@@ -40,6 +43,13 @@ namespace KnockRush.Multiplayer
         [Networked] public NetworkBool NetworkFinished { get; set; }
         [Networked] public NetworkBool NetworkInputLocked { get; set; }
         [Networked] public byte ColorIndex { get; set; }
+
+        /// <summary>Equipped cosmetics as catalogue index + 1 (0 = not set yet).</summary>
+        [Networked] public short LoadoutBody { get; set; }
+        [Networked] public short LoadoutColor { get; set; }
+        [Networked] public short LoadoutPattern { get; set; }
+        [Networked] public short LoadoutHat { get; set; }
+        [Networked] public short LoadoutEmote { get; set; }
 
         /// <summary>Server-only flag marking bot-controlled characters (excluded from rewards and stats).</summary>
         [Networked] public NetworkBool IsBot { get; set; }
@@ -150,9 +160,20 @@ namespace KnockRush.Multiplayer
                 appearance.SetPaletteIndex(ColorIndex);
             }
 
+            cosmetics = GetComponentInChildren<CosmeticApplier>();
             if (HasInputAuthority)
             {
                 BindLocalControls();
+                var catalog = CosmeticCatalog.Load();
+                if (catalog != null)
+                {
+                    var indices = LoadoutIndices.From(LocalLoadoutStore.Current, catalog);
+                    RPC_SetLoadout(indices.Body, indices.Color, indices.Pattern, indices.Hat, indices.Emote);
+                }
+            }
+            else if (HasStateAuthority && IsBot)
+            {
+                AssignRandomBotLoadout();
             }
             else if (inputReader != null)
             {
@@ -218,8 +239,65 @@ namespace KnockRush.Multiplayer
             }
         }
 
+        /// <summary>Owner → server: equip cosmetics (visual only; validated against the catalogue).</summary>
+        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+        public void RPC_SetLoadout(short body, short color, short pattern, short hat, short emote)
+        {
+            var catalog = CosmeticCatalog.Load();
+            short Clamp(short index) => (short)(catalog != null && catalog.Get(index) != null ? index + 1 : 0);
+            LoadoutBody = Clamp(body);
+            LoadoutColor = Clamp(color);
+            LoadoutPattern = Clamp(pattern);
+            LoadoutHat = Clamp(hat);
+            LoadoutEmote = Clamp(emote);
+        }
+
+        private void AssignRandomBotLoadout()
+        {
+            var catalog = CosmeticCatalog.Load();
+            if (catalog == null)
+            {
+                return;
+            }
+
+            var random = new System.Random(Object.Id.Raw.GetHashCode());
+            short Pick(CosmeticSlot slot)
+            {
+                var options = new System.Collections.Generic.List<CosmeticDefinition>(catalog.InSlot(slot));
+                return options.Count == 0 ? (short)0 : (short)(catalog.IndexOf(options[random.Next(options.Count)].ItemId) + 1);
+            }
+
+            LoadoutBody = random.NextDouble() < 0.6 ? Pick(CosmeticSlot.Body) : (short)0;
+            LoadoutColor = Pick(CosmeticSlot.Color);
+            LoadoutPattern = random.NextDouble() < 0.3 ? Pick(CosmeticSlot.Pattern) : (short)0;
+            LoadoutHat = random.NextDouble() < 0.4 ? Pick(CosmeticSlot.Hat) : (short)0;
+            LoadoutEmote = Pick(CosmeticSlot.Emote);
+        }
+
+        private void ApplyReplicatedLoadout()
+        {
+            var hash = LoadoutBody | (LoadoutColor << 7) | (LoadoutPattern << 14) | (LoadoutHat << 19) | (LoadoutEmote << 25);
+            if (cosmetics == null || hash == 0 || hash == appliedLoadoutHash)
+            {
+                return;
+            }
+
+            appliedLoadoutHash = hash;
+            var catalog = CosmeticCatalog.Load();
+            var indices = new LoadoutIndices
+            {
+                Body = (short)(LoadoutBody - 1),
+                Color = (short)(LoadoutColor - 1),
+                Pattern = (short)(LoadoutPattern - 1),
+                Hat = (short)(LoadoutHat - 1),
+                Emote = (short)(LoadoutEmote - 1)
+            };
+            cosmetics.Apply(indices.ToLoadout(catalog));
+        }
+
         public override void Render()
         {
+            ApplyReplicatedLoadout();
             presentationState = CurrentState();
             if (NetworkFinished && !finishedRaised)
             {
