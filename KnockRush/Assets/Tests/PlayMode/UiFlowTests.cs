@@ -57,6 +57,14 @@ namespace KnockRush.Tests.PlayMode
             Assert.IsTrue(MenuBeanStage.Current.Shown.Equals(LocalLoadoutStore.Current), "Stage bean wears the equipped loadout.");
             Assert.IsTrue(MenuBeanStage.Current.GetComponentInChildren<CosmeticApplier>().HasApplied);
 
+            // Layout: screens fill the panel (regression: NaN safe-area insets collapsed everything into a corner).
+            var panelWidth = app.Root.layout.width;
+            var homeRect = app.Navigator.Top.Root.worldBound;
+            Assert.Greater(panelWidth, 0f);
+            Assert.IsFalse(float.IsNaN(homeRect.width), "Screen layout is NaN.");
+            Assert.Greater(homeRect.width, panelWidth * 0.9f, "Home should fill the screen width.");
+            Assert.Greater(homeRect.height, app.Root.layout.height * 0.9f, "Home should fill the screen height.");
+
             // Theme + fonts are applied: the root carries the stylesheet and display text uses Lilita One.
             Assert.IsTrue(app.Root.ClassListContains("kr-root"));
             var playButton = app.Navigator.Top.Root.Q<Button>(className: "kr-btn--play");

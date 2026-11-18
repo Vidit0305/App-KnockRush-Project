@@ -30,7 +30,7 @@ namespace KnockRush.UI.Screens
             card.Add(swatch);
             card.Add(Ui.Label(item.DisplayName, "kr-item__name"));
             var price = UiData.Price(item.ItemId);
-            var status = footer ?? (equipped ? "EQUIPPED" : owned ? "OWNED" : price != null ? $"{price.Price} {(price.Currency == "gems" ? "GEMS" : "COINS")}" : "SEASON");
+            var status = footer ?? (equipped ? "EQUIPPED" : owned ? "OWNED" : price != null ? $"{price.Price} {(price.Currency == "gems" ? "GEMS" : "COINS")}" : UiData.Online ? "SEASON" : "LOCKED");
             var label = Ui.Label(status, "kr-item__status", "kr-display");
             label.EnableInClassList("kr-item__status--equipped", equipped);
             card.Add(label);

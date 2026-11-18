@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 namespace KnockRush.Core.Diagnostics
 {
     /// <summary>
-    /// Small top-left overlay with FPS, frame time, build and scene info.
+    /// Small one-line overlay (bottom-left) with FPS, frame time, build and scene info.
     /// Added automatically by AppRoot in the Editor and Development builds only.
     /// Uses IMGUI on purpose: zero setup, no dependency on the real UI (Phase 8).
     /// </summary>
@@ -34,11 +34,16 @@ namespace KnockRush.Core.Diagnostics
 
         private void OnGUI()
         {
+            if (CommandLine.Has("-uicapture") || CommandLine.Has("-nodebugoverlay"))
+            {
+                return; // clean screenshots
+            }
+
             if (style == null)
             {
                 style = new GUIStyle(GUI.skin.label)
                 {
-                    fontSize = 14,
+                    fontSize = 10,
                     richText = true
                 };
                 style.normal.textColor = Color.white;
@@ -52,17 +57,17 @@ namespace KnockRush.Core.Diagnostics
             var environment = config != null ? config.Environment.ToString() : "?";
             var safeArea = Screen.safeArea;
 
+            // One compact line at the bottom-left, clear of the game HUD (top) and touch controls.
             var text =
-                $"<b>KnockRush</b> v{Application.version} ({environment})\n" +
-                $"<color={fpsColor}>{fps:0} FPS</color>  {smoothedDeltaTime * 1000f:0.0} ms\n" +
-                $"Scene: {SceneManager.GetActiveScene().name}\n" +
-                $"Screen: {Screen.width}x{Screen.height}  Safe: {safeArea.width:0}x{safeArea.height:0}\n" +
-                $"Unity {Application.unityVersion}";
+                $"<b>KnockRush</b> v{Application.version} ({environment})  ·  <color={fpsColor}>{fps:0} FPS</color> {smoothedDeltaTime * 1000f:0.0} ms  ·  " +
+                $"{SceneManager.GetActiveScene().name}  ·  {Screen.width}x{Screen.height} safe {safeArea.width:0}x{safeArea.height:0}";
 
-            GUI.color = new Color(0f, 0f, 0f, 0.55f);
-            GUI.DrawTexture(new Rect(8f, 8f, 300f, 96f), Texture2D.whiteTexture);
+            var width = Screen.width / scale;
+            var rect = new Rect(6f, ReferenceHeight - 20f, Mathf.Min(width - 12f, 560f), 16f);
+            GUI.color = new Color(0f, 0f, 0f, 0.45f);
+            GUI.DrawTexture(rect, Texture2D.whiteTexture);
             GUI.color = Color.white;
-            GUI.Label(new Rect(14f, 10f, 296f, 96f), text, style);
+            GUI.Label(new Rect(rect.x + 4f, rect.y, rect.width, rect.height), text, style);
 
             GUI.matrix = Matrix4x4.identity;
         }

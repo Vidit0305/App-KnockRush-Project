@@ -217,19 +217,24 @@ namespace KnockRush.UI.Framework
 
             appliedSafeArea = area;
             appliedScreenSize = screenSize;
-            var panelSize = Root.worldBound.size;
-            if (panelSize.x <= 0f || panelSize.y <= 0f)
+
+            // Convert through the panel's scaling (valid before the first layout pass, unlike worldBound).
+            var panel = Root.panel;
+            var topLeft = RuntimePanelUtils.ScreenToPanel(panel, new Vector2(area.xMin, screenSize.y - area.yMax));
+            var bottomRight = RuntimePanelUtils.ScreenToPanel(panel, new Vector2(area.xMax, screenSize.y - area.yMin));
+            var full = RuntimePanelUtils.ScreenToPanel(panel, new Vector2(screenSize.x, screenSize.y));
+            if (!IsFinite(topLeft) || !IsFinite(bottomRight) || !IsFinite(full))
             {
-                appliedSafeArea = default; // layout not ready yet; retry next frame
+                appliedSafeArea = default; // panel not scaled yet; retry next frame
                 return;
             }
 
-            var scaleX = panelSize.x / screenSize.x;
-            var scaleY = panelSize.y / screenSize.y;
-            safeArea.style.left = area.xMin * scaleX;
-            safeArea.style.right = (screenSize.x - area.xMax) * scaleX;
-            safeArea.style.top = (screenSize.y - area.yMax) * scaleY; // screen Y is bottom-up
-            safeArea.style.bottom = area.yMin * scaleY;
+            safeArea.style.left = Mathf.Max(0f, topLeft.x);
+            safeArea.style.top = Mathf.Max(0f, topLeft.y);
+            safeArea.style.right = Mathf.Max(0f, full.x - bottomRight.x);
+            safeArea.style.bottom = Mathf.Max(0f, full.y - bottomRight.y);
         }
+
+        private static bool IsFinite(Vector2 value) => !float.IsNaN(value.x) && !float.IsNaN(value.y) && !float.IsInfinity(value.x) && !float.IsInfinity(value.y);
     }
 }
