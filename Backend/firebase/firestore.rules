@@ -1,0 +1,88 @@
+rules_version = '2';
+
+// KnockRush Firestore security rules.
+// Principle: clients can READ what they need and WRITE almost nothing. Currency, XP, inventory,
+// match history, leaderboards and friendships are written only by Cloud Functions (Admin SDK,
+// which bypasses these rules). Anything not listed is denied.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function ownsItem(uid, itemId) {
+      return exists(/databases/$(database)/documents/users/$(uid)/inventory/$(itemId));
+    }
+
+    // Each equip slot must hold an item the player owns ("none" allowed for the hat).
+    function equipValid(uid, equipped) {
+      return equipped.keys().hasOnly(['body', 'color', 'hat', 'emote'])
+        && ownsItem(uid, equipped.body)
+        && ownsItem(uid, equipped.color)
+        && (equipped.hat == 'none' || ownsItem(uid, equipped.hat))
+        && ownsItem(uid, equipped.emote);
+    }
+
+    // Public profile: readable by signed-in players; the owner may change only cosmetics they own.
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow update: if isOwner(uid)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['equipped'])
+        && equipValid(uid, request.resource.data.equipped);
+      allow create, delete: if false;
+
+      match /private/{doc} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+
+      match /inventory/{itemId} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+
+      match /matchHistory/{matchId} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+
+      match /friends/{friendUid} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+
+      match /friendRequests/{fromUid} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+    }
+
+    match /usernames/{name} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    match /leaderboards/{board}/entries/{uid} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    // Server-only collections.
+    match /matches/{matchId} {
+      allow read, write: if false;
+    }
+
+    match /ledger/{entryId} {
+      allow read, write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
