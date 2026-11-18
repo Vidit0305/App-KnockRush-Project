@@ -91,6 +91,7 @@ namespace KnockRush.Tests.PlayMode
                 () => nav.Push<SeasonPassScreen>(),
                 () => nav.Push<LeaderboardScreen>(),
                 () => nav.Push<ProfileScreen>(),
+                () => nav.Push<AchievementsScreen>(),
                 () => nav.Push<SettingsScreen>(),
                 () => nav.Push<LoginScreen>()
             };

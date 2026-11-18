@@ -267,6 +267,40 @@
     background-color: rgb(255, 106, 26);
 }
 
+/* ---------- Achievements ---------- */
+.kr-achievement {
+    flex-direction: row;
+    align-items: center;
+    width: 820px;
+    margin: 10px;
+    opacity: 0.8;
+}
+
+.kr-achievement--unlocked {
+    opacity: 1;
+    border-color: rgb(255, 209, 43);
+}
+
+.kr-achievement__medal {
+    width: 96px;
+    height: 96px;
+    border-radius: 48px;
+    margin-right: 20px;
+    font-size: 52px;
+    -unity-text-align: middle-center;
+    background-color: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.kr-achievement--unlocked .kr-achievement__medal {
+    background-color: rgb(255, 209, 43);
+    color: rgb(196, 70, 6);
+}
+
+.kr-achievement__title {
+    font-size: 30px;
+}
+
 /* ---------- HUD ---------- */
 .kr-hud-banner {
     font-size: 110px;

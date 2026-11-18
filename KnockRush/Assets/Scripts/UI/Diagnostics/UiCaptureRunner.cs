@@ -67,6 +67,7 @@ namespace KnockRush.UI.Diagnostics
             yield return Page(() => nav.Push<SeasonPassScreen>(), "season_pass");
             yield return Page(() => nav.Push<LeaderboardScreen>(), "leaderboard");
             yield return Page(() => nav.Push<ProfileScreen>(), "profile");
+            yield return Page(() => nav.Push<AchievementsScreen>(), "achievements");
             yield return Page(() => nav.Push<SettingsScreen>(), "settings");
             yield return Page(() => nav.Push<LoginScreen>(), "login");
             yield return Page(() =>

@@ -237,6 +237,7 @@ namespace KnockRush.UI.Screens
             card.Add(xpText);
             var actions = Ui.Row("kr-center");
             actions.Add(Ui.Button("CHANGE NAME", () => Nav.Push<LoginScreen>(), "kr-btn--small"));
+            actions.Add(Ui.Button("ACHIEVEMENTS", () => Nav.Push<AchievementsScreen>(), "kr-btn--small", "kr-btn--good"));
             actions.Add(Ui.Button("LOCKER", () => Nav.Push<CustomizeScreen>(), "kr-btn--small", "kr-btn--ghost"));
             card.Add(actions);
             row.Add(card);
@@ -269,6 +270,70 @@ namespace KnockRush.UI.Screens
             var tile = Ui.Panel("kr-stat");
             tile.Add(Ui.Label(Ui.FormatNumber(value) + suffix, "kr-stat__value", "kr-display"));
             tile.Add(Ui.Label(label, "kr-subtle"));
+            return tile;
+        }
+    }
+
+    /// <summary>Achievements: lifetime goals with progress (part of the Player Profile).</summary>
+    public sealed class AchievementsScreen : UIScreen
+    {
+        private Label summary;
+        private VisualElement grid;
+
+        protected override void Build(VisualElement root)
+        {
+            root.AddToClassList("kr-backdrop");
+            summary = Ui.Label(string.Empty, "kr-heading");
+            root.Add(Ui.Header("ACHIEVEMENTS", () => Nav.Pop(), summary));
+            var scroll = Ui.Scroll();
+            grid = Ui.Element("kr-wrap");
+            scroll.Add(grid);
+            root.Add(scroll);
+        }
+
+        public override async void OnShow()
+        {
+            grid.Clear();
+            summary.text = string.Empty;
+            if (!UiData.Online)
+            {
+                grid.Add(OfflineNotice.Create("your achievements"));
+                return;
+            }
+
+            AchievementsResponse response = null;
+            if (!await App.Run(async () => response = await UiData.Backend.GetAchievementsAsync()) || response == null)
+            {
+                return;
+            }
+
+            grid.Clear();
+            var unlocked = 0;
+            foreach (var achievement in response.Achievements)
+            {
+                unlocked += achievement.Unlocked ? 1 : 0;
+                grid.Add(Tile(achievement));
+            }
+
+            summary.text = $"{unlocked} / {response.Achievements.Count}";
+        }
+
+        private static VisualElement Tile(AchievementEntry achievement)
+        {
+            var tile = Ui.Panel("kr-achievement");
+            tile.EnableInClassList("kr-achievement--unlocked", achievement.Unlocked);
+            var medal = Ui.Label(achievement.Unlocked ? achievement.Title.Substring(0, 1).ToUpperInvariant() : "?", "kr-achievement__medal", "kr-display");
+            tile.Add(medal);
+            var text = Ui.Col("kr-grow");
+            text.Add(Ui.Label(achievement.Title.ToUpperInvariant(), "kr-achievement__title", "kr-display"));
+            text.Add(Ui.Label(achievement.Description, "kr-subtle"));
+            var bar = Ui.ProgressBar(out var fill, achievement.Unlocked ? new Color32(34, 197, 139, 255) : (Color?)null);
+            bar.style.height = 12;
+            bar.style.marginTop = 6;
+            Ui.SetProgress(fill, achievement.Target > 0 ? (float)achievement.Progress / achievement.Target : 0f);
+            text.Add(bar);
+            text.Add(Ui.Label(achievement.Unlocked ? "UNLOCKED" : $"{achievement.Progress} / {achievement.Target}", "kr-item__status", "kr-display"));
+            tile.Add(text);
             return tile;
         }
     }
