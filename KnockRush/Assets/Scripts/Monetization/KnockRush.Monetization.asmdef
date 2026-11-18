@@ -1,0 +1,23 @@
+{
+    "name": "KnockRush.Monetization",
+    "rootNamespace": "KnockRush.Monetization",
+    "references": [
+        "KnockRush.Core",
+        "KnockRush.Utilities",
+        "KnockRush.Backend",
+        "UnityEngine.Purchasing",
+        "UnityEngine.Purchasing.Stores",
+        "Unity.Services.Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

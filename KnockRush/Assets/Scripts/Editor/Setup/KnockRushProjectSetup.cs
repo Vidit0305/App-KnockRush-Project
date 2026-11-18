@@ -305,7 +305,7 @@ namespace KnockRush.EditorTools.Setup
 
             CreateSceneIfMissing(MainMenuScenePath, MainMenuBackground, () =>
             {
-                new GameObject("MainMenuPlaceholder").AddComponent<MainMenuPlaceholder>();
+                // Populated by KnockRush > Build > UI and Main Menu (UiContentBuilder).
             });
 
             UpdateBuildSceneList();

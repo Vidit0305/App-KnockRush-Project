@@ -16,7 +16,10 @@
         "Fusion.Unity",
         "KnockRush.GameModes",
         "KnockRush.Backend",
-        "KnockRush.Inventory"
+        "KnockRush.Inventory",
+        "KnockRush.UI",
+        "KnockRush.Matchmaking",
+        "KnockRush.Monetization"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

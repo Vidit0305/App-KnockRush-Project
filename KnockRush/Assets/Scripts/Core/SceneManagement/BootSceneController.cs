@@ -10,7 +10,7 @@ namespace KnockRush.Core.SceneManagement
     /// Lives in the Boot scene (Build index 0). Waits for <see cref="AppRoot"/> to finish
     /// initialising, keeps the splash visible for a minimum time, then loads the first scene.
     ///
-    /// The IMGUI splash is a PLACEHOLDER; Phase 8 replaces it with the branded splash/loading UI.
+    /// The branded splash itself is drawn by the UI layer (KnockRush.UI SplashScreen).
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class BootSceneController : MonoBehaviour
@@ -19,8 +19,11 @@ namespace KnockRush.Core.SceneManagement
 
         private string status = "Loading...";
         private bool failed;
-        private GUIStyle titleStyle;
-        private GUIStyle statusStyle;
+
+        /// <summary>Boot progress text (shown by the splash screen; useful in logs and tests).</summary>
+        public string Status => status;
+
+        public bool Failed => failed;
 
         private async void Start()
         {
@@ -57,32 +60,6 @@ namespace KnockRush.Core.SceneManagement
                 status = "Startup failed. Check the Console / device log.";
                 Log.Exception(exception, this);
             }
-        }
-
-        private void OnGUI()
-        {
-            if (titleStyle == null)
-            {
-                titleStyle = new GUIStyle(GUI.skin.label)
-                {
-                    fontSize = 72,
-                    fontStyle = FontStyle.Bold,
-                    alignment = TextAnchor.MiddleCenter
-                };
-                titleStyle.normal.textColor = Color.white;
-
-                statusStyle = new GUIStyle(titleStyle) { fontSize = 22, fontStyle = FontStyle.Normal };
-            }
-
-            var scale = Screen.height / 720f;
-            GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(scale, scale, 1f));
-            var width = Screen.width / scale;
-
-            GUI.Label(new Rect(0f, 250f, width, 100f), "KNOCKRUSH", titleStyle);
-            statusStyle.normal.textColor = failed ? new Color(1f, 0.45f, 0.45f) : new Color(1f, 1f, 1f, 0.8f);
-            GUI.Label(new Rect(0f, 360f, width, 40f), status, statusStyle);
-
-            GUI.matrix = Matrix4x4.identity;
         }
     }
 }

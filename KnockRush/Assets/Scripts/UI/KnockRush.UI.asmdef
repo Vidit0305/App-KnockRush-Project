@@ -15,7 +15,8 @@
         "KnockRush.Matchmaking",
         "Fusion.Unity",
         "KnockRush.Inventory",
-        "KnockRush.Backend"
+        "KnockRush.Backend",
+        "KnockRush.Monetization"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
