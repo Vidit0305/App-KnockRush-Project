@@ -11,6 +11,28 @@ namespace KnockRush.Player.Presentation
         VictoryDance = 2
     }
 
+    /// <summary>Maps cosmetic emote ids (backend catalogue) to animator state names.</summary>
+    public static class EmoteStates
+    {
+        public static string ForItem(string emoteItemId)
+        {
+            switch (emoteItemId)
+            {
+                case "emote_celebrate": return CharacterAnimationDriver.Celebrate;
+                case "emote_victory": return CharacterAnimationDriver.VictoryDance;
+                case "emote_wave": return "Wave";
+                case "emote_bounce": return "Bounce";
+                case "emote_spin": return "Spin";
+                case "emote_clap": return "Clap";
+                case "emote_bow": return "Bow";
+                case "emote_flex": return "Flex";
+                case "emote_laugh": return "Laugh";
+                case "emote_robotdance": return "RobotDance";
+                default: return null;
+            }
+        }
+    }
+
     /// <summary>
     /// Chooses the animation state purely from the simulated <see cref="MotorState"/> (plus a few
     /// one-shot events), so remote players animate correctly from replicated state alone and
@@ -42,12 +64,21 @@ namespace KnockRush.Player.Presentation
         private ICharacterView character;
         private int currentState;
         private float lockedUntil;
-        private CharacterEmote emote;
+        private string emoteState;
+
+        /// <summary>Emote played by the "Celebrate" input (the player's equipped emote).</summary>
+        public string EquippedEmoteState { get; set; } = Celebrate;
         private bool eliminated;
 
         public void PlayEmote(CharacterEmote value)
         {
-            emote = value;
+            emoteState = value == CharacterEmote.Celebrate ? Celebrate : value == CharacterEmote.VictoryDance ? VictoryDance : null;
+        }
+
+        /// <summary>Plays any emote state by name (see <see cref="EmoteStates"/>).</summary>
+        public void PlayEmote(string stateName)
+        {
+            emoteState = stateName;
         }
 
         public void SetEliminated(bool value)
@@ -94,11 +125,11 @@ namespace KnockRush.Player.Presentation
             {
                 if (PlayerInputReader.Local.CelebratePressedThisFrame)
                 {
-                    emote = CharacterEmote.Celebrate;
+                    emoteState = EquippedEmoteState;
                 }
                 else if (PlayerInputReader.Local.VictoryPressedThisFrame)
                 {
-                    emote = CharacterEmote.VictoryDance;
+                    emoteState = VictoryDance;
                 }
             }
 
@@ -109,7 +140,7 @@ namespace KnockRush.Player.Presentation
 
             if (!character.HasFinished && (speed01 > 0.15f || state.Mode != MotorMode.Grounded))
             {
-                emote = CharacterEmote.None;
+                emoteState = null;
             }
 
             if (Time.time < lockedUntil)
@@ -139,28 +170,20 @@ namespace KnockRush.Player.Presentation
                 case MotorMode.Airborne:
                     return state.Velocity.y > 0.5f ? Jump : Fall;
                 case MotorMode.Disabled:
-                    return emote == CharacterEmote.VictoryDance ? VictoryDance : Celebrate;
+                    return emoteState ?? Celebrate;
                 default:
                     if (state.IsGrabbing)
                     {
                         return Grab;
                     }
 
-                    switch (emote)
-                    {
-                        case CharacterEmote.Celebrate:
-                            return Celebrate;
-                        case CharacterEmote.VictoryDance:
-                            return VictoryDance;
-                        default:
-                            return Locomotion;
-                    }
+                    return emoteState ?? Locomotion;
             }
         }
 
         private void OnFinished()
         {
-            emote = CharacterEmote.Celebrate;
+            emoteState = EquippedEmoteState;
         }
 
         private void OnMotorEvents(MotorEvents events)
@@ -191,14 +214,14 @@ namespace KnockRush.Player.Presentation
             else if ((events & MotorEvents.Respawned) != 0)
             {
                 lockedUntil = 0f;
-                emote = CharacterEmote.None;
+                emoteState = null;
                 CrossFade(Fall);
             }
         }
 
         private void Play(string stateName, float lockDuration)
         {
-            emote = CharacterEmote.None;
+            emoteState = null;
             var hash = Animator.StringToHash(stateName);
             if (!animator.HasState(0, hash))
             {

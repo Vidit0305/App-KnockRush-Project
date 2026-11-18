@@ -430,6 +430,77 @@ def build_animations(rig):
     cycle(c, 32, 'Chest', [deg(0, -8), deg(0, 0), deg(0, 8), deg(0, 0)])
     c.finish(True); clips.append(c)
 
+    # ---- Emotes (Phase 8) -------------------------------------------------------------------
+    # 14. Wave - right arm high, waving.
+    c = Clip(rig, 'Wave', 24)
+    cycle(c, 24, 'Arm.R', [deg(-25, 150), deg(25, 150)])
+    cycle(c, 24, 'Arm.L', [deg(0, -8), deg(4, -12)])
+    cycle(c, 24, 'Chest', [deg(0, 0, 4), deg(0, 0, -4)])
+    c.finish(True); clips.append(c)
+
+    # 15. Bounce - happy hops on the spot.
+    c = Clip(rig, 'Bounce', 20)
+    cycle(c, 20, 'Hips', [(0, 0, 0), (0, 0, 0.22)], 'loc')
+    cycle(c, 20, 'Hips', [(1.1, 0.88, 1.1), (0.94, 1.1, 0.94)], 'scale')
+    cycle(c, 20, 'Arm.L', [deg(0, -40), deg(0, -70)])
+    cycle(c, 20, 'Arm.R', [deg(0, 40), deg(0, 70)])
+    c.finish(True); clips.append(c)
+
+    # 16. Spin - full turn with arms out.
+    c = Clip(rig, 'Spin', 30)
+    for i, angle in enumerate((0, 120, 240, 360)):
+        c.key('Root', i * 10, rot=deg(0, 0, angle))
+    for f in (0, 30):
+        c.key('Arm.L', f, rot=deg(0, -85))
+        c.key('Arm.R', f, rot=deg(0, 85))
+    c.finish(True); clips.append(c)
+
+    # 17. Clap - hands meet in front.
+    c = Clip(rig, 'Clap', 16)
+    cycle(c, 16, 'Arm.L', [deg(-80, -35), deg(-80, -5)])
+    cycle(c, 16, 'Arm.R', [deg(-80, 35), deg(-80, 5)])
+    cycle(c, 16, 'Hips', [(0, 0, 0), (0, 0, 0.03)], 'loc')
+    c.finish(True); clips.append(c)
+
+    # 18. Bow - polite bow and back up.
+    c = Clip(rig, 'Bow', 40)
+    c.key('Hips', 0, rot=deg(0))
+    c.key('Hips', 14, rot=deg(48))
+    c.key('Hips', 26, rot=deg(48))
+    c.key('Hips', 40, rot=deg(0))
+    c.key('Arm.L', 14, rot=deg(-30, -10))
+    c.key('Arm.R', 14, rot=deg(20, 60))
+    c.key('Arm.L', 26, rot=deg(-30, -10))
+    c.key('Arm.R', 26, rot=deg(20, 60))
+    c.finish(True); clips.append(c)
+
+    # 19. Flex - double biceps pump.
+    c = Clip(rig, 'Flex', 24)
+    cycle(c, 24, 'Arm.L', [deg(0, -95), deg(0, -125)])
+    cycle(c, 24, 'Arm.R', [deg(0, 95), deg(0, 125)])
+    cycle(c, 24, 'Chest', [(1, 1, 1), (1.08, 1.03, 1.08)], 'scale')
+    c.finish(True); clips.append(c)
+
+    # 20. Laugh - lean back, belly shake.
+    c = Clip(rig, 'Laugh', 16)
+    cycle(c, 16, 'Chest', [deg(-16, 0, 3), deg(-12, 0, -3), deg(-16, 0, 3), deg(-12, 0, -3)])
+    cycle(c, 16, 'Hips', [(1.04, 0.97, 1.04), (0.98, 1.02, 0.98)], 'scale')
+    cycle(c, 16, 'Arm.L', [deg(-35, -12), deg(-40, -8)])
+    cycle(c, 16, 'Arm.R', [deg(-35, 12), deg(-40, 8)])
+    c.finish(True); clips.append(c)
+
+    # 21. RobotDance - stiff, snappy poses.
+    c = Clip(rig, 'RobotDance', 32)
+    poses = [(deg(-90, 0), deg(0, 0), deg(0, 0, 25)), (deg(0, 0), deg(-90, 0), deg(0, 0, -25)),
+             (deg(0, -90), deg(0, 90), deg(0, 0, 0)), (deg(-90, 0), deg(-90, 0), deg(0, 0, 0))]
+    for i, (left, right, hips) in enumerate(poses + [poses[0]]):
+        for f in (i * 8, i * 8 + 5):
+            if f <= 32:
+                c.key('Arm.L', f, rot=left)
+                c.key('Arm.R', f, rot=right)
+                c.key('Hips', f, rot=hips)
+    c.finish(True); clips.append(c)
+
     return clips
 
 

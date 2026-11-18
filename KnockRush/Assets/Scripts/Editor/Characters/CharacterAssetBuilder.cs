@@ -30,7 +30,8 @@ namespace KnockRush.EditorTools.Characters
         private static readonly string[] RequiredClips =
         {
             "Idle", "Walk", "Run", "Jump", "Fall", "Land", "Dive", "Hit", "Stumble", "Grab",
-            "Eliminated", "Celebrate", "VictoryDance"
+            "Eliminated", "Celebrate", "VictoryDance",
+            "Wave", "Bounce", "Spin", "Clap", "Bow", "Flex", "Laugh", "RobotDance"
         };
 
         public static MovementSettings EnsureMovementSettings()
@@ -95,7 +96,8 @@ namespace KnockRush.EditorTools.Characters
                          CharacterAnimationDriver.Jump, CharacterAnimationDriver.Fall, CharacterAnimationDriver.Land,
                          CharacterAnimationDriver.Dive, CharacterAnimationDriver.Hit, CharacterAnimationDriver.Stumble,
                          CharacterAnimationDriver.Grab, CharacterAnimationDriver.Eliminated,
-                         CharacterAnimationDriver.Celebrate, CharacterAnimationDriver.VictoryDance
+                         CharacterAnimationDriver.Celebrate, CharacterAnimationDriver.VictoryDance,
+                         "Wave", "Bounce", "Spin", "Clap", "Bow", "Flex", "Laugh", "RobotDance"
                      })
             {
                 var state = stateMachine.AddState(name, position);

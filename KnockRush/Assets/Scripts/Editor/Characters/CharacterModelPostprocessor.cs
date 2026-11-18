@@ -16,7 +16,8 @@ namespace KnockRush.EditorTools.Characters
 
         public static readonly HashSet<string> LoopingClips = new HashSet<string>(StringComparer.Ordinal)
         {
-            "Idle", "Walk", "Run", "Fall", "Stumble", "Grab", "Celebrate", "VictoryDance"
+            "Idle", "Walk", "Run", "Fall", "Stumble", "Grab", "Celebrate", "VictoryDance",
+            "Wave", "Bounce", "Spin", "Clap", "Bow", "Flex", "Laugh", "RobotDance"
         };
 
         private bool IsCharacterModel =>
