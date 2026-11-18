@@ -12,7 +12,12 @@
         "UnityEngine.UI",
         "KnockRush.Interaction",
         "KnockRush.Obstacles",
-        "KnockRush.Maps"
+        "KnockRush.Maps",
+        "KnockRush.Multiplayer",
+        "Fusion.Unity",
+        "Photon.Realtime",
+        "Unity.Addressables",
+        "Unity.Addressables.Editor"
     ],
     "includePlatforms": [
         "Editor"

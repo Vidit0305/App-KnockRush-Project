@@ -30,6 +30,13 @@ namespace KnockRush.Core.SceneManagement
             {
                 await AppRoot.InitializationTask;
 
+                // Headless roles (dedicated server, bot clients) are launched by the network layer.
+                if (AppRoot.IsDedicatedServer || CommandLine.Has("-server") || CommandLine.Has("-botclient") || CommandLine.Has("-single"))
+                {
+                    status = "Headless launch";
+                    return;
+                }
+
                 var config = ServiceLocator.Get<GameConfig>();
                 var remaining = config.MinimumSplashDuration - (Time.realtimeSinceStartup - startTime);
                 if (remaining > 0f)

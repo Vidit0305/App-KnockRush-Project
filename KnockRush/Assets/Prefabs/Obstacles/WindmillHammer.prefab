@@ -114,79 +114,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &872302030283115626
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3671186379990763527}
-  - component: {fileID: 506034786958677155}
-  - component: {fileID: 1087852325084674105}
-  m_Layer: 8
-  m_Name: Hitbox
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3671186379990763527
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 872302030283115626}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.8660254, w: -0.50000006}
-  m_LocalPosition: {x: -3.3774996, y: 1.95, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2770080966275551593}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &506034786958677155
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 872302030283115626}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2, y: 2, z: 2.2}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1087852325084674105
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 872302030283115626}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8ac3eb2861a28e4a8e52db9e93daaff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: KnockRush.Interaction::KnockRush.Interaction.ImpulseZone
-  mode: 0
-  strength: 10
-  velocityScale: 0.6
-  upwardBoost: 5
-  localDirection: {x: 0, y: 1, z: 0}
-  minimumObstacleSpeed: 0.75
-  cooldown: 0.4
 --- !u!1 &1231475332052499044
 GameObject:
   m_ObjectHideFlags: 0
@@ -335,13 +262,13 @@ Transform:
   - {fileID: 3095083982453936676}
   - {fileID: 362138529833482807}
   - {fileID: 8237313106386005564}
-  - {fileID: 2832329676961066748}
+  - {fileID: 2134879791492695028}
   - {fileID: 1571281762803304639}
   - {fileID: 7807064950428570091}
-  - {fileID: 5090289555660333735}
+  - {fileID: 6624034762413970512}
   - {fileID: 6080250348345159601}
   - {fileID: 3019301127172184334}
-  - {fileID: 3671186379990763527}
+  - {fileID: 6686415628341879770}
   m_Father: {fileID: 3897803013152579910}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &314825223642416055
@@ -724,7 +651,7 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &2697913984605558264
+--- !u!1 &3049120133318811357
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -732,9 +659,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2832329676961066748}
-  - component: {fileID: 1733526208292726986}
-  - component: {fileID: 730153789618467062}
+  - component: {fileID: 6686415628341879770}
+  - component: {fileID: 6069504576948754797}
+  - component: {fileID: 4953569625308305642}
   m_Layer: 8
   m_Name: Hitbox
   m_TagString: Untagged
@@ -742,28 +669,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2832329676961066748
+--- !u!4 &6686415628341879770
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2697913984605558264}
+  m_GameObject: {fileID: 3049120133318811357}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -3.9, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0.8660254, w: -0.50000006}
+  m_LocalPosition: {x: -3.3774996, y: 1.95, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2770080966275551593}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &1733526208292726986
+--- !u!65 &6069504576948754797
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2697913984605558264}
+  m_GameObject: {fileID: 3049120133318811357}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -778,13 +705,86 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2, y: 2, z: 2.2}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &730153789618467062
+--- !u!114 &4953569625308305642
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2697913984605558264}
+  m_GameObject: {fileID: 3049120133318811357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8ac3eb2861a28e4a8e52db9e93daaff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: KnockRush.Interaction::KnockRush.Interaction.ImpulseZone
+  mode: 0
+  strength: 10
+  velocityScale: 0.6
+  upwardBoost: 5
+  localDirection: {x: 0, y: 1, z: 0}
+  minimumObstacleSpeed: 0.75
+  cooldown: 0.4
+--- !u!1 &4269747458981317588
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2134879791492695028}
+  - component: {fileID: 5216119171170953612}
+  - component: {fileID: 7379427150311479423}
+  m_Layer: 8
+  m_Name: Hitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2134879791492695028
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4269747458981317588}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -3.9, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2770080966275551593}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &5216119171170953612
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4269747458981317588}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 2, z: 2.2}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &7379427150311479423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4269747458981317588}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c8ac3eb2861a28e4a8e52db9e93daaff, type: 3}
@@ -1023,79 +1023,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &5082578454302182774
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5090289555660333735}
-  - component: {fileID: 2349609315129709473}
-  - component: {fileID: 5276554343050564461}
-  m_Layer: 8
-  m_Name: Hitbox
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5090289555660333735
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5082578454302182774}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.86602545, w: 0.49999997}
-  m_LocalPosition: {x: 3.377499, y: 1.9500005, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2770080966275551593}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &2349609315129709473
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5082578454302182774}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2, y: 2, z: 2.2}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &5276554343050564461
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5082578454302182774}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8ac3eb2861a28e4a8e52db9e93daaff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: KnockRush.Interaction::KnockRush.Interaction.ImpulseZone
-  mode: 0
-  strength: 10
-  velocityScale: 0.6
-  upwardBoost: 5
-  localDirection: {x: 0, y: 1, z: 0}
-  minimumObstacleSpeed: 0.75
-  cooldown: 0.4
 --- !u!1 &7109069589698610824
 GameObject:
   m_ObjectHideFlags: 0
@@ -1129,6 +1056,79 @@ Transform:
   - {fileID: 2770080966275551593}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7901743815012499085
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6624034762413970512}
+  - component: {fileID: 8725466926741245321}
+  - component: {fileID: 751035792258340507}
+  m_Layer: 8
+  m_Name: Hitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6624034762413970512
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7901743815012499085}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0.86602545, w: 0.49999997}
+  m_LocalPosition: {x: 3.377499, y: 1.9500005, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2770080966275551593}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &8725466926741245321
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7901743815012499085}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 2, z: 2.2}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &751035792258340507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7901743815012499085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8ac3eb2861a28e4a8e52db9e93daaff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: KnockRush.Interaction::KnockRush.Interaction.ImpulseZone
+  mode: 0
+  strength: 10
+  velocityScale: 0.6
+  upwardBoost: 5
+  localDirection: {x: 0, y: 1, z: 0}
+  minimumObstacleSpeed: 0.75
+  cooldown: 0.4
 --- !u!1 &8690343824034793777
 GameObject:
   m_ObjectHideFlags: 0

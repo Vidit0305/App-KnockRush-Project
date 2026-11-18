@@ -7,6 +7,8 @@
 #   Tools/unity.sh editmode       Run KnockRush EditMode tests
 #   Tools/unity.sh playmode       Run KnockRush PlayMode tests
 #   Tools/unity.sh android        Build the Android development APK
+#   Tools/unity.sh windows        Build the Windows development player (headless server/bot testing)
+#   Tools/unity.sh server         Build the Linux dedicated server (needs Linux Dedicated Server module)
 #   Tools/unity.sh capture <Scene.unity> [Clip]  Render PNG captures to .logs/captures
 #   Tools/unity.sh bean           Regenerate the Bean FBX from ArtSource (needs BLENDER_EXE)
 #   Tools/unity.sh exec <Method>  Run any static editor method
@@ -58,8 +60,10 @@ case "${1:-}" in
   editmode) tests EditMode KnockRush.Tests.EditMode ;;
   playmode) tests PlayMode KnockRush.Tests.PlayMode ;;
   android)  GRAPHICS_FLAG="" run android -buildTarget Android -executeMethod KnockRush.EditorTools.Build.KnockRushBuild.BuildAndroidDevelopmentBatch ;;
+  windows)  GRAPHICS_FLAG="" run windows -buildTarget Win64 -executeMethod KnockRush.EditorTools.Build.KnockRushBuild.BuildWindowsDevelopmentBatch ;;
+  server)   run server -buildTarget Linux64 -standaloneBuildSubtarget Server -executeMethod KnockRush.EditorTools.Build.KnockRushBuild.BuildLinuxServerBatch ;;
   capture)  GRAPHICS_FLAG="" run "capture" -executeMethod KnockRush.EditorTools.Diagnostics.SceneCapture.CaptureBatch               -captureScene "${2:-Assets/Scenes/Dev/Playground.unity}" -captureOut "$LOGS/captures" -captureClip "${3:-Run}" ;;
   bean)     "$BLENDER_EXE" -b --factory-startup --python "$ROOT/ArtSource/Characters/build_bean.py" --               "$PROJECT/Assets/Art/Characters/Bean/Bean.fbx" "$ROOT/ArtSource/Characters/Bean.blend" | grep build_bean ;;
   exec)     shift; run "exec-${1##*.}" -executeMethod "$1" ;;
-  *) sed -n '2,14p' "$0"; exit 2 ;;
+  *) sed -n '2,16p' "$0"; exit 2 ;;
 esac

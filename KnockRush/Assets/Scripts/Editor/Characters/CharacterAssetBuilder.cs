@@ -159,7 +159,6 @@ namespace KnockRush.EditorTools.Characters
                 EditorAssetUtility.SetField(character, "settings", movementSettings);
                 EditorAssetUtility.SetField(character, "visualRoot", visual);
                 EditorAssetUtility.SetField(character, "inputReader", reader);
-                EditorAssetUtility.SetField(driver, "character", character);
                 EditorAssetUtility.SetField(driver, "animator", animator);
                 EditorAssetUtility.SetField(appearance, "bodyRenderer", renderer);
 

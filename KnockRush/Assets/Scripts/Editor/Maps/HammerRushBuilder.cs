@@ -1,4 +1,3 @@
-using KnockRush.CameraRig;
 using KnockRush.EditorTools.Common;
 using KnockRush.EditorTools.Obstacles;
 using KnockRush.EditorTools.Scenes;
@@ -34,7 +33,7 @@ namespace KnockRush.EditorTools.Maps
             return definition;
         }
 
-        public static void Build(CameraSettings cameraSettings)
+        public static void Build(GameObject offlineRig, GameObject onlineRig)
         {
             KnockRushProjectSetup.EnsureFolder("Assets/Scenes/Maps");
             KnockRushProjectSetup.EnsureFolder(MaterialFolder);
@@ -52,6 +51,7 @@ namespace KnockRush.EditorTools.Maps
             var sea = M("Sea", new Color32(0x4F, 0xB4, 0xFF, 0xFF));
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+            Object.DestroyImmediate(Camera.main.gameObject); // cameras come from the rig (none on servers)
             ConfigureLighting(Quaternion.Euler(48f, -35f, 0f), new Color(0.74f, 0.84f, 1f), new Color(0.66f, 0.62f, 0.74f), new Color(0.38f, 0.32f, 0.44f));
 
             var level = new GameObject("Level").transform;
@@ -128,7 +128,9 @@ namespace KnockRush.EditorTools.Maps
             var spawns = SpawnGrid(gameplay, new Vector3(0f, 0f, -2f), 8, 4, 2.6f, 2.2f, 0f);
             var mapController = new GameObject("MapController").AddComponent<MapController>();
             mapController.Configure(definition, spawns, KillHeight);
-            new GameObject("RaceSession").AddComponent<OfflineRaceSession>();
+            offlineRig = AssetDatabase.LoadAssetAtPath<GameObject>(RigBuilder.OfflineRigPath);
+            onlineRig = AssetDatabase.LoadAssetAtPath<GameObject>(RigBuilder.OnlineRigPath);
+            mapController.gameObject.AddComponent<MapBootstrap>().Configure(offlineRig, onlineRig, 3);
 
             // ---- Scenery ----------------------------------------------------------------------------
             Decor(decor, PrimitiveType.Plane, "Sea", new Vector3(0f, -45f, 85f), new Vector3(400f, 1f, 400f), sea);
@@ -144,9 +146,6 @@ namespace KnockRush.EditorTools.Maps
                 Flag(decor, new Vector3(-halfWidth - 0.6f, 0f, z), arch, edge);
                 Flag(decor, new Vector3(halfWidth + 0.6f, 0f, z), start, edge);
             }
-
-            // ---- Player rig (offline play / testing) ----------------------------------------------
-            AddLocalPlayerRig(spawns[3], KillHeight, cameraSettings, withRaceHud: true);
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             PlaygroundSceneBuilder.AddToBuildSettings(ScenePath);

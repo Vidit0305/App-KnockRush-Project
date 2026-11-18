@@ -49,10 +49,13 @@ namespace KnockRush.EditorTools.Diagnostics
             Directory.CreateDirectory(outputFolder);
             var sceneName = Path.GetFileNameWithoutExtension(scenePath);
 
-            var camera = Camera.main ?? Object.FindFirstObjectByType<Camera>();
+            // Map scenes have no camera (it comes from the runtime rig): use a temporary one.
+            var camera = Camera.main != null ? Camera.main : Object.FindFirstObjectByType<Camera>();
             if (camera == null)
             {
-                throw new InvalidOperationException($"No camera in {scenePath}.");
+                camera = new GameObject("CaptureCamera").AddComponent<Camera>();
+                camera.fieldOfView = 60f;
+                camera.farClipPlane = 600f;
             }
 
             var player = Object.FindFirstObjectByType<PlayerCharacter>();

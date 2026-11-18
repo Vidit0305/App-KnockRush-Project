@@ -4,6 +4,7 @@ using KnockRush.Core.Config;
 using KnockRush.Core.SceneManagement;
 using KnockRush.Core.Services;
 using KnockRush.Core.Settings;
+using KnockRush.Multiplayer;
 using KnockRush.Utilities;
 using UnityEngine;
 
@@ -62,7 +63,7 @@ namespace KnockRush.UI.Placeholders
             var scale = Screen.height / 720f;
             GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(scale, scale, 1f));
             var width = Screen.width / scale;
-            var panel = new Rect((width - 520f) * 0.5f, 80f, 520f, 620f);
+            var panel = new Rect((width - 560f) * 0.5f, 60f, 560f, 660f);
 
             GUILayout.BeginArea(panel);
             GUILayout.Label("KNOCKRUSH", titleStyle);
@@ -90,6 +91,27 @@ namespace KnockRush.UI.Placeholders
 
             GUILayout.Space(8f);
 
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Net Practice", buttonStyle, GUILayout.Height(48f)))
+            {
+                StartNetwork(SessionRole.Single);
+            }
+
+            GUI.enabled = !sceneLoader.IsLoading && NetworkSettings.HasAppId;
+            if (GUILayout.Button("Host Online", buttonStyle, GUILayout.Height(48f)))
+            {
+                StartNetwork(SessionRole.Host);
+            }
+
+            if (GUILayout.Button("Join Online", buttonStyle, GUILayout.Height(48f)))
+            {
+                StartNetwork(SessionRole.Client);
+            }
+
+            GUI.enabled = !sceneLoader.IsLoading;
+            GUILayout.EndHorizontal();
+            GUILayout.Space(8f);
+
             if (GUILayout.Button("Movement Playground", buttonStyle, GUILayout.Height(56f)))
             {
                 Load(SceneNames.Playground);
@@ -106,6 +128,22 @@ namespace KnockRush.UI.Placeholders
             GUILayout.EndArea();
 
             GUI.matrix = Matrix4x4.identity;
+        }
+
+        private async void StartNetwork(SessionRole role)
+        {
+            try
+            {
+                var result = await NetworkSession.StartAsync(new NetworkLaunchOptions { Role = role, SessionName = "knockrush-dev" });
+                if (!result.Ok)
+                {
+                    Log.Warning(Tag, $"Network start failed: {result.ShutdownReason}");
+                }
+            }
+            catch (Exception exception)
+            {
+                Log.Exception(exception);
+            }
         }
 
         private async void Load(string sceneName)

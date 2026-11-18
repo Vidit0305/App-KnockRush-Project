@@ -162,7 +162,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7127bb7bf8e5a346babf35f00f28cf3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: KnockRush.Player::KnockRush.Player.Presentation.CharacterAnimationDriver
-  character: {fileID: 6090400528382218470}
   animator: {fileID: 4550630232463319853}
   crossFadeDuration: 0.12
   hardLandingSpeed: 6

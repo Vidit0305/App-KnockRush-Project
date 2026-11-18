@@ -34,12 +34,12 @@ namespace KnockRush.Player.Presentation
 
         private static readonly int SpeedParameter = Animator.StringToHash("Speed");
 
-        [SerializeField] private PlayerCharacter character;
         [SerializeField] private Animator animator;
         [SerializeField, Range(0f, 0.5f)] private float crossFadeDuration = 0.12f;
         [Tooltip("Landing speed (m/s) above which the squash 'Land' animation plays.")]
         [SerializeField] private float hardLandingSpeed = 6f;
 
+        private ICharacterView character;
         private int currentState;
         private float lockedUntil;
         private CharacterEmote emote;
@@ -57,8 +57,12 @@ namespace KnockRush.Player.Presentation
 
         private void Reset()
         {
-            character = GetComponentInParent<PlayerCharacter>();
             animator = GetComponentInChildren<Animator>();
+        }
+
+        private void Awake()
+        {
+            character = GetComponentInParent<ICharacterView>();
         }
 
         private void OnEnable()

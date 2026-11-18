@@ -1,6 +1,7 @@
 using System;
 using KnockRush.EditorTools.Characters;
 using KnockRush.EditorTools.Maps;
+using KnockRush.EditorTools.Multiplayer;
 using KnockRush.EditorTools.Obstacles;
 using KnockRush.EditorTools.Scenes;
 using KnockRush.EditorTools.Setup;
@@ -35,6 +36,11 @@ namespace KnockRush.EditorTools.Build
         public static void BuildAll()
         {
             KnockRushProjectSetup.EnsureLayers();
+
+            // Addressables settings (maps/cosmetics are delivered through Addressables from Phase 6;
+            // Fusion also probes Addressables at runtime, which needs a settings object to exist).
+            UnityEditor.AddressableAssets.AddressableAssetSettingsDefaultObject.GetSettings(true);
+
             var movement = CharacterAssetBuilder.EnsureMovementSettings();
             var cameraSettings = CharacterAssetBuilder.EnsureCameraSettings();
             var controller = CharacterAssetBuilder.BuildAnimatorController();
@@ -45,7 +51,11 @@ namespace KnockRush.EditorTools.Build
             // Phase 3: obstacle library, race HUD, first playable map.
             ObstaclePrefabBuilder.BuildAll();
             HudBuilder.BuildRaceHud();
-            HammerRushBuilder.Build(cameraSettings);
+
+            // Phase 4: networked player + settings, offline/online rigs, maps use MapBootstrap.
+            NetworkContentBuilder.Build(movement);
+            var rigs = RigBuilder.BuildAll(cameraSettings);
+            HammerRushBuilder.Build(rigs.offline, rigs.online);
             AssetDatabase.SaveAssets();
             Debug.Log("[KnockRush Build] Content build complete.");
         }

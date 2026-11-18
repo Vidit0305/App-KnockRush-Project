@@ -9,7 +9,8 @@
         "Unity.InputSystem",
         "UnityEngine.UI",
         "KnockRush.Interaction",
-        "KnockRush.Maps"
+        "KnockRush.Maps",
+        "KnockRush.Multiplayer"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

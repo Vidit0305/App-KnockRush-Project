@@ -18,7 +18,7 @@ namespace KnockRush.Player
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(CapsuleCollider))]
-    public sealed class PlayerCharacter : MonoBehaviour, ICourseParticipant
+    public sealed class PlayerCharacter : MonoBehaviour, ICourseParticipant, ICharacterView
     {
         [SerializeField] private MovementSettings settings;
 

@@ -1,0 +1,26 @@
+{
+    "name": "KnockRush.Multiplayer",
+    "rootNamespace": "KnockRush.Multiplayer",
+    "references": [
+        "KnockRush.Core",
+        "KnockRush.Utilities",
+        "KnockRush.Movement",
+        "KnockRush.Interaction",
+        "KnockRush.Obstacles",
+        "KnockRush.Maps",
+        "KnockRush.Player",
+        "KnockRush.CameraRig",
+        "Unity.InputSystem",
+        "Fusion.Unity",
+        "Photon.Realtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -53,15 +53,20 @@ Rule: a phase is **complete** only when every item is `[x]` and its milestone te
 - [x] **Hammer Rush** playable offline start → finish (5 sections, 5 checkpoints, 32 spawns, scenery)
 - [x] Tests: EditMode 19/19, PlayMode 24/24 (incl. real hammer knockback + finish qualification)
 
-## PHASE 4: Multiplayer networking and 32-player testing  ← **NEXT**
-- [ ] Photon account, App ID (dev), Fusion 2.1.x imported & configured
-- [ ] Network runner lifecycle (Host for dev, Server mode for prod), player spawning
-- [ ] Motor running in FixedUpdateNetwork with prediction; obstacles tick-driven
-- [ ] Server-authoritative knockback, grab (lag compensated), kill volumes
-- [ ] Linux dedicated server build + Docker + Edgegap test deployment
-- [ ] 32-player load test with headless bots; latency/loss testing; bandwidth & CPU budgets measured
+## PHASE 4: Multiplayer networking and 32-player testing: ✅ IMPLEMENTED (online run blocked on App ID)
+- [x] Fusion 2.1.4 imported & configured (32 players, weaving, lag compensation)
+- [x] NetworkSession: Single / Host / Client / Server lifecycle, scene loading, spawning, input collection
+- [x] NetworkCharacter: shared motor in FixedUpdateNetwork with prediction; NetworkTransform interpolation
+- [x] Server-authoritative knockback, checkpoints, finish, respawn, input lock; bot flag
+- [x] Obstacles driven by the network tick (NetworkObstacleClock)
+- [x] Map scenes content-only + MapBootstrap (offline rig / online rig / server: none)
+- [x] Headless launcher (-server / -botclient / -single), Windows dev build, Linux server build target, Dockerfile (Edgegap), load-test script
+- [x] Tests: EditMode 19/19, PlayMode 27/27 (real Fusion runner); headless Windows player smoke test passes
+- [ ] **Photon Fusion App ID** (your Photon account) → then Host/Join + `Tools/loadtest.sh` 32-player test
+- [ ] **Linux Dedicated Server module** (Unity Hub) → `Tools/unity.sh server` → container
+- [ ] Bandwidth/CPU budget measurement from the load test
 
-## PHASE 5: Matchmaking, private rooms and knockout system
+## PHASE 5: Matchmaking, private rooms and knockout system  ← **NEXT**
 - [ ] Photon Custom Auth via Firebase ID token (minimal Firebase Auth brought forward if needed)
 - [ ] MatchController state machine, rounds, qualification quotas, elimination, spectate
 - [ ] Public matchmaking with session filters, regions, protocol versioning
