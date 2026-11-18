@@ -80,6 +80,48 @@ namespace KnockRush.Tests.PlayMode
             Assert.AreEqual(localSlot, match.WinnerSlot, "Best placed qualifier is the winner.");
         }
 
+        [UnityTest]
+        public IEnumerator ClassicKnockout_PlaysAllRoundsAcrossMapsToAChampion()
+        {
+            var start = NetworkSession.StartAsync(new NetworkLaunchOptions
+            {
+                Role = SessionRole.Single,
+                SessionName = "test-classic",
+                GameModeId = "classic",
+                FillWithBots = true,
+                LobbySeconds = 1f,
+                RoundTimeLimitOverride = 6f
+            });
+            yield return Wait(start);
+            Assert.IsTrue(start.Result.Ok);
+
+            yield return WaitUntil(() => MatchController.Current != null && MatchController.Current.Phase == MatchPhase.Countdown, "first countdown");
+            var match = MatchController.Current;
+            Assert.AreEqual(32, match.PlayerCount(), "Classic fills to 32 with bots.");
+            Assert.AreEqual(20, match.Quota, "Round 1 quota 32 → 20.");
+
+            var mapsSeen = new System.Collections.Generic.HashSet<string>();
+            var maxRound = 0;
+            var elapsed = 0f;
+            while (match != null && match.Phase != MatchPhase.MatchResults && elapsed < 180f)
+            {
+                if (match.CurrentMap != null)
+                {
+                    mapsSeen.Add(match.CurrentMap.MapId);
+                }
+
+                maxRound = Mathf.Max(maxRound, match.RoundIndex);
+                elapsed += Time.unscaledDeltaTime;
+                yield return null;
+            }
+
+            Assert.IsNotNull(match);
+            Assert.AreEqual(MatchPhase.MatchResults, match.Phase, $"Match did not finish (round {match.RoundIndex}, phase {match.Phase}).");
+            Assert.GreaterOrEqual(mapsSeen.Count, 2, "Rounds should be played on different maps.");
+            Assert.GreaterOrEqual(maxRound, 1, "At least one round transition (scene reload) expected.");
+            Debug.Log($"[Test] Classic finished after {maxRound + 1} rounds on {string.Join(", ", mapsSeen)}; winner slot {match.WinnerSlot}, qualifiers {match.QualifiedCount()}.");
+        }
+
         private static IEnumerator Wait(Task task)
         {
             var elapsed = 0f;

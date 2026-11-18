@@ -342,9 +342,52 @@ namespace KnockRush.GameModes
             return QualifiedThisRound >= Quota || ActiveCount() == 0;
         }
 
+        /// <summary>
+        /// Race that timed out with nobody across the line: qualify the quota by course progress
+        /// (furthest checkpoint, then closest to the finish) so the match always continues.
+        /// </summary>
+        private void QualifyByProgressIfNobodyFinished()
+        {
+            if (QualifiedThisRound > 0)
+            {
+                return;
+            }
+
+            var finish = FindFirstObjectByType<FinishLine>();
+            var ranked = new List<(int slot, float score)>();
+            foreach (var pair in characters)
+            {
+                var record = Records.Get(pair.Key);
+                if (record.Status != RecordStatus.Active || pair.Value == null)
+                {
+                    continue;
+                }
+
+                var distance = finish != null ? Vector3.Distance(pair.Value.Position, finish.transform.position) : 0f;
+                ranked.Add((pair.Key, pair.Value.CheckpointOrder * 10000f - distance));
+            }
+
+            ranked.Sort((a, b) => b.score.CompareTo(a.score));
+            for (var i = 0; i < ranked.Count && i < Quota; i++)
+            {
+                var record = Records.Get(ranked[i].slot);
+                record.Status = RecordStatus.Qualified;
+                record.RoundPlacement = (short)(i + 1);
+                SetRecord(ranked[i].slot, record);
+                QualifiedThisRound++;
+            }
+
+            Log.Info(Tag, $"Time up with no finishers: {QualifiedThisRound} qualified by progress.");
+        }
+
         private void EndRound()
         {
             var survival = CurrentMap != null && CurrentMap.FallRule == FallRule.Eliminate;
+            if (!survival)
+            {
+                QualifyByProgressIfNobodyFinished();
+            }
+
             for (var slot = 0; slot < MaxRecords; slot++)
             {
                 var record = Records.Get(slot);
