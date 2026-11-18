@@ -64,6 +64,7 @@ namespace KnockRush.EditorTools.Scenes
             {
                 AddCamera(root.transform, cameraSettings, null);
                 AddUi(root.transform);
+                new GameObject("MatchHud", typeof(KnockRush.UI.Hud.MatchHud)).transform.SetParent(root.transform, false);
                 return PrefabUtility.SaveAsPrefabAsset(root, OnlineRigPath);
             }
             finally

@@ -3,6 +3,7 @@ using Fusion;
 using KnockRush.CameraRig;
 using KnockRush.Core.Events;
 using KnockRush.Interaction;
+using KnockRush.Maps;
 using KnockRush.Movement;
 using KnockRush.Player;
 using KnockRush.Player.Controls;
@@ -163,7 +164,14 @@ namespace KnockRush.Multiplayer
         {
             var state = CurrentState();
             var input = MotorInput.None;
-            if (GetInput(out NetworkInputData data))
+            if (IsBot)
+            {
+                if (HasStateAuthority)
+                {
+                    input = BotBrain.Compute(this, Runner.Tick.Raw, Runner.DeltaTime);
+                }
+            }
+            else if (GetInput(out NetworkInputData data))
             {
                 input = data.ToMotorInput(PreviousButtons);
                 PreviousButtons = data.Buttons;
@@ -176,14 +184,31 @@ namespace KnockRush.Multiplayer
 
             CharacterMotor.Step(ref state, input, settings, Runner.DeltaTime, Runner.GetPhysicsScene(), shape);
 
-            if (state.Position.y < killHeight)
+            var fellOut = state.Position.y < killHeight;
+            if (fellOut && !HasStateAuthority)
             {
-                state = MotorState.Spawn(RespawnPosition, RespawnYaw);
+                // Predicting client: hold still until the server decides (respawn or elimination).
+                state.Position.y = killHeight;
+                state.Velocity = Vector3.zero;
             }
 
             var events = CharacterMotor.ConsumeEvents(ref state);
             transform.SetPositionAndRotation(state.Position, Quaternion.Euler(0f, state.Yaw, 0f));
             Motor = NetworkMotorState.From(state);
+
+            if (fellOut && HasStateAuthority)
+            {
+                if (MapController.Current != null)
+                {
+                    MapController.Current.HandleFall(this); // respawn (race) or eliminate (survival)
+                }
+                else
+                {
+                    Respawn();
+                }
+
+                return;
+            }
 
             // Presentation events fire once per tick, never again during resimulation.
             if (Runner.IsForward && events != MotorEvents.None)

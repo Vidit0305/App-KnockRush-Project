@@ -1,5 +1,6 @@
 using System;
 using KnockRush.EditorTools.Characters;
+using KnockRush.EditorTools.GameModes;
 using KnockRush.EditorTools.Maps;
 using KnockRush.EditorTools.Multiplayer;
 using KnockRush.EditorTools.Obstacles;
@@ -56,6 +57,9 @@ namespace KnockRush.EditorTools.Build
             NetworkContentBuilder.Build(movement);
             var rigs = RigBuilder.BuildAll(cameraSettings);
             HammerRushBuilder.Build(rigs.offline, rigs.online);
+
+            // Phase 5: game modes, catalog (modes + map pool), MatchController prefab.
+            GameModeContentBuilder.Build();
             AssetDatabase.SaveAssets();
             Debug.Log("[KnockRush Build] Content build complete.");
         }

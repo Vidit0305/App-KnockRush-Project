@@ -13,7 +13,8 @@
         "KnockRush.Player",
         "KnockRush.Multiplayer",
         "KnockRush.CameraRig",
-        "Fusion.Unity"
+        "Fusion.Unity",
+        "KnockRush.GameModes"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

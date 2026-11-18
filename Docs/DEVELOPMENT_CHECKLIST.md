@@ -66,15 +66,18 @@ Rule: a phase is **complete** only when every item is `[x]` and its milestone te
 - [ ] **Linux Dedicated Server module** (Unity Hub) → `Tools/unity.sh server` → container
 - [ ] Bandwidth/CPU budget measurement from the load test
 
-## PHASE 5: Matchmaking, private rooms and knockout system  ← **NEXT**
-- [ ] Photon Custom Auth via Firebase ID token (minimal Firebase Auth brought forward if needed)
-- [ ] MatchController state machine, rounds, qualification quotas, elimination, spectate
-- [ ] Public matchmaking with session filters, regions, protocol versioning
-- [ ] Private rooms with codes, owner controls
-- [ ] Disconnect/reconnect grace window; bots fill
-- [ ] Classic Knockout end-to-end with 2–3 maps
+## PHASE 5: Matchmaking, private rooms and knockout system: ✅ IMPLEMENTED (online run needs App ID)
+- [x] MatchController server state machine (lobby, rounds, countdown, results, champion), kept across map loads
+- [x] Race / survival / final round rules, qualification quotas (32→20→10→5→1), server-side fall & finish handling
+- [x] Game modes: Classic Knockout, Quick Race, Private Party (catalog + map pool)
+- [x] Server bots (BotBrain) filling empty slots; IsBot flag
+- [x] Disconnect grace (45 s) + reconnect by user id; spectator camera
+- [x] Matchmaking: quick play (mode/protocol filters), private rooms with codes, owner controls (RPC), practice vs bots
+- [x] Match HUD + menu entries (placeholder UI)
+- [x] Tests: EditMode 25/25, PlayMode 28/28 (full Quick Race match with 23 bots on a Fusion runner)
+- [ ] Online matchmaking test across devices (needs Photon App ID)
 
-## PHASE 6: Eight maps and three game modes
+## PHASE 6: Eight maps and three game modes  ← **NEXT**
 - [ ] Hammer Rush, Slime Mountain, Sky High (race)
 - [ ] Spin Attack, Falling Tiles, Pendulum Panic (survival)
 - [ ] Crown Climber, Last Platform (final)

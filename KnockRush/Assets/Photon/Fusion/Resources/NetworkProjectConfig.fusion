@@ -98,7 +98,8 @@
     "AssembliesToWeave": [
         "Assembly-CSharp",
         "Assembly-CSharp-firstpass",
-        "KnockRush.Multiplayer"
+        "KnockRush.Multiplayer",
+        "KnockRush.GameModes"
     ],
     "UseSerializableDictionary": true,
     "NullChecksForNetworkedProperties": true,

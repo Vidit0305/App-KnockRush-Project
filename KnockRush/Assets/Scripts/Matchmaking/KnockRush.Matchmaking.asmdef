@@ -1,0 +1,21 @@
+{
+    "name": "KnockRush.Matchmaking",
+    "rootNamespace": "KnockRush.Matchmaking",
+    "references": [
+        "KnockRush.Core",
+        "KnockRush.Utilities",
+        "KnockRush.Multiplayer",
+        "KnockRush.GameModes",
+        "Fusion.Unity",
+        "Photon.Realtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

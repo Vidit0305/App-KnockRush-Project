@@ -26,6 +26,9 @@ namespace KnockRush.Multiplayer
         [Tooltip("Networked player prefab (NetworkObject + NetworkCharacter).")]
         [SerializeField] private NetworkObject playerPrefab;
 
+        [Tooltip("Networked round controller prefab (spawned by the server for game modes).")]
+        [SerializeField] private NetworkObject matchControllerPrefab;
+
         [Tooltip("Sessions only match clients with the same protocol version. Bump on any network-breaking change.")]
         [SerializeField] private string protocolVersion = "0.4";
 
@@ -35,12 +38,18 @@ namespace KnockRush.Multiplayer
         [SerializeField] private string fixedRegion = string.Empty;
 
         public NetworkObject PlayerPrefab => playerPrefab;
+        public NetworkObject MatchControllerPrefab => matchControllerPrefab;
         public string ProtocolVersion => protocolVersion;
         public int MaxPlayers => maxPlayers;
 
         public void Configure(NetworkObject prefab)
         {
             playerPrefab = prefab;
+        }
+
+        public void ConfigureMatchController(NetworkObject prefab)
+        {
+            matchControllerPrefab = prefab;
         }
 
         public static NetworkSettings Load()

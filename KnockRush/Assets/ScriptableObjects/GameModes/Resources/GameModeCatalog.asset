@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b45aab6330d23af4cadb29bd0fd98d18, type: 3}
+  m_Name: GameModeCatalog
+  m_EditorClassIdentifier: KnockRush.GameModes::KnockRush.GameModes.GameModeCatalog
+  modes:
+  - {fileID: 11400000, guid: 452caebd5dd629a429af1f4062607188, type: 2}
+  - {fileID: 11400000, guid: ee040d1dc7057134d916f24c1406b069, type: 2}
+  - {fileID: 11400000, guid: 03eaebd8157c08c41867df1a74bf2338, type: 2}
+  maps:
+  - {fileID: 11400000, guid: f6016e15b363ee7488cc7092cc8acada, type: 2}

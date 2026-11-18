@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: NetworkSettings
   m_EditorClassIdentifier: KnockRush.Multiplayer::KnockRush.Multiplayer.NetworkSettings
   playerPrefab: {fileID: 4536722521578852516, guid: fdcdc6c29f3333b4db7fdde8680e3082, type: 3}
+  matchControllerPrefab: {fileID: 7544595057267551523, guid: e5b8c96b0ff605c428b854bf334ca5f7, type: 3}
   protocolVersion: 0.4
   maxPlayers: 32
   fixedRegion: 

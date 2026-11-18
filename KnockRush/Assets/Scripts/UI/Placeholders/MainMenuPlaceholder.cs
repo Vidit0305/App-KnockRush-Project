@@ -4,7 +4,9 @@ using KnockRush.Core.Config;
 using KnockRush.Core.SceneManagement;
 using KnockRush.Core.Services;
 using KnockRush.Core.Settings;
+using KnockRush.Matchmaking;
 using KnockRush.Multiplayer;
+using KnockRush.UI.Hud;
 using KnockRush.Utilities;
 using UnityEngine;
 
@@ -91,21 +93,38 @@ namespace KnockRush.UI.Placeholders
 
             GUILayout.Space(8f);
 
+            GUILayout.Label("Practice vs bots (offline)", labelStyle);
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Net Practice", buttonStyle, GUILayout.Height(48f)))
+            if (GUILayout.Button("Classic Knockout", buttonStyle, GUILayout.Height(48f)))
             {
-                StartNetwork(SessionRole.Single);
+                Run(MatchmakingService.PracticeAsync("classic"));
             }
+
+            if (GUILayout.Button("Quick Race", buttonStyle, GUILayout.Height(48f)))
+            {
+                Run(MatchmakingService.PracticeAsync("quickrace"));
+            }
+
+            GUILayout.EndHorizontal();
+            GUILayout.Space(6f);
 
             GUI.enabled = !sceneLoader.IsLoading && NetworkSettings.HasAppId;
-            if (GUILayout.Button("Host Online", buttonStyle, GUILayout.Height(48f)))
+            GUILayout.Label(NetworkSettings.HasAppId ? "Online" : "Online (set a Photon App ID to enable)", labelStyle);
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Play Classic", buttonStyle, GUILayout.Height(48f)))
             {
-                StartNetwork(SessionRole.Host);
+                Run(MatchmakingService.QuickPlayAsync("classic"));
             }
 
-            if (GUILayout.Button("Join Online", buttonStyle, GUILayout.Height(48f)))
+            if (GUILayout.Button("Create Party", buttonStyle, GUILayout.Height(48f)))
             {
-                StartNetwork(SessionRole.Client);
+                CreateParty();
+            }
+
+            roomCodeInput = GUILayout.TextField(roomCodeInput ?? string.Empty, 6, GUILayout.Width(110f), GUILayout.Height(48f));
+            if (GUILayout.Button("Join", buttonStyle, GUILayout.Height(48f)))
+            {
+                Run(MatchmakingService.JoinPrivateRoomAsync(roomCodeInput));
             }
 
             GUI.enabled = !sceneLoader.IsLoading;
@@ -128,6 +147,37 @@ namespace KnockRush.UI.Placeholders
             GUILayout.EndArea();
 
             GUI.matrix = Matrix4x4.identity;
+        }
+
+        private string roomCodeInput = string.Empty;
+
+        private async void Run(System.Threading.Tasks.Task<Fusion.StartGameResult> start)
+        {
+            try
+            {
+                var result = await start;
+                if (!result.Ok)
+                {
+                    Log.Warning(Tag, $"Session start failed: {result.ShutdownReason}");
+                }
+            }
+            catch (Exception exception)
+            {
+                Log.Exception(exception);
+            }
+        }
+
+        private async void CreateParty()
+        {
+            try
+            {
+                var (result, code) = await MatchmakingService.CreatePrivateRoomAsync();
+                MatchHud.RoomCode = result.Ok ? code : null;
+            }
+            catch (Exception exception)
+            {
+                Log.Exception(exception);
+            }
         }
 
         private async void StartNetwork(SessionRole role)

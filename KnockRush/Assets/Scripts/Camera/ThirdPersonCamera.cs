@@ -29,6 +29,9 @@ namespace KnockRush.CameraRig
         private bool invertY;
         private bool hasSnapped;
 
+        /// <summary>The enabled gameplay camera on this device (spectating retargets it).</summary>
+        public static ThirdPersonCamera Active { get; private set; }
+
         /// <summary>Horizontal look direction in degrees; used to make movement camera-relative.</summary>
         public float Yaw => yaw;
 
@@ -107,6 +110,7 @@ namespace KnockRush.CameraRig
 
         private void OnEnable()
         {
+            Active = this;
             if (ServiceLocator.TryGet<ILocalSettingsService>(out var localSettings))
             {
                 ApplyLocalSettings(localSettings.Current);
@@ -117,6 +121,11 @@ namespace KnockRush.CameraRig
 
         private void OnDisable()
         {
+            if (Active == this)
+            {
+                Active = null;
+            }
+
             EventBus.Unsubscribe<LocalSettingsChangedEvent>(OnLocalSettingsChanged);
         }
 

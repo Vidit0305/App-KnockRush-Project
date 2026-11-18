@@ -17,7 +17,9 @@
         "Fusion.Unity",
         "Photon.Realtime",
         "Unity.Addressables",
-        "Unity.Addressables.Editor"
+        "Unity.Addressables.Editor",
+        "KnockRush.GameModes",
+        "KnockRush.Matchmaking"
     ],
     "includePlatforms": [
         "Editor"

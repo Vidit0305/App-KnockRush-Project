@@ -1,0 +1,25 @@
+{
+    "name": "KnockRush.GameModes",
+    "rootNamespace": "KnockRush.GameModes",
+    "references": [
+        "KnockRush.Core",
+        "KnockRush.Utilities",
+        "KnockRush.Movement",
+        "KnockRush.Interaction",
+        "KnockRush.Maps",
+        "KnockRush.Multiplayer",
+        "KnockRush.Player",
+        "KnockRush.CameraRig",
+        "Fusion.Unity",
+        "Photon.Realtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

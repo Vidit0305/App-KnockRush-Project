@@ -10,7 +10,10 @@
         "UnityEngine.UI",
         "KnockRush.Interaction",
         "KnockRush.Maps",
-        "KnockRush.Multiplayer"
+        "KnockRush.Multiplayer",
+        "KnockRush.GameModes",
+        "KnockRush.Matchmaking",
+        "Fusion.Unity"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

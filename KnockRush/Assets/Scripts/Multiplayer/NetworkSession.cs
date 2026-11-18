@@ -27,7 +27,10 @@ namespace KnockRush.Multiplayer
         Client,
 
         /// <summary>Headless dedicated server (production).</summary>
-        Server
+        Server,
+
+        /// <summary>Join a matching session, or host one if none exists (development / peer play).</summary>
+        AutoHostOrClient
     }
 
     public sealed class NetworkLaunchOptions
@@ -41,6 +44,21 @@ namespace KnockRush.Multiplayer
 
         /// <summary>When true this peer sends bot input (load testing).</summary>
         public bool IsBotClient;
+
+        /// <summary>Stable player id (reconnection; Phase 7: Firebase UID).</summary>
+        public string UserId;
+
+        /// <summary>Fill empty slots with server bots when the match starts.</summary>
+        public bool FillWithBots = true;
+
+        /// <summary>Seconds the lobby waits before starting (0 = mode default).</summary>
+        public float LobbySeconds;
+
+        /// <summary>Overrides every round's time limit (testing). 0 = map default.</summary>
+        public float RoundTimeLimitOverride;
+
+        /// <summary>Private rooms are hidden from matchmaking and joined by code.</summary>
+        public bool IsPrivate;
     }
 
     /// <summary>
@@ -66,6 +84,15 @@ namespace KnockRush.Multiplayer
         public NetworkLaunchOptions Options { get; private set; }
 
         public IReadOnlyDictionary<PlayerRef, NetworkObject> Characters => characters;
+
+        /// <summary>Round rules (MatchController) installed on the server; null = free roam.</summary>
+        public ISessionRules Rules { get; set; }
+
+        public NetworkSettings Settings => settings;
+
+        /// <summary>True when the session runs a game mode (anything except free roam).</summary>
+        public bool WantsMatch => Options != null && !string.IsNullOrEmpty(Options.GameModeId) && Options.GameModeId != "free"
+                                  && settings != null && settings.MatchControllerPrefab != null;
 
         public event Action<ShutdownReason> Stopped;
 
@@ -122,7 +149,7 @@ namespace KnockRush.Multiplayer
                 SessionName = options.SessionName,
                 PlayerCount = Mathf.Clamp(options.MaxPlayers, 1, settings.MaxPlayers),
                 SceneManager = sceneManager,
-                IsVisible = options.IsVisible,
+                IsVisible = options.IsVisible && !options.IsPrivate,
                 IsOpen = true,
                 SessionProperties = new Dictionary<string, SessionProperty>
                 {
@@ -134,6 +161,11 @@ namespace KnockRush.Multiplayer
             if (options.Role != SessionRole.Client)
             {
                 args.Scene = SceneRef.FromIndex(BuildIndexOf(options.MapScene));
+            }
+
+            if (!string.IsNullOrEmpty(options.UserId))
+            {
+                args.AuthValues = new Photon.Realtime.AuthenticationValues(options.UserId);
             }
 
             if (options.Role != SessionRole.Single)
@@ -202,6 +234,8 @@ namespace KnockRush.Multiplayer
                     return GameMode.Client;
                 case SessionRole.Server:
                     return GameMode.Server;
+                case SessionRole.AutoHostOrClient:
+                    return GameMode.AutoHostOrClient;
                 default:
                     return GameMode.Single;
             }
@@ -232,20 +266,48 @@ namespace KnockRush.Multiplayer
             }
 
             var index = spawnCounter++;
+            SpawnCharacter(player, index, false, (byte)(index % 8));
+            Log.Info(Tag, $"Spawned character for {player} at spawn {index}.");
+        }
+
+        /// <summary>
+        /// Spawns a networked character at a map spawn point (server only). Bots pass
+        /// <see cref="PlayerRef.None"/> as owner.
+        /// </summary>
+        public NetworkCharacter SpawnCharacter(PlayerRef owner, int spawnIndex, bool isBot, byte colorIndex)
+        {
             var map = MapController.Current;
-            var spawn = map != null ? map.GetSpawnPoint(index) : null;
+            var spawn = map != null ? map.GetSpawnPoint(spawnIndex) : null;
             var position = spawn != null ? spawn.position : new Vector3(0f, 1f, 0f);
             var rotation = spawn != null ? spawn.rotation : Quaternion.identity;
 
-            var character = runner.Spawn(settings.PlayerPrefab, position, rotation, player, (r, obj) =>
+            var obj = Runner.Spawn(settings.PlayerPrefab, position, rotation, isBot ? PlayerRef.None : owner, (r, o) =>
             {
-                var networkCharacter = obj.GetComponent<NetworkCharacter>();
-                networkCharacter.ColorIndex = (byte)(index % 8);
+                var networkCharacter = o.GetComponent<NetworkCharacter>();
+                networkCharacter.ColorIndex = colorIndex;
+                networkCharacter.IsBot = isBot;
             });
 
-            runner.SetPlayerObject(player, character);
-            characters[player] = character;
-            Log.Info(Tag, $"Spawned character for {player} at spawn {index}.");
+            if (!isBot)
+            {
+                Runner.SetPlayerObject(owner, obj);
+                characters[owner] = obj;
+            }
+
+            return obj.GetComponent<NetworkCharacter>();
+        }
+
+        public void ForgetCharacter(PlayerRef player)
+        {
+            characters.Remove(player);
+        }
+
+        private void SpawnMatchController(NetworkRunner runner)
+        {
+            if (Rules == null)
+            {
+                runner.Spawn(settings.MatchControllerPrefab, Vector3.zero, Quaternion.identity, PlayerRef.None);
+            }
         }
 
         private void SpawnAllPending(NetworkRunner runner)
@@ -262,7 +324,16 @@ namespace KnockRush.Multiplayer
         public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
             Log.Info(Tag, $"Player joined: {player} (active {runner.SessionInfo.PlayerCount})");
-            if (runner.IsServer && sceneReady)
+            if (!runner.IsServer)
+            {
+                return;
+            }
+
+            if (Rules != null)
+            {
+                Rules.OnPlayerJoined(player);
+            }
+            else if (sceneReady && !WantsMatch)
             {
                 SpawnCharacter(runner, player);
             }
@@ -270,6 +341,13 @@ namespace KnockRush.Multiplayer
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
+            if (runner.IsServer && Rules != null)
+            {
+                Rules.OnPlayerLeft(player);
+                characters.Remove(player);
+                return;
+            }
+
             if (runner.IsServer && characters.TryGetValue(player, out var character))
             {
                 if (character != null)
@@ -289,7 +367,20 @@ namespace KnockRush.Multiplayer
         public void OnSceneLoadDone(NetworkRunner runner)
         {
             sceneReady = true;
-            if (runner.IsServer)
+            if (!runner.IsServer)
+            {
+                return;
+            }
+
+            if (Rules != null)
+            {
+                Rules.OnSceneLoadDone();
+            }
+            else if (WantsMatch)
+            {
+                SpawnMatchController(runner);
+            }
+            else
             {
                 SpawnAllPending(runner);
             }
@@ -323,6 +414,8 @@ namespace KnockRush.Multiplayer
         {
             Log.Info(Tag, $"Session shut down: {shutdownReason}");
             characters.Clear();
+            Rules = null;
+            MapController.FallInterceptor = null;
             GameSession.Mode = GameSessionMode.Offline;
             if (Current == this)
             {

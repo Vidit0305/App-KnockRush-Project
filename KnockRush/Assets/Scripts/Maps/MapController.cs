@@ -19,6 +19,12 @@ namespace KnockRush.Maps
 
         public static MapController Current { get; private set; }
 
+        /// <summary>
+        /// Online round rules install this (server only). Returns true if the fall was handled
+        /// (e.g. eliminated on survival maps); false falls back to respawning.
+        /// </summary>
+        public static System.Func<ICourseParticipant, bool> FallInterceptor { get; set; }
+
         public MapDefinition Definition => definition;
 
         public float KillHeight => killHeight;
@@ -42,6 +48,11 @@ namespace KnockRush.Maps
         public void HandleFall(ICourseParticipant participant)
         {
             if (participant == null || participant.HasFinished)
+            {
+                return;
+            }
+
+            if (FallInterceptor != null && FallInterceptor(participant))
             {
                 return;
             }
