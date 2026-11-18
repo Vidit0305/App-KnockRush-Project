@@ -14,7 +14,8 @@
         "KnockRush.Multiplayer",
         "KnockRush.CameraRig",
         "Fusion.Unity",
-        "KnockRush.GameModes"
+        "KnockRush.GameModes",
+        "KnockRush.Backend"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -26,7 +27,8 @@
         "Fusion.Common.dll",
         "Fusion.Sockets.dll",
         "Fusion.Realtime.dll",
-        "Fusion.Log.dll"
+        "Fusion.Log.dll",
+        "Newtonsoft.Json.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [
