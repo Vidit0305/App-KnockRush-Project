@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using Fusion;
+using KnockRush.Backend;
+using KnockRush.Core.Services;
 using KnockRush.Core.SceneManagement;
 using KnockRush.Multiplayer;
 
@@ -24,16 +26,39 @@ namespace KnockRush.Matchmaking
     {
         public static MatchmakingBackend Backend { get; set; } = MatchmakingBackend.PeerHosted;
 
-        /// <summary>Joins a public match of <paramref name="modeId"/> ("classic", "quickrace").</summary>
-        public static Task<StartGameResult> QuickPlayAsync(string modeId)
+        /// <summary>
+        /// Player identity for sessions: the Firebase UID + ID token when signed in (verified by
+        /// Photon custom auth), otherwise the local device id (practice / offline development).
+        /// </summary>
+        public static async Task<(string userId, string token)> GetIdentityAsync()
         {
-            return NetworkSession.StartAsync(new NetworkLaunchOptions
+            if (ServiceLocator.TryGet<IBackendService>(out var backend) && backend.State == BackendState.Online && backend is BackendService service)
+            {
+                try
+                {
+                    return (service.Uid, await service.Client.GetIdTokenAsync());
+                }
+                catch (BackendException)
+                {
+                    // fall through to the device id
+                }
+            }
+
+            return (LocalPlayerId.Get(), null);
+        }
+
+        /// <summary>Joins a public match of <paramref name="modeId"/> ("classic", "quickrace").</summary>
+        public static async Task<StartGameResult> QuickPlayAsync(string modeId)
+        {
+            var (userId, token) = await GetIdentityAsync();
+            return await NetworkSession.StartAsync(new NetworkLaunchOptions
             {
                 Role = Backend == MatchmakingBackend.DedicatedServers ? SessionRole.Client : SessionRole.AutoHostOrClient,
                 SessionName = null, // random matching session
                 GameModeId = modeId,
                 MapScene = SceneNames.HammerRush,
-                UserId = LocalPlayerId.Get(),
+                UserId = userId,
+                AuthToken = token,
                 FillWithBots = true
             });
         }
@@ -42,13 +67,15 @@ namespace KnockRush.Matchmaking
         public static async Task<(StartGameResult result, string code)> CreatePrivateRoomAsync(string modeId = "private", bool bots = false)
         {
             var code = RoomCodes.Generate(new Random());
+            var (userId, token) = await GetIdentityAsync();
             var result = await NetworkSession.StartAsync(new NetworkLaunchOptions
             {
+                AuthToken = token,
                 Role = SessionRole.Host,
                 SessionName = RoomCodes.ToSessionName(code),
                 GameModeId = modeId,
                 MapScene = SceneNames.HammerRush,
-                UserId = LocalPlayerId.Get(),
+                UserId = userId,
                 IsPrivate = true,
                 FillWithBots = bots,
                 LobbySeconds = 600f // the owner starts the match
@@ -56,7 +83,7 @@ namespace KnockRush.Matchmaking
             return (result, code);
         }
 
-        public static Task<StartGameResult> JoinPrivateRoomAsync(string typedCode)
+        public static async Task<StartGameResult> JoinPrivateRoomAsync(string typedCode)
         {
             var code = RoomCodes.Normalize(typedCode);
             if (!RoomCodes.IsValid(code))
@@ -64,12 +91,14 @@ namespace KnockRush.Matchmaking
                 throw new ArgumentException($"'{typedCode}' is not a valid room code.");
             }
 
-            return NetworkSession.StartAsync(new NetworkLaunchOptions
+            var (userId, token) = await GetIdentityAsync();
+            return await NetworkSession.StartAsync(new NetworkLaunchOptions
             {
                 Role = SessionRole.Client,
                 SessionName = RoomCodes.ToSessionName(code),
                 GameModeId = "private",
-                UserId = LocalPlayerId.Get()
+                UserId = userId,
+                AuthToken = token
             });
         }
 

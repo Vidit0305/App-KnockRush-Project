@@ -45,8 +45,14 @@ namespace KnockRush.Multiplayer
         /// <summary>When true this peer sends bot input (load testing).</summary>
         public bool IsBotClient;
 
-        /// <summary>Stable player id (reconnection; Phase 7: Firebase UID).</summary>
+        /// <summary>Stable player id (reconnection). Ignored when <see cref="AuthToken"/> is set.</summary>
         public string UserId;
+
+        /// <summary>
+        /// Firebase ID token. When set, Photon custom authentication verifies it with the backend
+        /// (photonAuth) and the verified Firebase UID becomes the player's UserId.
+        /// </summary>
+        public string AuthToken;
 
         /// <summary>Fill empty slots with server bots when the match starts.</summary>
         public bool FillWithBots = true;
@@ -163,7 +169,13 @@ namespace KnockRush.Multiplayer
                 args.Scene = SceneRef.FromIndex(BuildIndexOf(options.MapScene));
             }
 
-            if (!string.IsNullOrEmpty(options.UserId))
+            if (!string.IsNullOrEmpty(options.AuthToken) && options.Role != SessionRole.Single)
+            {
+                var auth = new Photon.Realtime.AuthenticationValues { AuthType = Photon.Realtime.CustomAuthenticationType.Custom };
+                auth.AddAuthParameter("token", options.AuthToken);
+                args.AuthValues = auth;
+            }
+            else if (!string.IsNullOrEmpty(options.UserId))
             {
                 args.AuthValues = new Photon.Realtime.AuthenticationValues(options.UserId);
             }
