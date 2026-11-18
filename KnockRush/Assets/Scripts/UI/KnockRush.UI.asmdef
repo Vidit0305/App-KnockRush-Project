@@ -1,0 +1,17 @@
+{
+    "name": "KnockRush.UI",
+    "rootNamespace": "KnockRush.UI",
+    "references": [
+        "KnockRush.Core",
+        "KnockRush.Utilities"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
