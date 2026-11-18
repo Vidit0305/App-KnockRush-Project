@@ -9,7 +9,7 @@ import { HttpsError, onCall, onRequest } from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
 import {
   computeReward, levelForXp, xpForLevel, validateUsername, nextDailyClaim, utcDayNumber, newAchievements,
-  validateMatchReport, STARTING_COINS, STARTING_GEMS, PlayerStats,
+  validateMatchReport, STARTING_COINS, STARTING_GEMS, PlayerStats, ACHIEVEMENTS, achievementReached,
 } from "./rules.js";
 import { CATALOG, findItem, STARTER_ITEMS, SHOP_ITEMS } from "./catalog.js";
 import { db, requireUid, userRef, walletRef, progressRef, missionsRef, ledger } from "./common.js";
@@ -86,6 +86,28 @@ export const getProfile = onCall(async request => {
   }
 
   return profile;
+});
+
+/** All achievements with the player's progress towards each (for the Achievements screen). */
+export const getAchievements = onCall(async request => {
+  const uid = requireUid(request);
+  const [user, progress] = await Promise.all([userRef(uid).get(), progressRef(uid).get()]);
+  const stats: PlayerStats = {
+    matches: user.get("stats.matches") ?? 0,
+    wins: user.get("stats.wins") ?? 0,
+    roundsCleared: user.get("stats.roundsCleared") ?? 0,
+  };
+  const owned: string[] = progress.get("achievements") ?? [];
+  return {
+    achievements: ACHIEVEMENTS.map(a => ({
+      id: a.id,
+      title: a.title,
+      description: a.description,
+      target: a.target,
+      progress: Math.min(a.target, stats[a.stat]),
+      unlocked: owned.includes(a.id) || achievementReached(a, stats),
+    })),
+  };
 });
 
 /** Claims a unique username (case-insensitive). Players may rename at most once per 7 days. */

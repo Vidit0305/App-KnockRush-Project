@@ -89,6 +89,11 @@ test("match results: server key required, validated, rewarded once", async () =>
   assert.equal(champ.stats.crowns, 1);
   assert.ok(champ.xp >= 410);
   assert.ok(champ.achievements.includes("first_win"));
+  const list = await call("getAchievements", {}, winner);
+  const crowned = list.achievements.find((a: { id: string }) => a.id === "first_win");
+  assert.equal(crowned.unlocked, true);
+  const wins5 = list.achievements.find((a: { id: string }) => a.id === "wins_5");
+  assert.deepEqual([wins5.unlocked, wins5.progress, wins5.target], [false, 1, 5]);
   assert.equal(champ.level, 2);
 
   const other = await call("getProfile", {}, loser);
