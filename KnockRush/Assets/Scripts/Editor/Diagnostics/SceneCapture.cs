@@ -42,6 +42,27 @@ namespace KnockRush.EditorTools.Diagnostics
             EditorApplication.Exit(exitCode);
         }
 
+        /// <summary>Captures every map scene in Assets/Scenes/Maps (overview + checkpoints).</summary>
+        public static void CaptureAllMapsBatch()
+        {
+            var exitCode = 0;
+            try
+            {
+                var output = GetArg("-captureOut") ?? "../.logs/captures";
+                foreach (var guid in AssetDatabase.FindAssets("t:Scene", new[] { "Assets/Scenes/Maps" }))
+                {
+                    CaptureScene(AssetDatabase.GUIDToAssetPath(guid), output, "Idle");
+                }
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+                exitCode = 1;
+            }
+
+            EditorApplication.Exit(exitCode);
+        }
+
         /// <summary>Captures a character close-up (posed with <paramref name="clipName"/>) and a wide shot.</summary>
         public static void CaptureScene(string scenePath, string outputFolder, string clipName)
         {
