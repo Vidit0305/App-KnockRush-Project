@@ -58,6 +58,9 @@ namespace KnockRush.EditorTools.Build
             var rigs = RigBuilder.BuildAll(cameraSettings);
             HammerRushBuilder.Build(rigs.offline, rigs.online);
 
+            // Phase 6: the other seven maps.
+            AdditionalMapsBuilder.BuildAll();
+
             // Phase 5: game modes, catalog (modes + map pool), MatchController prefab.
             GameModeContentBuilder.Build();
             AssetDatabase.SaveAssets();

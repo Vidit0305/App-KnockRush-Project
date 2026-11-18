@@ -17,6 +17,27 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Maps/HammerRush.unity
     guid: a1aeb7b18f764fb428cf5b8596f1f69a
+  - enabled: 1
+    path: Assets/Scenes/Maps/SlimeMountain.unity
+    guid: 03f38ff676c54284b858b899f5ec302a
+  - enabled: 1
+    path: Assets/Scenes/Maps/SkyHigh.unity
+    guid: 175b83a41d3d4b148bb931159a313c33
+  - enabled: 1
+    path: Assets/Scenes/Maps/SpinAttack.unity
+    guid: b8ac8991e8a45304398a7786d4ad9376
+  - enabled: 1
+    path: Assets/Scenes/Maps/FallingTiles.unity
+    guid: c5d1e34de41211d4f83321a05e8d5d17
+  - enabled: 1
+    path: Assets/Scenes/Maps/PendulumPanic.unity
+    guid: 93ae5eff885635d49a2d410203ebad66
+  - enabled: 1
+    path: Assets/Scenes/Maps/CrownClimber.unity
+    guid: fb228cec0e58e2647baa5d4712fcbbe3
+  - enabled: 1
+    path: Assets/Scenes/Maps/LastPlatform.unity
+    guid: 7d337a7fac7ccbe48bc2866b78e9a654
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: a6c991ddf687dd14991dfe18bbe38191, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b56268b9e70188d48afcaa0252839d1e, type: 3}
+  m_Name: SkyHigh
+  m_EditorClassIdentifier: KnockRush.Maps::KnockRush.Maps.MapDefinition
+  mapId: sky_high
+  displayName: Sky High
+  description: Hop across floating islands in the clouds. Bridges vanish, platforms
+    drift and the shortcut is a long way down.
+  category: 0
+  fallRule: 0
+  sceneName: SkyHigh
+  difficulty: 3
+  minPlayers: 2
+  maxPlayers: 32
+  timeLimit: 180
+  themeColor: {r: 0.1764706, g: 0.6117647, b: 1, a: 1}
