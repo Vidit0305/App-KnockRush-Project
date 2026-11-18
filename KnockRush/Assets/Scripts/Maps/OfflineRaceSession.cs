@@ -79,7 +79,8 @@ namespace KnockRush.Maps
             }
 
             phaseStartTime = Time.time;
-            ObstacleSimulation.ResetClock(Time.timeAsDouble);
+            ObstacleSimulation.ResetClock(Time.timeAsDouble + countdownSeconds);
+            FallingTile.Armed = false;
         }
 
         private void Update()
@@ -118,6 +119,7 @@ namespace KnockRush.Maps
         {
             CurrentPhase = Phase.Running;
             phaseStartTime = Time.time;
+            FallingTile.Armed = true;
             foreach (var participant in participants)
             {
                 participant.InputLocked = false;

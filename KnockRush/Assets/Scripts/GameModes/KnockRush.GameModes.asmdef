@@ -11,7 +11,8 @@
         "KnockRush.Player",
         "KnockRush.CameraRig",
         "Fusion.Unity",
-        "Photon.Realtime"
+        "Photon.Realtime",
+        "KnockRush.Obstacles"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

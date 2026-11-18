@@ -36,6 +36,18 @@ namespace KnockRush.Obstacles
 
         public TileState State { get; private set; } = TileState.Idle;
 
+        /// <summary>
+        /// Global gate: tiles ignore characters until the round starts (players stand on them
+        /// during the countdown). Round controllers set this at countdown / GO.
+        /// </summary>
+        public static bool Armed { get; set; } = true;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics()
+        {
+            Armed = true;
+        }
+
         public void Configure(float shake, float fall, float respawn)
         {
             shakeDuration = shake;
@@ -73,7 +85,17 @@ namespace KnockRush.Obstacles
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.GetComponentInParent<IKnockbackTarget>() != null)
+            TryTrigger(other);
+        }
+
+        private void OnTriggerStay(Collider other)
+        {
+            TryTrigger(other);
+        }
+
+        private void TryTrigger(Collider other)
+        {
+            if (Armed && State == TileState.Idle && other.GetComponentInParent<IKnockbackTarget>() != null)
             {
                 Trigger();
             }

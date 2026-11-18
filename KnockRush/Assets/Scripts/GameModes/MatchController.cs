@@ -298,6 +298,7 @@ namespace KnockRush.GameModes
         {
             Phase = MatchPhase.Countdown;
             Timer = TickTimer.CreateFromSeconds(Runner, CountdownSeconds);
+            KnockRush.Obstacles.FallingTile.Armed = false;
             foreach (var character in characters.Values)
             {
                 if (character != null)
@@ -311,6 +312,7 @@ namespace KnockRush.GameModes
         {
             Phase = MatchPhase.Playing;
             RoundStartTick = Runner.Tick.Raw;
+            KnockRush.Obstacles.FallingTile.Armed = true;
             var limit = RoundTimeLimitOverride > 0f ? RoundTimeLimitOverride : (CurrentMap != null ? CurrentMap.TimeLimit : 180f);
             Timer = TickTimer.CreateFromSeconds(Runner, limit);
             foreach (var character in characters.Values)
