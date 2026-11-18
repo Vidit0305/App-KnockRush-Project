@@ -4,6 +4,7 @@
  * dedicated game server reports results with a server key. Firestore rules deny direct writes.
  */
 import { initializeApp } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
 import { FieldValue, getFirestore, Transaction } from "firebase-admin/firestore";
 import { HttpsError, onCall, onRequest, CallableRequest } from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
@@ -367,4 +368,25 @@ export const respondFriendRequest = onCall(async request => {
     }
   });
   return { accepted: !!accept };
+});
+
+// -------------------------------------------------------------------------------------------
+// Photon custom authentication: Photon calls this with the player's Firebase ID token and uses
+// the returned UserId, so match identities are verified Firebase UIDs (no impersonation).
+// Configure in the Photon dashboard: Authentication → Custom → URL of this function,
+// with the client sending the "token" parameter.
+// -------------------------------------------------------------------------------------------
+export const photonAuth = onRequest(async (req, res) => {
+  const token = (req.query.token ?? req.body?.token) as string | undefined;
+  if (!token) {
+    res.status(200).json({ ResultCode: 3, Message: "Missing token" });
+    return;
+  }
+
+  try {
+    const decoded = await getAuth().verifyIdToken(token);
+    res.status(200).json({ ResultCode: 1, UserId: decoded.uid });
+  } catch {
+    res.status(200).json({ ResultCode: 2, Message: "Invalid token" });
+  }
 });

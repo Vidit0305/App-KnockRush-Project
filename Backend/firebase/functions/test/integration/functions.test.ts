@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { call, expectCallError, report, signUpAnonymous } from "./helpers.js";
+import { call, expectCallError, report, signUpAnonymous, FUNCTIONS, PROJECT, REGION } from "./helpers.js";
 
 test("ensureProfile creates wallet and starter inventory, idempotently", async () => {
   const user = await signUpAnonymous();
@@ -111,4 +111,15 @@ test("friend requests by username", async () => {
   const accepted = await call("respondFriendRequest", { fromUid: a.uid, accept: true }, b);
   assert.equal(accepted.accepted, true);
   await expectCallError(call("respondFriendRequest", { fromUid: a.uid, accept: true }, b), "NOT_FOUND");
+});
+
+test("photon custom auth returns the verified uid", async () => {
+  const user = await signUpAnonymous();
+  const url = `http://${FUNCTIONS}/${PROJECT}/${REGION}/photonAuth`;
+  const ok = await (await fetch(`${url}?token=${encodeURIComponent(user.token)}`)).json() as any;
+  assert.deepEqual(ok, { ResultCode: 1, UserId: user.uid });
+  const bad = await (await fetch(`${url}?token=forged`)).json() as any;
+  assert.equal(bad.ResultCode, 2);
+  const missing = await (await fetch(url)).json() as any;
+  assert.equal(missing.ResultCode, 3);
 });
