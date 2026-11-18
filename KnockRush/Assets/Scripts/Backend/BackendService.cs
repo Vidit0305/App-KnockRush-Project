@@ -56,6 +56,15 @@ namespace KnockRush.Backend
         Task SendFriendRequestAsync(string username);
         Task RespondFriendRequestAsync(string fromUid, bool accept);
         Task LinkAccountAsync(string providerId, string providerIdToken);
+        Task<FriendsResponse> GetFriendsAsync();
+        Task<SeasonResponse> GetSeasonAsync();
+        Task BuyPremiumPassAsync();
+        Task<TierReward> ClaimSeasonRewardAsync(int tier, bool premium);
+        Task<MissionsResponse> GetMissionsAsync();
+        Task ClaimMissionAsync(string missionId);
+        Task<ShopResponse> GetShopAsync();
+        Task PurchaseBundleAsync(string bundleId);
+        Task<PurchaseValidation> ValidatePurchaseAsync(string store, string productId, string token);
     }
 
     /// <summary>
@@ -185,6 +194,46 @@ namespace KnockRush.Backend
         {
             await client.LinkWithProviderAsync(providerId, providerIdToken);
             await RefreshProfileAsync();
+        }
+
+        public Task<FriendsResponse> GetFriendsAsync() => client.CallAsync<FriendsResponse>("getFriends", null);
+
+        public Task<SeasonResponse> GetSeasonAsync() => client.CallAsync<SeasonResponse>("getSeason", null);
+
+        public async Task BuyPremiumPassAsync()
+        {
+            await client.CallAsync("buyPremiumPass", null);
+            await RefreshProfileAsync();
+        }
+
+        public async Task<TierReward> ClaimSeasonRewardAsync(int tier, bool premium)
+        {
+            var reward = await client.CallAsync<TierReward>("claimSeasonReward", new { tier, track = premium ? "premium" : "free" });
+            await RefreshProfileAsync();
+            return reward;
+        }
+
+        public Task<MissionsResponse> GetMissionsAsync() => client.CallAsync<MissionsResponse>("getMissions", null);
+
+        public async Task ClaimMissionAsync(string missionId)
+        {
+            await client.CallAsync("claimMission", new { missionId });
+            await RefreshProfileAsync();
+        }
+
+        public Task<ShopResponse> GetShopAsync() => client.CallAsync<ShopResponse>("getShop", null);
+
+        public async Task PurchaseBundleAsync(string bundleId)
+        {
+            await client.CallAsync("purchaseBundle", new { bundleId });
+            await RefreshProfileAsync();
+        }
+
+        public async Task<PurchaseValidation> ValidatePurchaseAsync(string store, string productId, string token)
+        {
+            var result = await client.CallAsync<PurchaseValidation>("validatePurchase", new { store, productId, token });
+            await RefreshProfileAsync();
+            return result;
         }
 
         private void SetProfile(PlayerProfile profile)

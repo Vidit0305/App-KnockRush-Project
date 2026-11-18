@@ -108,9 +108,15 @@ test("friend requests by username", async () => {
   await call("setUsername", { username: bName }, b);
 
   await call("sendFriendRequest", { username: bName }, a);
+  const pending = await call("getFriends", {}, b);
+  assert.ok(pending.requests.some((r: { uid: string }) => r.uid === a.uid), "request listed");
   const accepted = await call("respondFriendRequest", { fromUid: a.uid, accept: true }, b);
   assert.equal(accepted.accepted, true);
   await expectCallError(call("respondFriendRequest", { fromUid: a.uid, accept: true }, b), "NOT_FOUND");
+  const listA = await call("getFriends", {}, a);
+  assert.ok(listA.friends.some((f: { uid: string }) => f.uid === b.uid), "friendship is mutual");
+  const listB = await call("getFriends", {}, b);
+  assert.equal(listB.requests.length, 0);
 });
 
 test("photon custom auth returns the verified uid", async () => {

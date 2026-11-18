@@ -341,6 +341,19 @@ export const sendFriendRequest = onCall(async request => {
   return { sentTo: target };
 });
 
+/** Friends and incoming friend requests (most recent first), for the Friends & Party screen. */
+export const getFriends = onCall(async request => {
+  const uid = requireUid(request);
+  const [friends, requests] = await Promise.all([
+    userRef(uid).collection("friends").limit(200).get(),
+    userRef(uid).collection("friendRequests").orderBy("at", "desc").limit(50).get(),
+  ]);
+  return {
+    friends: friends.docs.map(d => ({ uid: d.id, displayName: d.get("displayName") ?? "Player" })),
+    requests: requests.docs.map(d => ({ uid: d.id, displayName: d.get("displayName") ?? "Player" })),
+  };
+});
+
 export const respondFriendRequest = onCall(async request => {
   const uid = requireUid(request);
   const { fromUid, accept } = (request.data ?? {}) as { fromUid?: string; accept?: boolean };
