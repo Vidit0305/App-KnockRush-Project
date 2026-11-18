@@ -18,6 +18,9 @@ Shader "KnockRush/Toon"
         _RimStrength ("Rim Strength", Range(0, 1)) = 0.3
         _SpecularSize ("Specular Size", Range(0, 0.2)) = 0.04
         _SpecularStrength ("Specular Strength", Range(0, 1)) = 0.35
+        [IntRange] _PatternType ("Pattern (0 none, 1 stripes, 2 dots, 3 zigzag, 4 stars, 5 hearts, 6 checker, 7 flames)", Range(0, 7)) = 0
+        _PatternColor ("Pattern Color", Color) = (1, 1, 1, 1)
+        _PatternScale ("Pattern Scale", Range(0.25, 4)) = 1
     }
 
     SubShader
@@ -41,7 +44,58 @@ Shader "KnockRush/Toon"
             float _RimStrength;
             float _SpecularSize;
             float _SpecularStrength;
+            float _PatternType;
+            float4 _PatternColor;
+            float _PatternScale;
         CBUFFER_END
+
+        // Procedural cosmetic patterns in object space (no textures). Returns 0..1 coverage.
+        float PatternMask(float3 positionOS, float type)
+        {
+            if (type < 0.5) return 0;
+            float3 p = positionOS * _PatternScale;
+            float u = atan2(p.x, p.z) / 6.2831853 + 0.5; // around the body
+            float v = p.y;                               // up the body
+            float2 cell;
+            float2 local;
+            if (type < 1.5) // stripes
+            {
+                return step(0.5, frac(v * 5.0));
+            }
+            if (type < 2.5) // polka dots
+            {
+                cell = float2(u * 14.0, v * 7.0);
+                local = frac(cell) - 0.5;
+                return 1.0 - smoothstep(0.24, 0.28, length(local));
+            }
+            if (type < 3.5) // zigzag
+            {
+                return step(0.5, frac(v * 5.0 + abs(frac(u * 10.0) - 0.5) * 1.2));
+            }
+            if (type < 4.5) // stars
+            {
+                cell = float2(u * 10.0, v * 5.0);
+                local = (frac(cell) - 0.5) * 2.0;
+                float r = length(local);
+                float a = atan2(local.y, local.x);
+                float star = 0.42 * (0.55 + 0.45 * cos(5.0 * a));
+                return 1.0 - smoothstep(star, star + 0.06, r);
+            }
+            if (type < 5.5) // hearts
+            {
+                cell = float2(u * 10.0, v * 5.0);
+                local = (frac(cell) - 0.5) * 3.0;
+                local.y += 0.25;
+                float h = pow(local.x * local.x + local.y * local.y - 1.0, 3.0) - local.x * local.x * local.y * local.y * local.y;
+                return step(h, 0.0);
+            }
+            if (type < 6.5) // checker
+            {
+                return fmod(floor(u * 12.0) + floor(v * 6.0), 2.0);
+            }
+            // flames rising from the bottom
+            return step(v, 0.55 + 0.18 * sin(u * 40.0 + v * 9.0) + 0.08 * sin(u * 97.0));
+        }
         ENDHLSL
 
         Pass
@@ -82,6 +136,7 @@ Shader "KnockRush/Toon"
                 float3 positionWS : TEXCOORD2;
                 float4 color : TEXCOORD3;
                 float fogFactor : TEXCOORD4;
+                float3 positionOS : TEXCOORD5;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
                 UNITY_VERTEX_OUTPUT_STEREO
             };
@@ -102,6 +157,7 @@ Shader "KnockRush/Toon"
                 output.uv = TRANSFORM_TEX(input.uv, _BaseMap);
                 output.color = input.color;
                 output.fogFactor = ComputeFogFactor(positionInputs.positionCS.z);
+                output.positionOS = input.positionOS.xyz;
                 return output;
             }
 
@@ -117,6 +173,9 @@ Shader "KnockRush/Toon"
                 half3 texColor = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.uv).rgb;
                 half3 vertexAlbedo = lerp(vertexRgb, vertexRgb * _BaseColor.rgb, input.color.a);
                 half3 albedo = lerp(_BaseColor.rgb, vertexAlbedo, _UseVertexColor) * texColor;
+                half tintMask = lerp(1.0h, input.color.a, _UseVertexColor);
+                half pattern = PatternMask(input.positionOS, _PatternType) * tintMask;
+                albedo = lerp(albedo, _PatternColor.rgb * lerp(1.0h, vertexRgb, _UseVertexColor), pattern);
 
                 half3 normalWS = normalize(input.normalWS);
                 half3 viewDirWS = SafeNormalize(GetWorldSpaceViewDir(input.positionWS));

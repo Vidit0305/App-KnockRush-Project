@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7906596459649058821}
   - component: {fileID: 4900176165336125231}
   - component: {fileID: 3806728197913427935}
+  - component: {fileID: 12152334729967991}
   m_Layer: 6
   m_Name: Visual
   m_TagString: Untagged
@@ -63,6 +64,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: KnockRush.Player::KnockRush.Player.Presentation.BeanAppearance
   bodyRenderer: {fileID: 7334727842326871707}
   bodyColor: {r: 1, g: 0.41568628, b: 0.101960786, a: 1}
+--- !u!114 &12152334729967991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2987091859399160423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90fb74feb1ad75d409bf2f692cebde00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: KnockRush.Inventory::KnockRush.Inventory.CosmeticApplier
+  bodyRenderer: {fileID: 7334727842326871707}
+  animationDriver: {fileID: 4900176165336125231}
 --- !u!1 &8775811608699027132
 GameObject:
   m_ObjectHideFlags: 0

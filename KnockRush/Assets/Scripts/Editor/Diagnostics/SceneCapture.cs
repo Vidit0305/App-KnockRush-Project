@@ -63,6 +63,53 @@ namespace KnockRush.EditorTools.Diagnostics
             EditorApplication.Exit(exitCode);
         }
 
+        /// <summary>Renders every costume (20) on a bean in a 5×4 grid: Tools/unity.sh exec ...CaptureCosmeticsBatch.</summary>
+        public static void CaptureCosmeticsBatch()
+        {
+            var exitCode = 0;
+            try
+            {
+                var output = GetArg("-captureOut") ?? "../.logs/captures";
+                Directory.CreateDirectory(output);
+                EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+                var catalog = KnockRush.Inventory.CosmeticCatalog.Load();
+                var model = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Characters/Bean/Bean.fbx");
+                var material = AssetDatabase.LoadAssetAtPath<Material>("Assets/Art/Characters/Bean/Bean_Toon.mat");
+                var costumes = new System.Collections.Generic.List<KnockRush.Inventory.CosmeticDefinition>(catalog.InSlot(KnockRush.Inventory.CosmeticSlot.Body));
+                var colors = new System.Collections.Generic.List<KnockRush.Inventory.CosmeticDefinition>(catalog.InSlot(KnockRush.Inventory.CosmeticSlot.Color));
+                var hats = new System.Collections.Generic.List<KnockRush.Inventory.CosmeticDefinition>(catalog.InSlot(KnockRush.Inventory.CosmeticSlot.Hat));
+                for (var i = 0; i < costumes.Count; i++)
+                {
+                    var bean = (GameObject)PrefabUtility.InstantiatePrefab(model);
+                    bean.transform.SetPositionAndRotation(new Vector3((i % 5 - 2f) * 1.6f, -(i / 5) * 2.1f, 0f), Quaternion.identity);
+                    var renderer = bean.GetComponentInChildren<SkinnedMeshRenderer>();
+                    renderer.sharedMaterial = material;
+                    var applier = bean.AddComponent<KnockRush.Inventory.CosmeticApplier>();
+                    var so = new SerializedObject(applier);
+                    so.FindProperty("bodyRenderer").objectReferenceValue = renderer;
+                    so.ApplyModifiedPropertiesWithoutUndo();
+                    var loadout = KnockRush.Inventory.Loadout.Default;
+                    loadout.Body = costumes[i].ItemId;
+                    loadout.Color = colors[i % colors.Count].ItemId;
+                    applier.Apply(loadout);
+                    if (i == 0)
+                    {
+                        loadout.Hat = hats[2].ItemId;
+                    }
+                }
+
+                var camera = Camera.main;
+                Render(camera, new Vector3(0f, -1.3f, -11.5f), new Vector3(0f, -2.2f, 0f), Path.Combine(output, "cosmetics_costumes.png"));
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+                exitCode = 1;
+            }
+
+            EditorApplication.Exit(exitCode);
+        }
+
         /// <summary>Captures a character close-up (posed with <paramref name="clipName"/>) and a wide shot.</summary>
         public static void CaptureScene(string scenePath, string outputFolder, string clipName)
         {

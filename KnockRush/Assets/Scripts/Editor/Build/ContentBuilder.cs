@@ -38,6 +38,9 @@ namespace KnockRush.EditorTools.Build
         {
             KnockRushProjectSetup.EnsureLayers();
 
+            // Phase 8: cosmetic visuals (needed by the player prefabs below).
+            KnockRush.EditorTools.Cosmetics.CosmeticContentBuilder.Build();
+
             // Addressables settings (maps/cosmetics are delivered through Addressables from Phase 6;
             // Fusion also probes Addressables at runtime, which needs a settings object to exist).
             UnityEditor.AddressableAssets.AddressableAssetSettingsDefaultObject.GetSettings(true);

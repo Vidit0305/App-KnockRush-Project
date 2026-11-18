@@ -77,6 +77,9 @@ namespace KnockRush.EditorTools.Multiplayer
                 EditorAssetUtility.SetField(driver, "animator", animator);
                 var appearance = visual.gameObject.AddComponent<BeanAppearance>();
                 EditorAssetUtility.SetField(appearance, "bodyRenderer", renderer);
+                var cosmetics = visual.gameObject.AddComponent<KnockRush.Inventory.CosmeticApplier>();
+                EditorAssetUtility.SetField(cosmetics, "bodyRenderer", renderer);
+                EditorAssetUtility.SetField(cosmetics, "animationDriver", driver);
 
                 EditorAssetUtility.SetLayerRecursively(root, GameLayers.Player);
                 var prefab = PrefabUtility.SaveAsPrefabAsset(root, NetworkPlayerPath);

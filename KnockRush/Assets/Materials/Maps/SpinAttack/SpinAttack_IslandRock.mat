@@ -30,6 +30,8 @@ Material:
     m_Ints: []
     m_Floats:
     - _AmbientStrength: 0.6
+    - _PatternScale: 1
+    - _PatternType: 0
     - _RampSmoothness: 0.06
     - _RampThreshold: 0.5
     - _RimPower: 3.5
@@ -39,6 +41,7 @@ Material:
     - _UseVertexColor: 0
     m_Colors:
     - _BaseColor: {r: 0.35686275, g: 0.2784314, b: 0.6117647, a: 1}
+    - _PatternColor: {r: 1, g: 1, b: 1, a: 1}
     - _RimColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShadeColor: {r: 0.62, g: 0.58, b: 0.78, a: 1}
   m_BuildTextureStacks: []

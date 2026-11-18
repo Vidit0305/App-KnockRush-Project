@@ -163,6 +163,9 @@ namespace KnockRush.EditorTools.Characters
                 EditorAssetUtility.SetField(character, "inputReader", reader);
                 EditorAssetUtility.SetField(driver, "animator", animator);
                 EditorAssetUtility.SetField(appearance, "bodyRenderer", renderer);
+                var cosmetics = visual.gameObject.AddComponent<KnockRush.Inventory.CosmeticApplier>();
+                EditorAssetUtility.SetField(cosmetics, "bodyRenderer", renderer);
+                EditorAssetUtility.SetField(cosmetics, "animationDriver", driver);
 
                 EditorAssetUtility.SetLayerRecursively(root, GameLayers.Player);
 

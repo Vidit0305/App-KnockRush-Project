@@ -20,7 +20,8 @@
         "Unity.Addressables.Editor",
         "KnockRush.GameModes",
         "KnockRush.Matchmaking",
-        "KnockRush.Backend"
+        "KnockRush.Backend",
+        "KnockRush.Inventory"
     ],
     "includePlatforms": [
         "Editor"
