@@ -10,7 +10,7 @@
     "test:unit": "npm run build && node --test \"build/test/unit/**/*.test.js\"",
     "test:integration": "node --test --test-concurrency=1 \"build/test/integration/**/*.test.js\"",
     "test": "npm run test:unit && npm run build && firebase emulators:exec --project demo-knockrush --only auth,firestore,functions \"npm run test:integration\"",
-    "pretest": "node -e \"require('fs').existsSync('.secret.local')||require('fs').writeFileSync('.secret.local','MATCH_REPORT_KEY=dev-report-key\n')\""
+    "pretest": "node scripts/ensure-dev-secret.cjs"
   },
   "dependencies": {
     "firebase-admin": "^14.5.1",

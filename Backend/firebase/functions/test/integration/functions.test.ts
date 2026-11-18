@@ -35,7 +35,7 @@ test("shop purchases are priced and paid on the server", async () => {
   const user = await signUpAnonymous();
   await call("ensureProfile", {}, user);
   const purchase = await call("purchaseShopItem", { itemId: "color_purple" }, user);
-  assert.equal(purchase.coins, 200);
+  assert.equal(purchase.coins, 100); // 500 start − 400 (common)
   await expectCallError(call("purchaseShopItem", { itemId: "color_purple" }, user), "ALREADY_EXISTS");
   await expectCallError(call("purchaseShopItem", { itemId: "hat_crown" }, user), "FAILED_PRECONDITION");
   await expectCallError(call("purchaseShopItem", { itemId: "free_gems_hack" }, user), "NOT_FOUND");
@@ -44,7 +44,7 @@ test("shop purchases are priced and paid on the server", async () => {
   await expectCallError(call("equipItems", { equipped: { body: "body_dino" } }, user), "PERMISSION_DENIED");
   const profile = await call("getProfile", {}, user);
   assert.equal(profile.equipped.color, "color_purple");
-  assert.equal(profile.coins, 200);
+  assert.equal(profile.coins, 100);
 });
 
 test("daily reward can be claimed once per day", async () => {

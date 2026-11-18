@@ -45,13 +45,13 @@ namespace KnockRush.Tests.PlayMode
 
             var purchase = backend.PurchaseAsync("color_purple");
             yield return Wait(purchase);
-            Assert.AreEqual(200, backend.Profile.Coins);
+            Assert.AreEqual(100, backend.Profile.Coins);
             Assert.IsTrue(backend.Profile.Owns("color_purple"));
 
             var daily = backend.ClaimDailyRewardAsync();
             yield return Wait(daily);
             Assert.AreEqual(1, daily.Result.Streak);
-            Assert.AreEqual(250, backend.Profile.Coins);
+            Assert.AreEqual(150, backend.Profile.Coins);
 
             var equip = backend.EquipAsync(new Dictionary<string, string> { ["color"] = "color_purple" });
             yield return Wait(equip);
@@ -68,7 +68,7 @@ namespace KnockRush.Tests.PlayMode
             var restore = again.SignInAsync();
             yield return Wait(restore);
             Assert.AreEqual(backend.Uid, again.Uid);
-            Assert.AreEqual(250, restore.Result.Coins);
+            Assert.AreEqual(150, restore.Result.Coins);
         }
 
         private static IEnumerator RequireEmulator()
