@@ -107,7 +107,7 @@ namespace KnockRush.EditorTools.UI
             KnockRushProjectSetup.EnsureFolder(MenuMaterialsFolder);
             var podiumMat = EditorAssetUtility.CreateToonMaterial(MenuMaterialsFolder + "/Podium.mat", new Color32(255, 106, 26, 255), false);
             var podiumRimMat = EditorAssetUtility.CreateToonMaterial(MenuMaterialsFolder + "/PodiumRim.mat", new Color32(255, 209, 43, 255), false);
-            var floorMat = EditorAssetUtility.CreateToonMaterial(MenuMaterialsFolder + "/Floor.mat", new Color32(58, 36, 160, 255), false);
+            var floorMat = EditorAssetUtility.CreateLevelMaterial(MenuMaterialsFolder + "/Floor.mat", new Color32(70, 205, 140, 255));
             Color[] shapeColors =
             {
                 new Color32(34, 197, 139, 255), new Color32(255, 79, 154, 255), new Color32(255, 209, 43, 255), new Color32(91, 46, 255, 255), new Color32(45, 156, 255, 255)
@@ -134,18 +134,14 @@ namespace KnockRush.EditorTools.UI
             camera.transform.localPosition = new Vector3(0f, 1.25f, 5.2f);
             camera.transform.localRotation = Quaternion.LookRotation(new Vector3(0f, 0.95f, 0f) - camera.transform.localPosition);
             camera.fieldOfView = 32f;
-            camera.clearFlags = CameraClearFlags.SolidColor;
-            camera.backgroundColor = new Color32(0x2A, 0x1A, 0x7A, 0xFF);
+            Scenes.WorldLookBuilder.ConfigureCamera(camera);
             camera.nearClipPlane = 0.1f;
             camera.farClipPlane = 80f;
 
             SceneBuildKitFacade.ConfigureLighting(Quaternion.Euler(42f, 150f, 0f),
-                new Color32(150, 140, 255, 255), new Color32(120, 90, 200, 255), new Color32(60, 40, 120, 255), 1.15f);
-            RenderSettings.fog = true;
-            RenderSettings.fogMode = FogMode.Linear;
-            RenderSettings.fogColor = camera.backgroundColor;
-            RenderSettings.fogStartDistance = 14f;
-            RenderSettings.fogEndDistance = 45f;
+                new Color32(205, 225, 255, 255), new Color32(190, 205, 235, 255), new Color32(120, 120, 160, 255), 1.2f);
+            RenderSettings.fogStartDistance = 30f;
+            RenderSettings.fogEndDistance = 140f;
 
             var stageRoot = new GameObject("MenuStage");
             var floor = Primitive(PrimitiveType.Cylinder, "Floor", stageRoot.transform, new Vector3(0f, -0.62f, -6f), new Vector3(40f, 0.5f, 40f), floorMat);
@@ -154,16 +150,24 @@ namespace KnockRush.EditorTools.UI
             Primitive(PrimitiveType.Cylinder, "Podium", stageRoot.transform, new Vector3(0f, -0.08f, 0f), new Vector3(2.2f, 0.12f, 2.2f), podiumMat);
 
             var random = new System.Random(42);
-            for (var i = 0; i < 14; i++)
+            for (var i = 0; i < 8; i++)
             {
                 var side = i % 2 == 0 ? -1f : 1f;
-                var position = new Vector3(side * (3.5f + (float)random.NextDouble() * 8f), 0.5f + (float)random.NextDouble() * 5f, -4f - (float)random.NextDouble() * 18f);
-                var size = 0.5f + (float)random.NextDouble() * 1.6f;
-                var type = i % 3 == 0 ? PrimitiveType.Cube : PrimitiveType.Sphere;
+                var position = new Vector3(side * (4.5f + (float)random.NextDouble() * 7f), 1f + (float)random.NextDouble() * 4f, -8f - (float)random.NextDouble() * 14f);
+                var size = 0.35f + (float)random.NextDouble() * 0.6f;
+                var type = PrimitiveType.Sphere;
                 var shape = Primitive(type, $"Shape{i}", stageRoot.transform, position, Vector3.one * size, shapeMats[i % shapeMats.Length]);
                 shape.transform.rotation = Quaternion.Euler(random.Next(360), random.Next(360), random.Next(360));
-                shape.AddComponent<FloatingDecor>();
+                shape.AddComponent<KnockRush.Maps.FloatingDecor>();
             }
+
+            // Festival backdrop (balloons + crown banner towers) like the key art.
+            Scenes.WorldLookBuilder.Balloon(stageRoot.transform, new Vector3(-6.2f, 3.6f, -18f), 1.7f, 0);
+            Scenes.WorldLookBuilder.Balloon(stageRoot.transform, new Vector3(6.8f, 4.4f, -22f), 2.1f, 1);
+            Scenes.WorldLookBuilder.Balloon(stageRoot.transform, new Vector3(-11.5f, 5.2f, -32f), 2.4f, 2);
+            Scenes.WorldLookBuilder.Balloon(stageRoot.transform, new Vector3(12.5f, 5.8f, -36f), 2.6f, 3);
+            Scenes.WorldLookBuilder.Tower(stageRoot.transform, new Vector3(-9.5f, -0.4f, -32f), 11f, -1f, 0.3f);
+            Scenes.WorldLookBuilder.Tower(stageRoot.transform, new Vector3(10.5f, -0.4f, -36f), 13f, 1f, 0.3f);
 
             // The bean.
             var turntable = new GameObject("Turntable").transform;

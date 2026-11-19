@@ -81,6 +81,7 @@ namespace KnockRush.EditorTools.Scenes
             camera.fieldOfView = cameraSettings.FieldOfView;
             camera.nearClipPlane = 0.1f;
             camera.farClipPlane = 600f;
+            WorldLookBuilder.ConfigureCamera(camera);
             var rig = cameraObject.AddComponent<ThirdPersonCamera>();
             EditorAssetUtility.SetField(rig, "settings", cameraSettings);
             if (target != null)

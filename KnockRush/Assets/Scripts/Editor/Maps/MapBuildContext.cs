@@ -69,7 +69,7 @@ namespace KnockRush.EditorTools.Maps
         {
             if (!materials.TryGetValue(name, out var material) || material == null)
             {
-                material = EditorAssetUtility.CreateToonMaterial($"{materialFolder}/{SceneName}_{name}.mat", color, false);
+                material = EditorAssetUtility.CreateLevelMaterial($"{materialFolder}/{SceneName}_{name}.mat", color, name != "Cloud" && name != "Sea");
                 materials[name] = material;
             }
 

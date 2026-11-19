@@ -39,7 +39,7 @@ namespace KnockRush.EditorTools.Maps
             KnockRushProjectSetup.EnsureFolder(MaterialFolder);
             var definition = EnsureDefinition();
 
-            Material M(string name, Color32 color) => EditorAssetUtility.CreateToonMaterial($"{MaterialFolder}/HR_{name}.mat", color, false);
+            Material M(string name, Color32 color) => EditorAssetUtility.CreateLevelMaterial($"{MaterialFolder}/HR_{name}.mat", color, !name.Contains("Cloud") && !name.Contains("Sea"));
             var path = M("Path", new Color32(0xFF, 0xB2, 0x3F, 0xFF));
             var edge = M("Edge", new Color32(0xFF, 0xF4, 0xE0, 0xFF));
             var start = M("Start", new Color32(0x5B, 0x2E, 0xFF, 0xFF));

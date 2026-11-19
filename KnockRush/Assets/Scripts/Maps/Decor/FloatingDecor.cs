@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace KnockRush.UI.Stage
+namespace KnockRush.Maps
 {
     /// <summary>Menu backdrop shape: bobs and tumbles slowly (cheap, no physics).</summary>
     [DisallowMultipleComponent]

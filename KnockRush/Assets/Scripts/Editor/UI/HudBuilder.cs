@@ -16,7 +16,8 @@ namespace KnockRush.EditorTools.UI
         public static GameObject BuildRaceHud()
         {
             KnockRushProjectSetup.EnsureFolder("Assets/Prefabs/UI");
-            var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            // Brand display font (Lilita One), same as the UI Toolkit screens.
+            var font = AssetDatabase.LoadAssetAtPath<Font>(UiContentBuilder.DisplayFontPath) ?? Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
 
             var root = new GameObject("RaceHud", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
             try
@@ -72,7 +73,7 @@ namespace KnockRush.EditorTools.UI
             var text = rect.gameObject.AddComponent<Text>();
             text.font = font;
             text.fontSize = size;
-            text.fontStyle = FontStyle.Bold;
+            text.fontStyle = FontStyle.Normal;
             text.alignment = TextAnchor.MiddleCenter;
             text.color = color;
             text.supportRichText = true;
@@ -80,8 +81,11 @@ namespace KnockRush.EditorTools.UI
             text.horizontalOverflow = HorizontalWrapMode.Overflow;
             text.verticalOverflow = VerticalWrapMode.Overflow;
             var outline = rect.gameObject.AddComponent<Outline>();
-            outline.effectColor = new Color(0f, 0f, 0f, 0.6f);
-            outline.effectDistance = new Vector2(3f, -3f);
+            outline.effectColor = new Color32(20, 28, 88, 255);
+            outline.effectDistance = new Vector2(4f, -4f);
+            var shadow = rect.gameObject.AddComponent<Shadow>();
+            shadow.effectColor = new Color32(20, 28, 88, 200);
+            shadow.effectDistance = new Vector2(0f, -8f);
             text.text = string.Empty;
             return text;
         }

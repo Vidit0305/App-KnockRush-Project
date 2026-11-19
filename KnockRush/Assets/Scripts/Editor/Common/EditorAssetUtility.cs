@@ -82,6 +82,15 @@ namespace KnockRush.EditorTools.Common
             }
         }
 
+        /// <summary>Toon material for level geometry: adds world-space floor tiles and wall bands.</summary>
+        public static Material CreateLevelMaterial(string path, Color color, bool tiled = true)
+        {
+            var material = CreateToonMaterial(path, color, false);
+            material.SetFloat("_TileStrength", tiled ? 1f : 0f);
+            EditorUtility.SetDirty(material);
+            return material;
+        }
+
         public static Material CreateToonMaterial(string path, Color color, bool useVertexColor)
         {
             var shader = Shader.Find("KnockRush/Toon");

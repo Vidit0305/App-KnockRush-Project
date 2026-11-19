@@ -82,6 +82,7 @@ namespace KnockRush.EditorTools.Scenes
             RenderSettings.ambientSkyColor = sky;
             RenderSettings.ambientEquatorColor = equator;
             RenderSettings.ambientGroundColor = ground;
+            WorldLookBuilder.Apply();
         }
 
         public static Transform[] SpawnGrid(Transform parent, Vector3 center, int columns, int rows, float spacingX, float spacingZ, float yaw)
@@ -137,6 +138,7 @@ namespace KnockRush.EditorTools.Scenes
             box.isTrigger = true;
             box.size = size;
             go.AddComponent<FinishLine>();
+            WorldLookBuilder.FinishArch(parent, center, size);
         }
 
         public static void AddKillVolume(Transform parent, Vector3 center, Vector3 size)
@@ -192,6 +194,7 @@ namespace KnockRush.EditorTools.Scenes
         {
             var root = new GameObject("Scenery").transform;
             root.SetParent(parent, false);
+            WorldLookBuilder.Festival(root, course, seed);
             var random = new System.Random(seed);
             float Range(float min, float max) => (float)(min + random.NextDouble() * (max - min));
 

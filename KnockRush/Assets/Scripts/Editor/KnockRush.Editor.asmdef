@@ -21,7 +21,9 @@
         "KnockRush.GameModes",
         "KnockRush.Matchmaking",
         "KnockRush.Backend",
-        "KnockRush.Inventory"
+        "KnockRush.Inventory",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Core.Runtime"
     ],
     "includePlatforms": [
         "Editor"
