@@ -38,6 +38,7 @@ Material:
     - _RimStrength: 0.25
     - _SpecularSize: 0.04
     - _SpecularStrength: 0.3
+    - _TileStrength: 0
     - _UseVertexColor: 0
     m_Colors:
     - _BaseColor: {r: 0.13333334, g: 0.77254903, b: 0.54509807, a: 1}
