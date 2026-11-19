@@ -21,6 +21,7 @@ Shader "KnockRush/Toon"
         [IntRange] _PatternType ("Pattern (0 none, 1 stripes, 2 dots, 3 zigzag, 4 stars, 5 hearts, 6 checker, 7 flames)", Range(0, 7)) = 0
         _PatternColor ("Pattern Color", Color) = (1, 1, 1, 1)
         _PatternScale ("Pattern Scale", Range(0.25, 4)) = 1
+        _TileStrength ("Level Tiles (world-space floor tiles + wall bands)", Range(0, 1)) = 0
     }
 
     SubShader
@@ -47,6 +48,7 @@ Shader "KnockRush/Toon"
             float _PatternType;
             float4 _PatternColor;
             float _PatternScale;
+            float _TileStrength;
         CBUFFER_END
 
         // Procedural cosmetic patterns in object space (no textures). Returns 0..1 coverage.
@@ -178,6 +180,22 @@ Shader "KnockRush/Toon"
                 albedo = lerp(albedo, _PatternColor.rgb * lerp(1.0h, vertexRgb, _UseVertexColor), pattern);
 
                 half3 normalWS = normalize(input.normalWS);
+
+                // Level surfaces: 2.5 m floor tiles (grout lines + soft checker) and bands on walls,
+                // giving scale and a crafted look without textures.
+                if (_TileStrength > 0.0)
+                {
+                    float2 cell = input.positionWS.xz / 2.5;
+                    float2 g = abs(frac(cell) - 0.5);
+                    half grout = smoothstep(0.455, 0.49, max(g.x, g.y));
+                    half parity = frac((floor(cell.x) + floor(cell.y)) * 0.5) * 2.0;
+                    half up = saturate(normalWS.y * 2.0 - 1.0);
+                    albedo *= 1.0h - up * _TileStrength * (0.07h * parity + 0.4h * grout);
+                    half side = 1.0h - abs(normalWS.y);
+                    float band = abs(frac(input.positionWS.y / 1.25) - 0.5);
+                    albedo *= 1.0h - side * _TileStrength * 0.22h * smoothstep(0.44, 0.49, band);
+                }
+
                 half3 viewDirWS = SafeNormalize(GetWorldSpaceViewDir(input.positionWS));
 
                 float4 shadowCoord = TransformWorldToShadowCoord(input.positionWS);
