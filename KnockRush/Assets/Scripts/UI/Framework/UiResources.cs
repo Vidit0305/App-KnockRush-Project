@@ -15,16 +15,21 @@ namespace KnockRush.UI.Framework
         [SerializeField] private StyleSheet theme;
         [SerializeField] private Font displayFont;
         [SerializeField] private Font bodyFont;
+        [SerializeField] private Sprite loadingBackground;
 
         public PanelSettings PanelSettings => panelSettings;
         public StyleSheet Theme => theme;
         public Font DisplayFont => displayFont;
         public Font BodyFont => bodyFont;
 
+        /// <summary>Key art behind the splash and every loading screen.</summary>
+        public Sprite LoadingBackground => loadingBackground;
+
         public static UiResources Load() => Resources.Load<UiResources>(ResourcesPath);
 
-        public void Configure(PanelSettings panel, StyleSheet styleSheet, Font display, Font body)
+        public void Configure(PanelSettings panel, StyleSheet styleSheet, Font display, Font body, Sprite loading)
         {
+            loadingBackground = loading;
             panelSettings = panel;
             theme = styleSheet;
             displayFont = display;

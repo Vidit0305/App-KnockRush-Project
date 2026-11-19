@@ -836,3 +836,118 @@
     border-color: rgb(214, 160, 20);
     margin-bottom: 10px;
 }
+
+/* ---------- Key-art splash & loading (matches the KnockRush key art) ---------- */
+.kr-keyart {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgb(45, 139, 240);
+    -unity-background-scale-mode: scale-and-crop;
+}
+
+.kr-keyart-screen {
+    padding: 0;
+}
+
+.kr-keyart-dock {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 4%;
+    align-items: center;
+}
+
+.kr-keyart-title {
+    font-size: 54px;
+    color: rgb(255, 255, 255);
+    -unity-text-outline-width: 3px;
+    -unity-text-outline-color: rgb(20, 28, 88);
+    text-shadow: 0 4px 0 rgb(20, 28, 88);
+    margin-bottom: 6px;
+}
+
+.kr-keyart-row {
+    flex-direction: row;
+    align-items: center;
+    width: 62%;
+    justify-content: center;
+}
+
+.kr-keyart-track {
+    flex-grow: 1;
+    height: 52px;
+    border-radius: 26px;
+    border-width: 5px;
+    border-color: rgb(255, 255, 255);
+    background-color: rgb(18, 30, 92);
+    overflow: hidden;
+    padding: 4px;
+}
+
+.kr-keyart-fill {
+    height: 100%;
+    border-radius: 18px;
+    background-color: rgb(255, 196, 18);
+    overflow: hidden;
+}
+
+.kr-keyart-gloss {
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    top: 3px;
+    height: 40%;
+    border-radius: 10px;
+    background-color: rgba(255, 240, 160, 0.75);
+}
+
+.kr-keyart-stripes {
+    position: absolute;
+    left: 0;
+    top: -20px;
+    bottom: -20px;
+    flex-direction: row;
+    width: 2400px;
+}
+
+.kr-keyart-stripe {
+    width: 18px;
+    height: 100%;
+    margin-right: 30px;
+    rotate: 28deg;
+    background-color: rgba(255, 150, 0, 0.42);
+}
+
+.kr-keyart-percent {
+    width: 150px;
+    margin-left: 18px;
+    font-size: 54px;
+    color: rgb(255, 255, 255);
+    -unity-text-outline-width: 3px;
+    -unity-text-outline-color: rgb(20, 28, 88);
+    text-shadow: 0 4px 0 rgb(20, 28, 88);
+}
+
+.kr-keyart-tagline {
+    margin-top: 12px;
+    font-size: 36px;
+    color: rgb(255, 255, 255);
+    -unity-text-outline-width: 2px;
+    -unity-text-outline-color: rgb(20, 28, 88);
+    text-shadow: 0 3px 0 rgb(20, 28, 88);
+}
+
+.kr-keyart-context {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 25%;
+    font-size: 42px;
+    color: rgb(255, 209, 43);
+    -unity-text-align: middle-center;
+    -unity-text-outline-width: 3px;
+    -unity-text-outline-color: rgb(20, 28, 88);
+}

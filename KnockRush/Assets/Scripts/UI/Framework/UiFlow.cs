@@ -241,6 +241,11 @@ namespace KnockRush.UI.Framework
 
         private void OnSceneLoadProgress(SceneLoadProgressEvent e)
         {
+            if (Current == Context.Boot && app.Navigator.Top is SplashScreen splash)
+            {
+                splash.SetProgress(e.Progress);
+            }
+
             if (sceneLoading && app.Navigator.IsShowing<LoadingScreen>())
             {
                 app.Navigator.Get<LoadingScreen>().SetProgress(e.Progress);

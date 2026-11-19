@@ -20,6 +20,8 @@ namespace KnockRush.UI.Framework
 
         private UIDocument document;
         private VisualElement safeArea;
+        private VisualElement keyArt;
+        private int keyArtRequests;
         private VisualElement toastLayer;
         private Rect appliedSafeArea;
         private Vector2Int appliedScreenSize;
@@ -97,6 +99,17 @@ namespace KnockRush.UI.Framework
 
             Root.pickingMode = PickingMode.Ignore;
 
+            // Full-bleed key art (outside the safe area so it reaches notches and screen edges).
+            keyArt = Ui.Element("kr-keyart");
+            keyArt.pickingMode = PickingMode.Ignore;
+            if (resources.LoadingBackground != null)
+            {
+                keyArt.style.backgroundImage = new StyleBackground(resources.LoadingBackground);
+            }
+
+            keyArt.style.display = DisplayStyle.None;
+            Root.Add(keyArt);
+
             safeArea = Ui.Element("kr-safe");
             safeArea.pickingMode = PickingMode.Ignore;
             Root.Add(safeArea);
@@ -145,6 +158,18 @@ namespace KnockRush.UI.Framework
 
             Flow?.Dispose();
         }
+
+        /// <summary>Shows or hides the full-screen key art (reference counted: splash and loading share it).</summary>
+        public void ShowKeyArt(bool show)
+        {
+            keyArtRequests = Mathf.Max(0, keyArtRequests + (show ? 1 : -1));
+            if (keyArt != null)
+            {
+                keyArt.style.display = keyArtRequests > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            }
+        }
+
+        public bool IsKeyArtVisible => keyArt != null && keyArt.style.display == DisplayStyle.Flex;
 
         /// <summary>Shows a short message at the top of the screen.</summary>
         public void Toast(string message, float seconds = 2.6f)

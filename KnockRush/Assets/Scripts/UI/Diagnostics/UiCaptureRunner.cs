@@ -48,7 +48,7 @@ namespace KnockRush.UI.Diagnostics
 
         private IEnumerator Run()
         {
-            yield return new WaitForSecondsRealtime(0.6f);
+            yield return new WaitForSecondsRealtime(1.2f);
             yield return Capture("splash");
 
             yield return Until(() => AppUI.Instance != null && AppUI.Instance.Navigator.Top is HomeScreen, 30f);
@@ -75,6 +75,12 @@ namespace KnockRush.UI.Diagnostics
                 DialogScreen.Show(app, "LEAVE MATCH?", "You'll be out of this match. Rewards for rounds you cleared still count.", "LEAVE", null, "STAY");
                 return nav.Top;
             }, "dialog");
+
+            nav.Push<LoadingScreen>().ShowScene(Core.SceneManagement.SceneNames.MainMenu);
+            yield return new WaitForSecondsRealtime(1.5f);
+            yield return Capture("loading");
+            nav.Remove<LoadingScreen>();
+            yield return new WaitForSecondsRealtime(0.3f);
 
             // A practice Quick Race against bots.
             MatchmakingScreen.Start(app, "quickrace", true);
