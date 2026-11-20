@@ -19,7 +19,13 @@ namespace KnockRush.EditorTools.UI
                 throw new System.InvalidOperationException($"Missing key art at {path}.");
             }
 
-            var changed = importer.textureType != TextureImporterType.Sprite || importer.maxTextureSize != 2048 || importer.mipmapEnabled;
+            var android = importer.GetPlatformTextureSettings("Android");
+            var changed = importer.textureType != TextureImporterType.Sprite || importer.maxTextureSize != 2048 || importer.mipmapEnabled
+                || !android.overridden || android.format != TextureImporterFormat.ASTC_6x6;
+            android.overridden = true;
+            android.format = TextureImporterFormat.ASTC_6x6; // full-screen art: ~4x smaller than ASTC 4x4, still crisp
+            android.maxTextureSize = 2048;
+            importer.SetPlatformTextureSettings(android);
             importer.textureType = TextureImporterType.Sprite;
             importer.spriteImportMode = SpriteImportMode.Single;
             importer.mipmapEnabled = false;
