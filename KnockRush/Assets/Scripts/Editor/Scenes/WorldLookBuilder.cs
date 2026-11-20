@@ -94,7 +94,7 @@ namespace KnockRush.EditorTools.Scenes
         // -------------------------------------------------------------------------------------
         // Festival decor
         // -------------------------------------------------------------------------------------
-        internal static Material Mat(string name, Color color, int pattern = 0, Color? patternColor = null, float patternScale = 1f)
+        private static Material Mat(string name, Color color, int pattern = 0, Color? patternColor = null, float patternScale = 1f)
         {
             var material = EditorAssetUtility.CreateToonMaterial($"{Folder}/{name}.mat", color, false);
             material.SetFloat("_PatternType", pattern);
