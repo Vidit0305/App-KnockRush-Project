@@ -23,10 +23,11 @@ namespace KnockRush.EditorTools.UI
         public const string RuntimeThemePath = "Assets/Art/UI/KnockRushRuntimeTheme.tss";
         public const string DisplayFontPath = "Assets/Art/UI/Fonts/LilitaOne-Regular.ttf";
         public const string BodyFontPath = "Assets/Art/UI/Fonts/Nunito-Variable.ttf";
-        public const string LoadingBackgroundPath = "Assets/Art/UI/KeyArt/LoadingBackground.png";
-        public const string AppIconPath = "Assets/Art/Icons/AppIcon.png";
-        public const string AdaptiveBackgroundPath = "Assets/Art/Icons/AppIcon_AdaptiveBackground.png";
-        public const string AdaptiveForegroundPath = "Assets/Art/Icons/AppIcon_AdaptiveForeground.png";
+        public const string LoadingBackgroundPath = "Assets/Art/UI/Backgrounds/LoadingBackground.png";
+        public const string AppIconPath = "Assets/Art/Branding/AppIcon.png";
+        public const string AdaptiveBackgroundPath = "Assets/Art/Branding/AppIcon_AdaptiveBackground.png";
+        public const string AdaptiveForegroundPath = "Assets/Art/Branding/AppIcon_AdaptiveForeground.png";
+        public const string LogoPath = "Assets/Art/Branding/Logo.png";
         public const string PanelSettingsPath = "Assets/Settings/UI/KnockRushPanelSettings.asset";
         public const string ResourcesFolder = "Assets/ScriptableObjects/UI/Resources";
         public const string UiResourcesPath = ResourcesFolder + "/UiResources.asset";
@@ -106,18 +107,18 @@ namespace KnockRush.EditorTools.UI
         {
             foreach (var guid in AssetDatabase.FindAssets("t:Texture2D", new[] { "Assets/Art/UI/Icons" }))
             {
-                MenuLobbyBuilder.ImportTexture(AssetDatabase.GUIDToAssetPath(guid), true, true);
+                MenuStageBuilder.ImportTexture(AssetDatabase.GUIDToAssetPath(guid), true, true, 256);
             }
 
-            foreach (var guid in AssetDatabase.FindAssets("t:Texture2D", new[] { "Assets/Art/UI/Home" }))
+            foreach (var guid in AssetDatabase.FindAssets("t:Texture2D", new[] { "Assets/Art/UI/Skins" }))
             {
-                var path = AssetDatabase.GUIDToAssetPath(guid);
-                var art = path.EndsWith("Logo.png") || path.EndsWith("PodiumGlow.png");
-                MenuLobbyBuilder.ImportTexture(path, art, art);
+                MenuStageBuilder.ImportTexture(AssetDatabase.GUIDToAssetPath(guid), false, false, 256);
             }
+
+            MenuStageBuilder.ImportTexture(LogoPath, true, true, 1024);
         }
 
-        /// <summary>The menu backdrop: the player's bean on a round podium with floating shapes.</summary>
+        /// <summary>The menu stage: the player's bean in front of the painted arena backdrop.</summary>
         public static void BuildMainMenuScene()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
@@ -133,7 +134,7 @@ namespace KnockRush.EditorTools.UI
                 throw new System.InvalidOperationException("Bean model/material/controller missing: build character assets first.");
             }
 
-            var beanAssets = new MenuLobbyBuilder.BeanAssets { Model = model, Material = beanMaterial, Controller = controller };
+            var beanAssets = new MenuStageBuilder.BeanAssets { Model = model, Material = beanMaterial, Controller = controller };
 
             // Camera: the hero bean centre-bottom, the festival arena filling the rest of the frame.
             var camera = Object.FindFirstObjectByType<Camera>();
@@ -141,21 +142,24 @@ namespace KnockRush.EditorTools.UI
             camera.transform.SetParent(rig, false);
             camera.transform.localPosition = new Vector3(0f, 0.95f, 4.9f);
             camera.transform.localRotation = Quaternion.LookRotation(new Vector3(0f, 1.02f, 0f) - camera.transform.localPosition);
-            camera.fieldOfView = 42f;
+            camera.fieldOfView = 38f;
             Scenes.WorldLookBuilder.ConfigureCamera(camera);
+            // The painted backdrop is final art: no post-processing tint, no sky behind it.
+            camera.GetUniversalAdditionalCameraData().renderPostProcessing = false;
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = new Color32(70, 150, 245, 255);
             camera.nearClipPlane = 0.1f;
             camera.farClipPlane = 140f;
 
             SceneBuildKitFacade.ConfigureLighting(Quaternion.Euler(40f, 155f, 0f),
                 new Color32(205, 225, 255, 255), new Color32(200, 205, 240, 255), new Color32(140, 120, 190, 255), 1.2f);
-            RenderSettings.fogStartDistance = 55f;
-            RenderSettings.fogEndDistance = 240f;
+            RenderSettings.fog = false;
 
             var stageRoot = new GameObject("MenuStage");
-            MenuLobbyBuilder.Build(stageRoot.transform, beanAssets);
+            MenuStageBuilder.Build(stageRoot.transform, camera);
 
             // The hero bean.
-            var (heroRoot, animator, cosmetics) = MenuLobbyBuilder.SpawnBean(stageRoot.transform, beanAssets, "Turntable", Vector3.zero, 0f);
+            var (heroRoot, animator, cosmetics) = MenuStageBuilder.SpawnBean(stageRoot.transform, beanAssets, "Turntable", Vector3.zero, 0f);
             animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
             EditorAssetUtility.SetLayerRecursively(heroRoot.gameObject, MenuBeanStage.PortraitLayer);
 
@@ -163,7 +167,7 @@ namespace KnockRush.EditorTools.UI
             var portrait = PortraitCamera("PortraitCamera", heroRoot, new Vector3(0f, 1.2f, 1.55f), new Vector3(0f, 1.12f, 0f), 30f);
 
             // Season showcase bean far behind the main camera, filmed for the Home season card.
-            var (seasonRoot, seasonAnimator, seasonCosmetics) = MenuLobbyBuilder.SpawnBean(stageRoot.transform, beanAssets, "SeasonModel", new Vector3(40f, 0f, 40f), 0f);
+            var (seasonRoot, seasonAnimator, seasonCosmetics) = MenuStageBuilder.SpawnBean(stageRoot.transform, beanAssets, "SeasonModel", new Vector3(40f, 0f, 40f), 0f);
             seasonAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
             EditorAssetUtility.SetLayerRecursively(seasonRoot.gameObject, MenuBeanStage.PortraitLayer);
             var seasonCamera = PortraitCamera("SeasonCamera", seasonRoot, new Vector3(0f, 1.05f, 3.9f), new Vector3(0f, 0.98f, 0f), 32f);

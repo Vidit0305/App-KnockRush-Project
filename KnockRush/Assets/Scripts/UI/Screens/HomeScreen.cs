@@ -125,7 +125,7 @@ namespace KnockRush.UI.Screens
             card.Add(frame);
 
             var info = Ui.Col("kr-h-profile__info");
-            var nameRow = Ui.Row();
+            var nameRow = Ui.Row("kr-h-namerow");
             nameLabel = Ui.Label("Player", "kr-h-name", "kr-display");
             nameRow.Add(nameLabel);
             nameRow.Add(Ui.Element("kr-ico", "kr-ico--edit", "kr-h-name__edit"));
@@ -183,8 +183,6 @@ namespace KnockRush.UI.Screens
             timeRow.Add(seasonTime);
             text.Add(timeRow);
             card.Add(text);
-            var badge = Ui.Element("kr-ico", "kr-ico--alert", "kr-h-badge", "kr-h-badge--season");
-            card.Add(badge);
             return card;
         }
 
@@ -237,7 +235,7 @@ namespace KnockRush.UI.Screens
             var col = Ui.Col("kr-h-mode__text");
             col.Add(Ui.Label(title, "kr-h-mode__title", "kr-display"));
             var row = Ui.Row("kr-h-mode__row");
-            row.Add(Ui.Element("kr-ico", "kr-ico--friends", "kr-h-mode__people"));
+            row.Add(Ui.Element("kr-ico", "kr-ico--person", "kr-h-mode__people"));
             row.Add(Ui.Label(players, "kr-h-mode__players", "kr-display"));
             col.Add(row);
             card.Add(col);
