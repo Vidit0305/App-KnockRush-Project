@@ -18,6 +18,7 @@ namespace KnockRush.Backend
         [JsonProperty("tiers")] public int Tiers;
         [JsonProperty("xpPerTier")] public int XpPerTier;
         [JsonProperty("premiumPriceGems")] public int PremiumPriceGems;
+        [JsonProperty("endsAt")] public string EndsAt;
     }
 
     public sealed class SeasonPlayerState

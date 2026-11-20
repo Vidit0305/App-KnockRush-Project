@@ -15,6 +15,8 @@ export const SEASON = {
   tiers: 30,
   xpPerTier: 500,
   premiumPriceGems: 950,
+  /** UTC end of the season (ISO 8601); clients show the countdown. */
+  endsAt: "2027-02-28T00:00:00Z",
 } as const;
 
 function track(build: (tier: number) => TierReward): TierReward[] {
