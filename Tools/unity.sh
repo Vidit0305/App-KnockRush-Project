@@ -6,7 +6,8 @@
 #   Tools/unity.sh content        Regenerate generated content (character, prefabs, scenes)
 #   Tools/unity.sh editmode       Run KnockRush EditMode tests
 #   Tools/unity.sh playmode       Run KnockRush PlayMode tests
-#   Tools/unity.sh android        Build the Android development APK
+#   Tools/unity.sh android        Build the Android APK (release configuration, size-optimised)
+#   Tools/unity.sh android-dev    Build the Android development APK (debuggable, much larger)
 #   Tools/unity.sh windows        Build the Windows development player (headless server/bot testing)
 #   Tools/unity.sh server         Build the Linux dedicated server (needs Linux Dedicated Server module)
 #   Tools/unity.sh capture <Scene.unity> [Clip]  Render PNG captures to .logs/captures
@@ -61,12 +62,13 @@ case "${1:-}" in
   content)  run content -executeMethod KnockRush.EditorTools.Build.ContentBuilder.BuildBatch ;;
   editmode) tests EditMode KnockRush.Tests.EditMode ;;
   playmode) tests PlayMode KnockRush.Tests.PlayMode ;;
-  android)  GRAPHICS_FLAG="" run android -buildTarget Android -executeMethod KnockRush.EditorTools.Build.KnockRushBuild.BuildAndroidDevelopmentBatch ;;
+  android)  GRAPHICS_FLAG="" run android -buildTarget Android -executeMethod KnockRush.EditorTools.Build.KnockRushBuild.BuildAndroidReleaseBatch ;;
+  android-dev) GRAPHICS_FLAG="" run android-dev -buildTarget Android -executeMethod KnockRush.EditorTools.Build.KnockRushBuild.BuildAndroidDevelopmentBatch ;;
   windows)  GRAPHICS_FLAG="" run windows -buildTarget Win64 -executeMethod KnockRush.EditorTools.Build.KnockRushBuild.BuildWindowsDevelopmentBatch ;;
   server)   run server -buildTarget Linux64 -standaloneBuildSubtarget Server -executeMethod KnockRush.EditorTools.Build.KnockRushBuild.BuildLinuxServerBatch ;;
   capture)  GRAPHICS_FLAG="" run "capture" -executeMethod KnockRush.EditorTools.Diagnostics.SceneCapture.CaptureBatch               -captureScene "${2:-Assets/Scenes/Dev/Playground.unity}" -captureOut "$LOGS/captures" -captureClip "${3:-Run}" ;;
   maps)     GRAPHICS_FLAG="" run "capture-maps" -executeMethod KnockRush.EditorTools.Diagnostics.SceneCapture.CaptureAllMapsBatch -captureOut "$LOGS/captures" ;;
   bean)     "$BLENDER_EXE" -b --factory-startup --python "$ROOT/ArtSource/Characters/build_bean.py" --               "$PROJECT/Assets/Art/Characters/Bean/Bean.fbx" "$ROOT/ArtSource/Characters/Bean.blend" | grep build_bean ;;
   exec)     shift; run "exec-${1##*.}" -executeMethod "$1" ;;
-  *) sed -n '2,16p' "$0"; exit 2 ;;
+  *) sed -n '2,17p' "$0"; exit 2 ;;
 esac

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 
@@ -10,36 +11,45 @@ namespace KnockRush.EditorTools.Build
     /// <summary>
     /// Repeatable player builds, usable from the menu and from the command line / CI.
     ///
-    /// Command line (Android development APK):
+    /// Command line (Android APK, size-optimised release configuration):
     ///   Unity.exe -batchmode -projectPath KnockRush -buildTarget Android
-    ///     -executeMethod KnockRush.EditorTools.Build.KnockRushBuild.BuildAndroidDevelopmentBatch -logFile build.log
+    ///     -executeMethod KnockRush.EditorTools.Build.KnockRushBuild.BuildAndroidReleaseBatch -logFile build.log
+    /// (BuildAndroidDevelopmentBatch makes the debuggable development APK.)
     ///
-    /// Release (signed AAB) builds are added in Phase 10 together with keystore handling.
+    /// The release APK is signed with the debug key until the store keystore is set up (Phase 10).
     /// </summary>
     public static class KnockRushBuild
     {
+        public const string AndroidReleasePath = "Builds/Android/KnockRush.apk";
         public const string AndroidDevelopmentPath = "Builds/Android/KnockRush-dev.apk";
 
+        [MenuItem("KnockRush/Build/Android APK (release, small)", priority = 99)]
+        public static void BuildAndroidReleaseMenu() => ShowResult(BuildAndroid(false), AndroidReleasePath);
+
         [MenuItem("KnockRush/Build/Android Development APK", priority = 100)]
-        public static void BuildAndroidDevelopmentMenu()
+        public static void BuildAndroidDevelopmentMenu() => ShowResult(BuildAndroid(true), AndroidDevelopmentPath);
+
+        public static void BuildAndroidReleaseBatch() => RunBatch(() => BuildAndroid(false));
+
+        public static void BuildAndroidDevelopmentBatch() => RunBatch(() => BuildAndroid(true));
+
+        public static BuildReport BuildAndroidDevelopment() => BuildAndroid(true);
+
+        private static void ShowResult(BuildReport report, string path)
         {
-            var report = BuildAndroidDevelopment();
             var succeeded = report.summary.result == BuildResult.Succeeded;
             EditorUtility.DisplayDialog(
                 "KnockRush Build",
-                succeeded
-                    ? $"Android development build succeeded.\n{Path.GetFullPath(AndroidDevelopmentPath)}"
-                    : $"Android build {report.summary.result}. See the Console.",
+                succeeded ? $"Android build succeeded: {Path.GetFullPath(path)}" : $"Android build {report.summary.result}. See the Console.",
                 "OK");
         }
 
-        public static void BuildAndroidDevelopmentBatch()
+        private static void RunBatch(Func<BuildReport> build)
         {
             var exitCode = 1;
             try
             {
-                var report = BuildAndroidDevelopment();
-                exitCode = report.summary.result == BuildResult.Succeeded ? 0 : 1;
+                exitCode = build().summary.result == BuildResult.Succeeded ? 0 : 1;
             }
             catch (Exception exception)
             {
@@ -49,7 +59,26 @@ namespace KnockRush.EditorTools.Build
             EditorApplication.Exit(exitCode);
         }
 
-        public static BuildReport BuildAndroidDevelopment()
+        /// <summary>
+        /// Download-size settings: 64-bit ARM only, IL2CPP optimised for size, managed code and
+        /// unused engine modules stripped (Assets/link.xml keeps reflection-reached code).
+        /// </summary>
+        public static void ApplyAndroidSizeSettings()
+        {
+            var android = NamedBuildTarget.Android;
+            PlayerSettings.SetScriptingBackend(android, ScriptingImplementation.IL2CPP);
+            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
+            PlayerSettings.SetManagedStrippingLevel(android, ManagedStrippingLevel.Medium);
+            PlayerSettings.stripEngineCode = true;
+            PlayerSettings.SetIl2CppCodeGeneration(android, Il2CppCodeGeneration.OptimizeSize);
+            PlayerSettings.SetIl2CppCompilerConfiguration(android, Il2CppCompilerConfiguration.Release);
+
+            // Static batching copies every static map piece into per-scene combined meshes (~17 MB of
+            // duplicated vertices). The SRP Batcher already draws the shared primitives cheaply.
+            PlayerSettings.SetStaticBatchingForPlatform(BuildTarget.Android, false);
+        }
+
+        public static BuildReport BuildAndroid(bool development)
         {
             var scenes = EditorBuildSettings.scenes
                 .Where(scene => scene.enabled)
@@ -61,22 +90,25 @@ namespace KnockRush.EditorTools.Build
                 throw new InvalidOperationException("No enabled scenes in the scene list. Run KnockRush > Setup first.");
             }
 
-            Directory.CreateDirectory(Path.GetDirectoryName(AndroidDevelopmentPath) ?? "Builds");
+            var path = development ? AndroidDevelopmentPath : AndroidReleasePath;
+            Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "Builds");
             EditorUserBuildSettings.buildAppBundle = false;
+            ApplyAndroidSizeSettings();
 
             var options = new BuildPlayerOptions
             {
                 scenes = scenes,
-                locationPathName = AndroidDevelopmentPath,
+                locationPathName = path,
                 target = BuildTarget.Android,
                 targetGroup = BuildTargetGroup.Android,
-                options = BuildOptions.Development
+                options = development ? BuildOptions.Development : BuildOptions.CompressWithLz4HC
             };
 
             var report = BuildPipeline.BuildPlayer(options);
             var summary = report.summary;
-            Debug.Log($"[KnockRush Build] Android development: {summary.result}, " +
-                      $"{summary.totalSize / (1024f * 1024f):0.0} MB, {summary.totalTime.TotalSeconds:0}s, " +
+            var bytes = File.Exists(path) ? new FileInfo(path).Length : 0L;
+            Debug.Log($"[KnockRush Build] Android {(development ? "development" : "release")}: {summary.result}, " +
+                      $"APK {bytes / (1024f * 1024f):0.0} MB, {summary.totalTime.TotalSeconds:0}s, " +
                       $"{summary.totalErrors} errors, {summary.totalWarnings} warnings -> {summary.outputPath}");
             return report;
         }

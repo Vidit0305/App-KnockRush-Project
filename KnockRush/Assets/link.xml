@@ -1,0 +1,32 @@
+<!--
+  Code stripping keeps for the release build (Managed Stripping Level: Medium).
+  Our gameplay, networking and backend code is preserved whole: JSON models are created by
+  reflection (Newtonsoft) and Fusion networked behaviours are found by reflection, so the linker
+  must not remove "unused" constructors or members there. Engine and BCL code is stripped.
+-->
+<linker>
+  <assembly fullname="KnockRush.Backend" preserve="all"/>
+  <assembly fullname="KnockRush.CameraRig" preserve="all"/>
+  <assembly fullname="KnockRush.Core" preserve="all"/>
+  <assembly fullname="KnockRush.GameModes" preserve="all"/>
+  <assembly fullname="KnockRush.Interaction" preserve="all"/>
+  <assembly fullname="KnockRush.Inventory" preserve="all"/>
+  <assembly fullname="KnockRush.Maps" preserve="all"/>
+  <assembly fullname="KnockRush.Matchmaking" preserve="all"/>
+  <assembly fullname="KnockRush.Monetization" preserve="all"/>
+  <assembly fullname="KnockRush.Movement" preserve="all"/>
+  <assembly fullname="KnockRush.Multiplayer" preserve="all"/>
+  <assembly fullname="KnockRush.Obstacles" preserve="all"/>
+  <assembly fullname="KnockRush.Player" preserve="all"/>
+  <assembly fullname="KnockRush.UI" preserve="all"/>
+  <assembly fullname="KnockRush.Utilities" preserve="all"/>
+
+  <assembly fullname="Fusion.Common" preserve="all"/>
+  <assembly fullname="Fusion.Log" preserve="all"/>
+  <assembly fullname="Fusion.Realtime" preserve="all"/>
+  <assembly fullname="Fusion.Runtime" preserve="all"/>
+  <assembly fullname="Fusion.Sockets" preserve="all"/>
+  <assembly fullname="Fusion.Unity" preserve="all"/>
+
+  <assembly fullname="Newtonsoft.Json" preserve="all"/>
+</linker>
