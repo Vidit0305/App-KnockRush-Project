@@ -1,0 +1,13 @@
+KnockRush UI icons
+==================
+
+The cart, hanger, trophy, friends, party, settings, mail, edit, clock, person and lock icons are
+restyled (gradient fill, outline, shadow) renders of Google Material Icons glyphs:
+
+  Material Icons - Copyright Google LLC
+  Licensed under the Apache License, Version 2.0
+  https://www.apache.org/licenses/LICENSE-2.0
+  https://github.com/google/material-design-icons
+
+The coin, gem, crown, stopwatch, gift, missions clipboard, plus, play arrows and alert icons are
+original KnockRush artwork.
