@@ -34,6 +34,7 @@ namespace KnockRush.UI.Framework
         private bool loginChecked;
         private bool sceneLoading;
         private bool returningToMenu;
+        private bool loadingDone;
 
         public UiFlow(AppUI app)
         {
@@ -57,6 +58,22 @@ namespace KnockRush.UI.Framework
             var match = MatchController.Current;
             var hasMatch = match != null && match.Object != null && match.Object.IsValid;
             var scene = SceneManager.GetActiveScene().name;
+
+            // A finished scene load lets its loading screen run to 100% before it goes away.
+            if (loadingDone && app.Navigator.Top is LoadingScreen finishing)
+            {
+                finishing.Complete();
+                if (finishing.IsFinished)
+                {
+                    loadingDone = false;
+                    app.Navigator.Remove<LoadingScreen>();
+                }
+            }
+            else if (loadingDone && !app.Navigator.IsShowing<LoadingScreen>())
+            {
+                loadingDone = false;
+            }
+
             var next = scene == SceneNames.Boot ? Context.Boot
                 : hasMatch ? Context.Match
                 : scene == SceneNames.MainMenu ? Context.Menu
@@ -95,6 +112,11 @@ namespace KnockRush.UI.Framework
 
             if (next != Current)
             {
+                if (next != Context.Boot && !LoadingBarFinished())
+                {
+                    return; // the splash / loading bar first runs to 100%
+                }
+
                 Enter(next);
             }
 
@@ -106,6 +128,18 @@ namespace KnockRush.UI.Framework
             {
                 OfferLoginOnce();
             }
+        }
+
+        /// <summary>True when no loading bar is up, or the one on top has reached 100%.</summary>
+        private bool LoadingBarFinished()
+        {
+            if (app.Navigator.Top is ILoadingScreen loading && (Current == Context.Boot || Current == Context.None))
+            {
+                loading.Complete();
+                return loading.IsFinished;
+            }
+
+            return true;
         }
 
         private async void ReturnToMenu()
@@ -135,6 +169,8 @@ namespace KnockRush.UI.Framework
             switch (context)
             {
                 case Context.Boot:
+                    loadingDone = false;
+                    returningToMenu = false;
                     nav.SetRoot<SplashScreen>();
                     break;
                 case Context.Menu:
@@ -154,6 +190,15 @@ namespace KnockRush.UI.Framework
             var localSlot = match.LocalSlot();
             var status = localSlot >= 0 ? match.Records.Get(localSlot).Status : RecordStatus.Empty;
             var phase = match.Phase;
+
+            if (phase != lastPhase && lastPhase == MatchPhase.Loading && nav.Top is LoadingScreen roundLoading)
+            {
+                roundLoading.Complete();
+                if (!roundLoading.IsFinished)
+                {
+                    return; // the round's loading bar finishes first
+                }
+            }
 
             if (phase != lastPhase)
             {
@@ -257,7 +302,7 @@ namespace KnockRush.UI.Framework
             sceneLoading = false;
             if (Current != Context.Match || app.Navigator.Top is LoadingScreen && MatchController.Current == null)
             {
-                app.Navigator.Remove<LoadingScreen>();
+                loadingDone = true; // removed once the bar shows 100% (see Update)
             }
         }
     }

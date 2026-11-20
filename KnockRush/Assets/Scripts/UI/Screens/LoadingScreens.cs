@@ -6,6 +6,16 @@ using UnityEngine.UIElements;
 
 namespace KnockRush.UI.Screens
 {
+    /// <summary>A screen with a progress bar that must reach 100% before the flow moves on.</summary>
+    public interface ILoadingScreen
+    {
+        /// <summary>The work is done: run the bar to 100%.</summary>
+        void Complete();
+
+        /// <summary>The bar has shown 100% (briefly held) and the screen may be replaced.</summary>
+        bool IsFinished { get; }
+    }
+
     /// <summary>
     /// The branded loading look shared by the splash and every loading screen: full-bleed key art,
     /// "LOADING..." title, a glossy striped progress bar with percentage and the tagline.
@@ -19,8 +29,13 @@ namespace KnockRush.UI.Screens
         private readonly Label tagline;
         private readonly VisualElement fill;
         private readonly VisualElement stripes;
+        private const float FillSpeed = 0.55f;       // bar per second while loading (0 to 100% in at least 1.8 s)
+
+
         private float shown;
         private float stripeOffset;
+        private bool completing;
+        private float heldAtFull;
 
         public KeyArtLoadingView(VisualElement parent)
         {
@@ -54,20 +69,43 @@ namespace KnockRush.UI.Screens
 
         public float Target { get; set; }
 
+        /// <summary>Once complete, the rest of the bar fills within this many seconds.</summary>
+        public float FinishSeconds { get; set; } = 0.8f;
+
+        /// <summary>How long "100%" stays readable before the next screen.</summary>
+        public float HoldAtFull { get; set; } = 0.25f;
+
         public void SetTitle(string text) => title.text = text;
 
         public void SetTagline(string text) => tagline.text = $"—  {text}  —";
 
+        public bool IsFinished => completing && shown >= 1f && heldAtFull >= HoldAtFull;
+
         public void SetProgressImmediate(float value)
         {
             shown = Target = Mathf.Clamp01(value);
+            completing = false;
+            heldAtFull = 0f;
             Apply();
+        }
+
+        /// <summary>Loading finished: the bar runs on to 100% (never jumps, never goes backwards).</summary>
+        public void Complete()
+        {
+            completing = true;
+            Target = 1f;
         }
 
         /// <summary>Eases the bar towards <see cref="Target"/> and scrolls the stripes.</summary>
         public void Tick(float deltaTime)
         {
-            shown = Mathf.MoveTowards(shown, Mathf.Clamp01(Target), deltaTime * 1.5f);
+            var speed = completing ? Mathf.Max(FillSpeed, (1f - shown) / FinishSeconds) : FillSpeed;
+            shown = Mathf.MoveTowards(shown, Mathf.Clamp01(completing ? 1f : Mathf.Min(Target, 0.99f)), deltaTime * speed);
+            if (completing && shown >= 1f)
+            {
+                heldAtFull += deltaTime;
+            }
+
             stripeOffset = (stripeOffset + deltaTime * 60f) % 48f;
             stripes.style.translate = new Translate(stripeOffset - 48f, 0);
             Apply();
@@ -81,10 +119,14 @@ namespace KnockRush.UI.Screens
     }
 
     /// <summary>1 · Splash: the key art while the app starts.</summary>
-    public sealed class SplashScreen : UIScreen
+    public sealed class SplashScreen : UIScreen, ILoadingScreen
     {
+        private const float MinSeconds = 2.2f;
+
         private KeyArtLoadingView view;
         private float time;
+        private float sceneProgress;
+        private bool completeRequested;
 
         protected override void Build(VisualElement root)
         {
@@ -95,6 +137,8 @@ namespace KnockRush.UI.Screens
         public override void OnShow()
         {
             time = 0f;
+            sceneProgress = 0f;
+            completeRequested = false;
             view.SetProgressImmediate(0f);
             App.ShowKeyArt(true);
         }
@@ -106,6 +150,15 @@ namespace KnockRush.UI.Screens
 
         public override void Tick(float deltaTime)
         {
+            // Scripts already run behind Unity's own startup logo: start the bar only once it is gone,
+            // so the player always sees it sweep from 0%.
+            if (!UnityEngine.Rendering.SplashScreen.isFinished)
+            {
+                time = 0f;
+                view.SetProgressImmediate(0f);
+                return;
+            }
+
             time += deltaTime;
             var boot = Object.FindFirstObjectByType<Core.SceneManagement.BootSceneController>();
             if (boot != null && boot.Failed)
@@ -115,15 +168,26 @@ namespace KnockRush.UI.Screens
                 return;
             }
 
-            // Services first (60%), then the menu scene load reported by the loader events.
-            view.Target = Mathf.Max(view.Target, AppRoot.IsInitialized ? Mathf.Min(0.6f + time * 0.08f, 0.9f) : Mathf.Min(time * 0.4f, 0.55f));
+            // Paced (0 to 100% over a couple of seconds) but never ahead of the real work:
+            // services first, then the menu scene load reported by the loader events.
+            var real = AppRoot.IsInitialized ? 0.6f + 0.39f * sceneProgress : 0.55f;
+            view.Target = Mathf.Max(view.Target, Mathf.Min(time / MinSeconds, real));
+            if (completeRequested && time >= MinSeconds * 0.7f)
+            {
+                view.Complete();
+            }
+
             view.Tick(deltaTime);
         }
 
         public void SetProgress(float value)
         {
-            view.Target = Mathf.Max(view.Target, 0.6f + 0.4f * Mathf.Clamp01(value));
+            sceneProgress = Mathf.Max(sceneProgress, Mathf.Clamp01(value));
         }
+
+        public void Complete() => completeRequested = true;
+
+        public bool IsFinished => view.IsFinished;
 
         public override bool OnBack() => false;
 
@@ -158,7 +222,7 @@ namespace KnockRush.UI.Screens
     }
 
     /// <summary>2 · Loading: every scene load and round transition shows the same key-art screen.</summary>
-    public sealed class LoadingScreen : UIScreen
+    public sealed class LoadingScreen : UIScreen, ILoadingScreen
     {
         private KeyArtLoadingView view;
         private Label context;
@@ -176,7 +240,7 @@ namespace KnockRush.UI.Screens
 
         public override void OnShow()
         {
-            view.SetProgressImmediate(0.05f);
+            view.SetProgressImmediate(0f);
             App.ShowKeyArt(true);
         }
 
@@ -187,12 +251,17 @@ namespace KnockRush.UI.Screens
 
         public void ShowScene(string sceneName)
         {
+            view.FinishSeconds = 0.8f;
+            view.HoldAtFull = 0.25f;
             context.text = string.Empty;
             Ui.SetVisible(context, false);
         }
 
         public void ShowRound(MatchController match)
         {
+            // Between rounds the countdown is already running: finish the bar quickly.
+            view.FinishSeconds = 0.35f;
+            view.HoldAtFull = 0.12f;
             var map = match.CurrentMap;
             context.text = map != null ? $"ROUND {match.RoundIndex + 1}  ·  {map.DisplayName.ToUpperInvariant()}" : $"ROUND {match.RoundIndex + 1}";
             Ui.SetVisible(context, true);
@@ -203,10 +272,14 @@ namespace KnockRush.UI.Screens
             view.Target = Mathf.Max(view.Target, Mathf.Clamp01(value));
         }
 
+        public void Complete() => view.Complete();
+
+        public bool IsFinished => view.IsFinished;
+
         public override void Tick(float deltaTime)
         {
             // Creep forward while waiting on the network so the bar never looks frozen.
-            view.Target = Mathf.Max(view.Target, Mathf.Min(0.95f, view.Target + deltaTime * 0.05f));
+            view.Target = Mathf.Max(view.Target, Mathf.Min(0.9f, view.Target + deltaTime * 0.12f));
             view.Tick(deltaTime);
         }
 
