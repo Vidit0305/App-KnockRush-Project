@@ -7,7 +7,7 @@ namespace KnockRush.EditorTools.UI
 {
     /// <summary>
     /// App branding from the key art: launcher icons (default, Android legacy/round/adaptive, iOS)
-    /// and the native startup splash background, so the very first frame already shows KnockRush.
+    /// and the native startup splash ("Made with Unity" on black, handing over to the key-art splash).
     /// </summary>
     public static class AppBrandingBuilder
     {
@@ -34,7 +34,7 @@ namespace KnockRush.EditorTools.UI
             return AssetDatabase.LoadAssetAtPath<Sprite>(path);
         }
 
-        public static void ApplyIconsAndSplash(string iconPath, string adaptiveBackgroundPath, string adaptiveForegroundPath, Sprite splashBackground)
+        public static void ApplyIconsAndSplash(string iconPath, string adaptiveBackgroundPath, string adaptiveForegroundPath)
         {
             var icon = ImportIcon(iconPath);
             var adaptiveBackground = ImportIcon(adaptiveBackgroundPath);
@@ -62,15 +62,19 @@ namespace KnockRush.EditorTools.UI
                 PlayerSettings.SetPlatformIcons(NamedBuildTarget.Android, kind, icons);
             }
 
-            // Native startup splash: the key art (no logos), handing over seamlessly to the in-game splash.
+            // Native startup splash: the standard "Made with Unity" logo on black, then the game's
+            // own key-art splash takes over (the Boot camera also clears to black, so no colour flash).
             PlayerSettings.SplashScreen.show = true;
-            PlayerSettings.SplashScreen.showUnityLogo = false;
+            PlayerSettings.SplashScreen.showUnityLogo = true;
+            PlayerSettings.SplashScreen.unityLogoStyle = PlayerSettings.SplashScreen.UnityLogoStyle.LightOnDark;
+            PlayerSettings.SplashScreen.drawMode = PlayerSettings.SplashScreen.DrawMode.UnityLogoBelow;
             PlayerSettings.SplashScreen.logos = new PlayerSettings.SplashScreenLogo[0];
-            PlayerSettings.SplashScreen.background = splashBackground;
-            PlayerSettings.SplashScreen.backgroundPortrait = splashBackground;
-            PlayerSettings.SplashScreen.backgroundColor = new Color32(0x2D, 0x8B, 0xF0, 0xFF);
+            PlayerSettings.SplashScreen.background = null;
+            PlayerSettings.SplashScreen.backgroundPortrait = null;
+            PlayerSettings.SplashScreen.backgroundColor = Color.black;
             PlayerSettings.SplashScreen.overlayOpacity = 0f;
-            PlayerSettings.SplashScreen.animationMode = PlayerSettings.SplashScreen.AnimationMode.Static;
+            PlayerSettings.SplashScreen.blurBackgroundImage = false;
+            PlayerSettings.SplashScreen.animationMode = PlayerSettings.SplashScreen.AnimationMode.Dolly;
             AssetDatabase.SaveAssets();
             Debug.Log($"[KnockRush Build] App icons ({PlayerSettings.GetSupportedIconKinds(NamedBuildTarget.Android).Length} Android kinds) and splash applied.");
         }

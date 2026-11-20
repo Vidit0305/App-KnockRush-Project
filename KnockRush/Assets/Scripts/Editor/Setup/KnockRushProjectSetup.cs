@@ -38,7 +38,7 @@ namespace KnockRush.EditorTools.Setup
         private const string Menu = "KnockRush/Setup/";
 
         // Brand colours used for placeholder scene backgrounds.
-        private static readonly Color BootBackground = new Color32(0x5B, 0x2E, 0xFF, 0xFF);     // Knock Purple
+        private static readonly Color BootBackground = Color.black;                         // matches the Unity splash (no colour flash)
         private static readonly Color MainMenuBackground = new Color32(0x1E, 0x14, 0x5C, 0xFF); // Deep Night
 
         /// <summary>Packages required at the end of Phase 1. Versions are resolved by the Package Manager for this editor.</summary>
