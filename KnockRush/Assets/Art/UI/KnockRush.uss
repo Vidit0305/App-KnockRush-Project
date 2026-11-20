@@ -492,77 +492,596 @@
     background-color: rgb(34, 197, 139);
 }
 
-/* ---------- Home ---------- */
-.kr-profile-chip {
+/* ---------- Home (premium lobby layout over the 3D festival stage) ---------- */
+.kr-home .kr-display {
+    color: rgb(255, 255, 255);
+    -unity-text-outline-width: 2px;
+    -unity-text-outline-color: rgb(16, 24, 78);
+    text-shadow: 0 3px 0 rgba(16, 24, 78, 0.85);
+}
+
+/* Bare skinned button: no default Unity / .kr-btn look, a quick squash when pressed. */
+.kr-h-btn {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+    transition-property: scale;
+    transition-duration: 0.08s;
+}
+
+.kr-h-btn:hover,
+.kr-h-btn:focus {
+    background-color: rgba(0, 0, 0, 0);
+    border-color: rgba(0, 0, 0, 0);
+}
+
+.kr-h-btn:active,
+.kr-h-btn:hover:active {
+    background-color: rgba(0, 0, 0, 0);
+    scale: 0.95 0.95;
+}
+
+/* Icons */
+.kr-ico {
+    -unity-background-scale-mode: scale-to-fit;
+    flex-shrink: 0;
+}
+
+.kr-ico--alert { background-image: url("Icons/alert.png"); }
+.kr-ico--cart { background-image: url("Icons/cart.png"); }
+.kr-ico--clock { background-image: url("Icons/clock.png"); }
+.kr-ico--coin { background-image: url("Icons/coin.png"); }
+.kr-ico--crown { background-image: url("Icons/crown.png"); }
+.kr-ico--edit { background-image: url("Icons/edit.png"); }
+.kr-ico--friends { background-image: url("Icons/friends.png"); }
+.kr-ico--gem { background-image: url("Icons/gem.png"); }
+.kr-ico--gift { background-image: url("Icons/gift.png"); }
+.kr-ico--hanger { background-image: url("Icons/hanger.png"); }
+.kr-ico--lock { background-image: url("Icons/lock.png"); }
+.kr-ico--mail { background-image: url("Icons/mail.png"); }
+.kr-ico--missions { background-image: url("Icons/missions.png"); }
+.kr-ico--party { background-image: url("Icons/party.png"); }
+.kr-ico--person { background-image: url("Icons/person.png"); }
+.kr-ico--play { background-image: url("Icons/play_arrows.png"); }
+.kr-ico--plus { background-image: url("Icons/plus.png"); }
+.kr-ico--settings { background-image: url("Icons/settings.png"); }
+.kr-ico--stopwatch { background-image: url("Icons/stopwatch.png"); }
+.kr-ico--trophy { background-image: url("Icons/trophy.png"); }
+
+/* 9-slice skins */
+.kr-skin-navy,
+.kr-h-profile,
+.kr-h-wallet,
+.kr-h-info {
+    background-image: url("Home/panel_navy.png");
+    -unity-slice-left: 34;
+    -unity-slice-right: 34;
+    -unity-slice-top: 34;
+    -unity-slice-bottom: 34;
+}
+
+/* ---- Top bar ---- */
+.kr-h-top {
+    position: absolute;
+    top: 14px;
+    left: 18px;
+    right: 18px;
+    height: 150px;
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.kr-h-profile {
     flex-direction: row;
     align-items: center;
-    background-color: rgba(30, 20, 92, 0.75);
-    border-radius: 40px;
-    padding: 6px 22px 6px 6px;
+    height: 140px;
+    padding: 10px 26px 10px 10px;
 }
 
-.kr-offline {
-    align-self: center;
-    background-color: rgba(232, 58, 58, 0.85);
-    border-radius: 16px;
-    padding: 4px 18px;
-    font-size: 22px;
+.kr-h-avatar {
+    width: 120px;
+    height: 120px;
+    padding: 8px;
+    background-image: url("Home/frame_gold.png");
+    -unity-slice-left: 36;
+    -unity-slice-right: 36;
+    -unity-slice-top: 36;
+    -unity-slice-bottom: 36;
 }
 
-.kr-home-menu {
-    width: 300px;
-    justify-content: center;
+.kr-h-avatar__inner {
+    flex-grow: 1;
+    background-image: url("Home/avatar_bg.png");
+    -unity-slice-left: 24;
+    -unity-slice-right: 24;
+    -unity-slice-top: 24;
+    -unity-slice-bottom: 24;
+    border-radius: 20px;
+    overflow: hidden;
 }
 
-.kr-menu-btn {
-    align-items: flex-start;
-    padding: 12px 24px;
-    margin: 8px 0;
+.kr-h-avatar__image {
+    flex-grow: 1;
+    -unity-background-scale-mode: scale-and-crop;
 }
 
-.kr-menu-btn__title {
+.kr-h-profile__info {
+    margin-left: 18px;
+}
+
+.kr-h-name {
     font-size: 38px;
 }
 
-.kr-menu-btn__sub {
-    font-size: 20px;
-    color: rgba(255, 255, 255, 0.8);
+.kr-h-name__edit {
+    width: 34px;
+    height: 34px;
+    margin-left: 10px;
+    align-self: center;
 }
 
-.kr-btn--shop { background-color: rgb(255, 79, 154); border-color: rgb(196, 40, 110); }
-.kr-btn--locker { background-color: rgb(91, 46, 255); border-color: rgb(55, 24, 170); }
-.kr-btn--season { background-color: rgb(255, 170, 20); border-color: rgb(200, 120, 0); }
-.kr-btn--friends { background-color: rgb(34, 197, 139); border-color: rgb(18, 140, 96); }
+.kr-h-levelrow {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 6px;
+}
 
-.kr-home-side {
-    width: 460px;
+.kr-home .kr-h-level {
+    font-size: 32px;
+    color: rgb(255, 214, 60);
+}
+
+.kr-h-xp {
+    width: 236px;
+    height: 32px;
+    margin-left: 14px;
+    background-image: url("Home/bar_track.png");
+    -unity-slice-left: 15;
+    -unity-slice-right: 15;
+    -unity-slice-top: 15;
+    -unity-slice-bottom: 15;
+}
+
+.kr-h-xp__fill {
+    position: absolute;
+    left: 3px;
+    top: 3px;
+    bottom: 3px;
+    width: 0;
+    max-width: 230px;
+    background-image: url("Home/bar_fill.png");
+    -unity-slice-left: 13;
+    -unity-slice-right: 13;
+    -unity-slice-top: 12;
+    -unity-slice-bottom: 12;
+}
+
+.kr-home .kr-h-xp__text {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    font-size: 19px;
+    -unity-text-align: middle-center;
+    -unity-text-outline-width: 1.5px;
+    text-shadow: 0 1px 0 rgba(16, 24, 78, 0.85);
+}
+
+.kr-h-wallet {
+    flex-direction: row;
+    align-items: center;
+    height: 72px;
+    min-width: 236px;
+    margin-left: 34px;
+    margin-top: 22px;
+    padding: 0 6px 0 66px;
+    -unity-slice-left: 30;
+    -unity-slice-right: 30;
+    -unity-slice-top: 30;
+    -unity-slice-bottom: 30;
+}
+
+.kr-h-wallet__icon {
+    position: absolute;
+    left: -26px;
+    top: -8px;
+    width: 88px;
+    height: 88px;
+}
+
+.kr-h-wallet__value {
+    flex-grow: 1;
+    font-size: 36px;
+    -unity-text-align: middle-center;
+    margin: 0 10px;
+}
+
+.kr-h-plus {
+    width: 58px;
+    height: 58px;
+    align-items: center;
     justify-content: center;
+    padding-bottom: 6px;
+    -unity-slice-left: 26;
+    -unity-slice-right: 26;
+    -unity-slice-top: 26;
+    -unity-slice-bottom: 34;
+}
+
+.kr-h-plus--yellow { background-image: url("Home/btn_yellow.png"); -unity-slice-left: 40; -unity-slice-right: 40; -unity-slice-top: 40; -unity-slice-bottom: 48; }
+.kr-h-plus--green { background-image: url("Home/btn_green.png"); }
+
+.kr-h-plus__icon {
+    width: 32px;
+    height: 32px;
+}
+
+.kr-h-square {
+    width: 80px;
+    height: 80px;
+    margin-left: 16px;
+    margin-top: 18px;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 6px;
+    background-image: url("Home/btn_blue.png");
+    -unity-slice-left: 26;
+    -unity-slice-right: 26;
+    -unity-slice-top: 26;
+    -unity-slice-bottom: 34;
+}
+
+.kr-h-square__icon {
+    width: 50px;
+    height: 50px;
+}
+
+.kr-h-badge {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    width: 38px;
+    height: 38px;
+}
+
+.kr-h-logo {
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    width: 560px;
+    height: 274px;
+    translate: -50% 0;
+    background-image: url("Home/Logo.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.kr-h-offline {
+    position: absolute;
+    top: 268px;
+    left: 50%;
+    translate: -50% 0;
+    padding: 4px 18px;
+    border-radius: 16px;
+    background-color: rgba(232, 58, 58, 0.92);
+    border-width: 2px;
+    border-color: rgb(255, 255, 255);
+}
+
+.kr-h-offline .kr-display {
+    font-size: 20px;
+}
+
+/* ---- Left: season card + navigation ---- */
+.kr-h-left {
+    position: absolute;
+    left: 18px;
+    top: 172px;
+    width: 480px;
+}
+
+.kr-h-season {
+    flex-direction: row;
+    align-items: center;
+    width: 470px;
+    height: 178px;
+    padding: 8px 16px 8px 4px;
+    background-image: url("Home/card_season.png");
+    -unity-slice-left: 40;
+    -unity-slice-right: 40;
+    -unity-slice-top: 40;
+    -unity-slice-bottom: 40;
+    rotate: -2deg;
+}
+
+.kr-h-season__image {
+    width: 176px;
+    height: 196px;
+    margin-top: -34px;
+    -unity-background-scale-mode: scale-and-crop;
+}
+
+.kr-h-season__text {
+    flex-grow: 1;
+    flex-shrink: 1;
+    margin-left: 4px;
+}
+
+.kr-h-season__number {
+    font-size: 30px;
+}
+
+.kr-home .kr-h-season__name {
+    font-size: 46px;
+    color: rgb(255, 222, 70);
+    white-space: normal;
+    -unity-text-outline-width: 3px;
+}
+
+.kr-h-season__timer {
+    flex-direction: row;
+    align-items: center;
+    align-self: flex-start;
+    margin-top: 6px;
+    padding: 3px 14px 3px 6px;
+    border-radius: 18px;
+    background-color: rgba(30, 16, 90, 0.6);
+}
+
+.kr-h-season__clock {
+    width: 28px;
+    height: 28px;
+}
+
+.kr-h-season__time {
+    font-size: 24px;
+    margin-left: 6px;
+}
+
+.kr-h-nav {
+    margin-top: 16px;
+    width: 230px;
+}
+
+.kr-h-nav__btn {
+    height: 102px;
+    margin-bottom: 12px;
+    align-items: center;
+    justify-content: center;
+    padding-top: 2px;
+    background-image: url("Home/card_blue.png");
+    -unity-slice-left: 40;
+    -unity-slice-right: 40;
+    -unity-slice-top: 40;
+    -unity-slice-bottom: 40;
+}
+
+.kr-h-nav__icon {
+    width: 54px;
+    height: 54px;
+}
+
+.kr-h-nav__label {
+    font-size: 26px;
+    margin-top: -2px;
+}
+
+.kr-h-nav--shop {
+    height: 142px;
+    padding-bottom: 8px;
+    background-image: url("Home/btn_yellow.png");
+    -unity-slice-left: 42;
+    -unity-slice-right: 42;
+    -unity-slice-top: 42;
+    -unity-slice-bottom: 50;
+}
+
+.kr-h-nav--shop .kr-h-nav__icon {
+    width: 78px;
+    height: 78px;
+}
+
+.kr-h-nav--shop .kr-h-nav__label {
+    font-size: 36px;
+}
+
+/* ---- Right: daily rewards + missions ---- */
+.kr-h-right {
+    position: absolute;
+    right: 18px;
+    top: 172px;
+    width: 370px;
+}
+
+.kr-h-info {
+    flex-direction: row;
+    align-items: center;
+    height: 114px;
+    margin-bottom: 16px;
+    padding: 8px 18px 8px 12px;
+}
+
+.kr-h-info__icon {
+    width: 88px;
+    height: 88px;
+}
+
+.kr-h-info__text {
+    flex-grow: 1;
+    margin-left: 12px;
+}
+
+.kr-h-info__title {
+    font-size: 32px;
+}
+
+.kr-h-info__row {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 2px;
+}
+
+.kr-h-info__subicon {
+    width: 28px;
+    height: 28px;
+}
+
+.kr-home .kr-h-info__sub {
+    font-size: 26px;
+    margin-left: 8px;
+    color: rgb(255, 222, 90);
+}
+
+/* ---- Bottom: mode cards + PLAY ---- */
+.kr-h-bottom {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 14px;
+    height: 200px;
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.kr-h-mode {
+    flex-direction: row;
+    align-items: center;
+    width: 384px;
+    min-width: 300px;
+    flex-shrink: 1;
+    height: 152px;
+    margin-right: 16px;
+    padding: 10px 18px 10px 14px;
+    background-image: url("Home/card_blue.png");
+    -unity-slice-left: 40;
+    -unity-slice-right: 40;
+    -unity-slice-top: 40;
+    -unity-slice-bottom: 40;
+}
+
+.kr-h-mode--party {
+    background-image: url("Home/card_purple.png");
+}
+
+.kr-h-mode--selected {
+    background-image: url("Home/card_blue_sel.png");
+    -unity-slice-left: 48;
+    -unity-slice-right: 48;
+    -unity-slice-top: 48;
+    -unity-slice-bottom: 48;
+    scale: 1.04 1.04;
+}
+
+.kr-h-mode__icon {
+    width: 100px;
+    height: 100px;
+}
+
+.kr-h-mode__text {
+    flex-grow: 1;
+    flex-shrink: 1;
+    margin-left: 14px;
+    align-items: flex-start;
+}
+
+.kr-h-mode__title {
+    font-size: 34px;
+    white-space: normal;
+    -unity-text-align: middle-left;
+}
+
+.kr-h-mode__row {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.kr-h-mode__people {
+    width: 32px;
+    height: 32px;
+}
+
+.kr-h-mode__players {
+    font-size: 24px;
+    margin-left: 8px;
+}
+
+.kr-h-playgroup {
+    align-items: flex-end;
+}
+
+.kr-h-tag {
+    flex-direction: row;
+    align-items: center;
+    margin-right: 46px;
+    margin-bottom: -16px;
+    padding: 6px 22px 10px 22px;
+    background-image: url("Home/tag_white.png");
+    -unity-slice-left: 22;
+    -unity-slice-right: 22;
+    -unity-slice-top: 22;
+    -unity-slice-bottom: 22;
+    rotate: -3deg;
+}
+
+.kr-home .kr-h-tag__text {
+    font-size: 28px;
+    color: rgb(28, 38, 110);
+    -unity-text-outline-width: 0;
+    text-shadow: 0 0 0 rgba(0, 0, 0, 0);
+}
+
+.kr-h-tag__crown {
+    width: 52px;
+    height: 52px;
+    margin-left: 8px;
+    margin-top: -26px;
+    margin-right: -30px;
+    rotate: 14deg;
+}
+
+.kr-h-play {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 580px;
+    height: 158px;
+    padding-bottom: 10px;
+    background-image: url("Home/btn_yellow.png");
+    -unity-slice-left: 44;
+    -unity-slice-right: 44;
+    -unity-slice-top: 44;
+    -unity-slice-bottom: 52;
+}
+
+.kr-home .kr-h-play__text {
+    font-size: 104px;
+    -unity-text-outline-width: 4px;
+    -unity-text-outline-color: rgb(120, 50, 0);
+    text-shadow: 0 6px 0 rgba(120, 50, 0, 0.9);
+    rotate: -3deg;
+}
+
+.kr-h-play__arrows {
+    width: 86px;
+    height: 86px;
+    margin-left: 18px;
+}
+
+.kr-missions {
+    width: 900px;
+}
+
+.kr-missions__list {
+    width: 100%;
+    margin: 16px 0;
 }
 
 .kr-mission {
     margin: 8px 0;
     font-size: 22px;
-}
-
-.kr-home-bottom {
-    flex-direction: row;
-    align-items: flex-end;
-    height: 150px;
-}
-
-.kr-mode-chip {
-    background-color: rgba(30, 20, 92, 0.78);
-    border-radius: 20px;
-    padding: 10px 26px;
-    margin-right: 12px;
-    align-items: flex-end;
-}
-
-.kr-btn--play {
-    font-size: 72px;
-    padding: 18px 90px;
-    border-bottom-width: 10px;
-    border-radius: 28px;
 }
 
 /* ---------- Modes / rooms / lobby ---------- */

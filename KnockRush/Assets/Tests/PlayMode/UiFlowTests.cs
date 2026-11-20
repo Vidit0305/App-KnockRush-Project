@@ -69,8 +69,10 @@ namespace KnockRush.Tests.PlayMode
             Assert.IsTrue(app.Root.ClassListContains("kr-root"));
             var playButton = app.Navigator.Top.Root.Q<Button>(className: "kr-btn--play");
             Assert.IsNotNull(playButton, "Home has a PLAY button.");
-            Assert.AreEqual("PLAY", playButton.text);
-            Assert.IsNotNull(playButton.resolvedStyle.unityFontDefinition.font ?? (UnityEngine.Object)playButton.resolvedStyle.unityFontDefinition.fontAsset, "Display font resolved.");
+            var playLabel = playButton.Q<Label>(className: "kr-h-play__text");
+            Assert.IsNotNull(playLabel, "PLAY button has its label.");
+            Assert.AreEqual("PLAY", playLabel.text);
+            Assert.IsNotNull(playLabel.resolvedStyle.unityFontDefinition.font ?? (UnityEngine.Object)playLabel.resolvedStyle.unityFontDefinition.fontAsset, "Display font resolved.");
         }
 
         [UnityTest]
@@ -159,8 +161,9 @@ namespace KnockRush.Tests.PlayMode
 
             yield return WaitUntil(() => app.Navigator.Top is WaitingLobbyScreen || app.Navigator.Top is MatchHudScreen, "lobby screen");
             yield return WaitUntil(() => MatchController.Current != null && MatchController.Current.Phase == MatchPhase.Countdown, "countdown");
-            yield return null;
-            Assert.IsInstanceOf<MatchHudScreen>(app.Navigator.Stack[0], "Countdown shows the match HUD.");
+            // The round's loading bar first runs to 100% (well under a second), then the HUD takes over.
+            yield return WaitUntil(() => app.Navigator.Stack.Count > 0 && app.Navigator.Stack[0] is MatchHudScreen, "match HUD");
+            Assert.AreEqual(MatchPhase.Countdown, MatchController.Current.Phase, "The HUD is up while the countdown is still running.");
             Assert.AreEqual(PickingMode.Ignore, app.Navigator.Stack[0].Root.pickingMode, "HUD must not block touch controls.");
 
             yield return WaitUntil(() => MatchController.Current != null && MatchController.Current.Phase == MatchPhase.MatchResults, "match results");
