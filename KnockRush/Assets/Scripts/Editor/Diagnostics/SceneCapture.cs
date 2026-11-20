@@ -42,6 +42,30 @@ namespace KnockRush.EditorTools.Diagnostics
             EditorApplication.Exit(exitCode);
         }
 
+        /// <summary>
+        /// Rebuilds the MainMenu lobby and renders it through its own stage camera (no UI):
+        /// Tools/unity.sh exec KnockRush.EditorTools.Diagnostics.SceneCapture.CaptureMenuBatch (with graphics).
+        /// </summary>
+        public static void CaptureMenuBatch()
+        {
+            var exitCode = 0;
+            try
+            {
+                UI.UiContentBuilder.BuildMainMenuScene();
+                var output = GetArg("-captureOut") ?? "../.logs/captures";
+                Directory.CreateDirectory(output);
+                var camera = Camera.main != null ? Camera.main : Object.FindFirstObjectByType<Camera>();
+                Render(camera, camera.transform.position, camera.transform.position + camera.transform.forward, Path.Combine(output, "MainMenu_stage.png"));
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+                exitCode = 1;
+            }
+
+            EditorApplication.Exit(exitCode);
+        }
+
         /// <summary>Captures every map scene in Assets/Scenes/Maps (overview + checkpoints).</summary>
         public static void CaptureAllMapsBatch()
         {

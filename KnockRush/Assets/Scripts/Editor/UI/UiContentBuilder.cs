@@ -8,6 +8,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UIElements;
 
 namespace KnockRush.EditorTools.UI
@@ -67,6 +68,7 @@ namespace KnockRush.EditorTools.UI
         {
             KnockRushProjectSetup.EnsureFolder("Assets/Settings/UI");
             KnockRushProjectSetup.EnsureFolder(ResourcesFolder);
+            ImportUiTextures();
             AssetDatabase.ImportAsset(RuntimeThemePath, ImportAssetOptions.ForceUpdate);
             AssetDatabase.ImportAsset(ThemePath, ImportAssetOptions.ForceUpdate);
 
@@ -88,7 +90,7 @@ namespace KnockRush.EditorTools.UI
                 AssetDatabase.LoadAssetAtPath<Font>(DisplayFontPath),
                 AssetDatabase.LoadAssetAtPath<Font>(BodyFontPath),
                 loadingBackground);
-            AppBrandingBuilder.ApplyIconsAndSplash(AppIconPath, AdaptiveBackgroundPath, AdaptiveForegroundPath, loadingBackground);
+            AppBrandingBuilder.ApplyIconsAndSplash(AppIconPath, AdaptiveBackgroundPath, AdaptiveForegroundPath);
             EditorUtility.SetDirty(resources);
 
             if (panel.themeStyleSheet == null || resources.Theme == null || resources.DisplayFont == null || resources.BodyFont == null || resources.LoadingBackground == null)
@@ -99,24 +101,28 @@ namespace KnockRush.EditorTools.UI
             return resources;
         }
 
+        /// <summary>Icons (mipmapped, compressed) and 9-slice skins (crisp, uncompressed) used by the theme.</summary>
+        private static void ImportUiTextures()
+        {
+            foreach (var guid in AssetDatabase.FindAssets("t:Texture2D", new[] { "Assets/Art/UI/Icons" }))
+            {
+                MenuLobbyBuilder.ImportTexture(AssetDatabase.GUIDToAssetPath(guid), true, true);
+            }
+
+            foreach (var guid in AssetDatabase.FindAssets("t:Texture2D", new[] { "Assets/Art/UI/Home" }))
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var art = path.EndsWith("Logo.png") || path.EndsWith("PodiumGlow.png");
+                MenuLobbyBuilder.ImportTexture(path, art, art);
+            }
+        }
+
         /// <summary>The menu backdrop: the player's bean on a round podium with floating shapes.</summary>
         public static void BuildMainMenuScene()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
 
             KnockRushProjectSetup.EnsureFolder(MenuMaterialsFolder);
-            var podiumMat = EditorAssetUtility.CreateToonMaterial(MenuMaterialsFolder + "/Podium.mat", new Color32(255, 106, 26, 255), false);
-            var podiumRimMat = EditorAssetUtility.CreateToonMaterial(MenuMaterialsFolder + "/PodiumRim.mat", new Color32(255, 209, 43, 255), false);
-            var floorMat = EditorAssetUtility.CreateLevelMaterial(MenuMaterialsFolder + "/Floor.mat", new Color32(70, 205, 140, 255));
-            Color[] shapeColors =
-            {
-                new Color32(34, 197, 139, 255), new Color32(255, 79, 154, 255), new Color32(255, 209, 43, 255), new Color32(91, 46, 255, 255), new Color32(45, 156, 255, 255)
-            };
-            var shapeMats = new Material[shapeColors.Length];
-            for (var i = 0; i < shapeColors.Length; i++)
-            {
-                shapeMats[i] = EditorAssetUtility.CreateToonMaterial($"{MenuMaterialsFolder}/Shape{i}.mat", shapeColors[i], false);
-            }
 
             // Assets reloaded by path after NewScene (it unloads unused assets).
             var model = AssetDatabase.LoadAssetAtPath<GameObject>(CharacterAssetBuilder.BeanModelPath);
@@ -127,73 +133,50 @@ namespace KnockRush.EditorTools.UI
                 throw new System.InvalidOperationException("Bean model/material/controller missing: build character assets first.");
             }
 
-            // Camera: slightly low, looking up at the hero bean.
+            var beanAssets = new MenuLobbyBuilder.BeanAssets { Model = model, Material = beanMaterial, Controller = controller };
+
+            // Camera: the hero bean centre-bottom, the festival arena filling the rest of the frame.
             var camera = Object.FindFirstObjectByType<Camera>();
             var rig = new GameObject("StageCameraRig").transform;
             camera.transform.SetParent(rig, false);
-            camera.transform.localPosition = new Vector3(0f, 1.25f, 5.2f);
-            camera.transform.localRotation = Quaternion.LookRotation(new Vector3(0f, 0.95f, 0f) - camera.transform.localPosition);
-            camera.fieldOfView = 32f;
+            camera.transform.localPosition = new Vector3(0f, 0.95f, 4.9f);
+            camera.transform.localRotation = Quaternion.LookRotation(new Vector3(0f, 1.02f, 0f) - camera.transform.localPosition);
+            camera.fieldOfView = 42f;
             Scenes.WorldLookBuilder.ConfigureCamera(camera);
             camera.nearClipPlane = 0.1f;
-            camera.farClipPlane = 80f;
+            camera.farClipPlane = 140f;
 
-            SceneBuildKitFacade.ConfigureLighting(Quaternion.Euler(42f, 150f, 0f),
-                new Color32(205, 225, 255, 255), new Color32(190, 205, 235, 255), new Color32(120, 120, 160, 255), 1.2f);
-            RenderSettings.fogStartDistance = 30f;
-            RenderSettings.fogEndDistance = 140f;
+            SceneBuildKitFacade.ConfigureLighting(Quaternion.Euler(40f, 155f, 0f),
+                new Color32(205, 225, 255, 255), new Color32(200, 205, 240, 255), new Color32(140, 120, 190, 255), 1.2f);
+            RenderSettings.fogStartDistance = 55f;
+            RenderSettings.fogEndDistance = 240f;
 
             var stageRoot = new GameObject("MenuStage");
-            var floor = Primitive(PrimitiveType.Cylinder, "Floor", stageRoot.transform, new Vector3(0f, -0.62f, -6f), new Vector3(40f, 0.5f, 40f), floorMat);
-            floor.GetComponent<MeshRenderer>().shadowCastingMode = ShadowCastingMode.Off;
-            Primitive(PrimitiveType.Cylinder, "PodiumRim", stageRoot.transform, new Vector3(0f, -0.2f, 0f), new Vector3(2.5f, 0.2f, 2.5f), podiumRimMat);
-            Primitive(PrimitiveType.Cylinder, "Podium", stageRoot.transform, new Vector3(0f, -0.08f, 0f), new Vector3(2.2f, 0.12f, 2.2f), podiumMat);
+            MenuLobbyBuilder.Build(stageRoot.transform, beanAssets);
 
-            var random = new System.Random(42);
-            for (var i = 0; i < 8; i++)
-            {
-                var side = i % 2 == 0 ? -1f : 1f;
-                var position = new Vector3(side * (4.5f + (float)random.NextDouble() * 7f), 1f + (float)random.NextDouble() * 4f, -8f - (float)random.NextDouble() * 14f);
-                var size = 0.35f + (float)random.NextDouble() * 0.6f;
-                var type = PrimitiveType.Sphere;
-                var shape = Primitive(type, $"Shape{i}", stageRoot.transform, position, Vector3.one * size, shapeMats[i % shapeMats.Length]);
-                shape.transform.rotation = Quaternion.Euler(random.Next(360), random.Next(360), random.Next(360));
-                shape.AddComponent<KnockRush.Maps.FloatingDecor>();
-            }
-
-            // Festival backdrop (balloons + crown banner towers) like the key art.
-            Scenes.WorldLookBuilder.Balloon(stageRoot.transform, new Vector3(-6.2f, 3.6f, -18f), 1.7f, 0);
-            Scenes.WorldLookBuilder.Balloon(stageRoot.transform, new Vector3(6.8f, 4.4f, -22f), 2.1f, 1);
-            Scenes.WorldLookBuilder.Balloon(stageRoot.transform, new Vector3(-11.5f, 5.2f, -32f), 2.4f, 2);
-            Scenes.WorldLookBuilder.Balloon(stageRoot.transform, new Vector3(12.5f, 5.8f, -36f), 2.6f, 3);
-            Scenes.WorldLookBuilder.Tower(stageRoot.transform, new Vector3(-9.5f, -0.4f, -32f), 11f, -1f, 0.3f);
-            Scenes.WorldLookBuilder.Tower(stageRoot.transform, new Vector3(10.5f, -0.4f, -36f), 13f, 1f, 0.3f);
-
-            // The bean.
-            var turntable = new GameObject("Turntable").transform;
-            turntable.SetParent(stageRoot.transform, false);
-            var visual = new GameObject("Visual");
-            visual.transform.SetParent(turntable, false);
-            var bean = (GameObject)PrefabUtility.InstantiatePrefab(model);
-            bean.name = "Bean";
-            bean.transform.SetParent(visual.transform, false);
-            bean.transform.localRotation = Quaternion.Euler(0f, 180f, 0f); // model faces −Z after import
-            var renderer = bean.GetComponentInChildren<SkinnedMeshRenderer>();
-            renderer.sharedMaterial = beanMaterial;
-            renderer.updateWhenOffscreen = true;
-            var animator = bean.GetComponent<Animator>() ?? bean.AddComponent<Animator>();
-            animator.runtimeAnimatorController = controller;
-            animator.applyRootMotion = false;
+            // The hero bean.
+            var (heroRoot, animator, cosmetics) = MenuLobbyBuilder.SpawnBean(stageRoot.transform, beanAssets, "Turntable", Vector3.zero, 0f);
             animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+            EditorAssetUtility.SetLayerRecursively(heroRoot.gameObject, MenuBeanStage.PortraitLayer);
 
-            var cosmetics = visual.AddComponent<CosmeticApplier>();
-            EditorAssetUtility.SetField(cosmetics, "bodyRenderer", renderer);
+            // Live portrait: head and shoulders of the hero (Home avatar).
+            var portrait = PortraitCamera("PortraitCamera", heroRoot, new Vector3(0f, 1.2f, 1.55f), new Vector3(0f, 1.12f, 0f), 30f);
+
+            // Season showcase bean far behind the main camera, filmed for the Home season card.
+            var (seasonRoot, seasonAnimator, seasonCosmetics) = MenuLobbyBuilder.SpawnBean(stageRoot.transform, beanAssets, "SeasonModel", new Vector3(40f, 0f, 40f), 0f);
+            seasonAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+            EditorAssetUtility.SetLayerRecursively(seasonRoot.gameObject, MenuBeanStage.PortraitLayer);
+            var seasonCamera = PortraitCamera("SeasonCamera", seasonRoot, new Vector3(0f, 1.05f, 3.9f), new Vector3(0f, 0.98f, 0f), 32f);
 
             var stage = stageRoot.AddComponent<MenuBeanStage>();
-            EditorAssetUtility.SetField(stage, "turntable", turntable);
+            EditorAssetUtility.SetField(stage, "turntable", heroRoot);
             EditorAssetUtility.SetField(stage, "animator", animator);
             EditorAssetUtility.SetField(stage, "cosmetics", cosmetics);
             EditorAssetUtility.SetField(stage, "stageCamera", camera);
+            EditorAssetUtility.SetField(stage, "portraitCamera", portrait);
+            EditorAssetUtility.SetField(stage, "seasonCamera", seasonCamera);
+            EditorAssetUtility.SetField(stage, "seasonCosmetics", seasonCosmetics);
+            EditorAssetUtility.SetField(stage, "seasonAnimator", seasonAnimator);
 
             // Editor preview of the default outfit (play mode re-applies the stored loadout).
             cosmetics.Apply(Loadout.Default);
@@ -201,16 +184,28 @@ namespace KnockRush.EditorTools.UI
             EditorSceneManager.SaveScene(scene, KnockRushProjectSetup.MainMenuScenePath);
         }
 
-        private static GameObject Primitive(PrimitiveType type, string name, Transform parent, Vector3 position, Vector3 scale, Material material)
+        private static Camera PortraitCamera(string name, Transform parent, Vector3 position, Vector3 lookAt, float fieldOfView)
         {
-            var go = GameObject.CreatePrimitive(type);
-            go.name = name;
+            var go = new GameObject(name);
             go.transform.SetParent(parent, false);
             go.transform.localPosition = position;
-            go.transform.localScale = scale;
-            Object.DestroyImmediate(go.GetComponent<Collider>());
-            go.GetComponent<MeshRenderer>().sharedMaterial = material;
-            return go;
+            go.transform.localRotation = Quaternion.LookRotation(lookAt - position);
+            var camera = go.AddComponent<Camera>();
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = new Color(0.63f, 0.88f, 1f, 0f);
+            camera.fieldOfView = fieldOfView;
+            camera.nearClipPlane = 0.2f;
+            camera.farClipPlane = 8f;
+            camera.cullingMask = 1 << MenuBeanStage.PortraitLayer;
+            camera.depth = -5;
+            camera.enabled = false; // MenuBeanStage turns it on (with a render texture) while Home is up
+            var data = camera.GetUniversalAdditionalCameraData();
+            data.renderPostProcessing = false;
+            data.renderShadows = false;
+            data.antialiasing = UnityEngine.Rendering.Universal.AntialiasingMode.None;
+            data.requiresDepthTexture = false;
+            data.requiresColorTexture = false;
+            return camera;
         }
     }
 

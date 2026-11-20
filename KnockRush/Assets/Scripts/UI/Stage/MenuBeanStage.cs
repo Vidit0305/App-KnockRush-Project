@@ -21,6 +21,14 @@ namespace KnockRush.UI.Stage
         [SerializeField] private CosmeticApplier cosmetics;
         [SerializeField] private Camera stageCamera;
         [SerializeField] private float lockerOffset = 1.1f;
+        [SerializeField] private Camera portraitCamera;
+        [SerializeField] private Camera seasonCamera;
+        [SerializeField] private CosmeticApplier seasonCosmetics;
+        [SerializeField] private Animator seasonAnimator;
+        [SerializeField] private string seasonBody = "body_bunny";
+        [SerializeField] private string seasonColor = "color_bubblegum";
+        [SerializeField] private string seasonPattern = "pattern_hearts";
+        [SerializeField] private string seasonHat = "hat_none";
 
         private Loadout shown;
         private bool previewing;
@@ -29,6 +37,19 @@ namespace KnockRush.UI.Stage
         private float spinVelocity;
         private bool dragging;
         private Vector3 cameraHome;
+        private Vector2 pressPosition;
+        private float pressDistance;
+        private float nextSeasonEmote;
+        private float seasonEmoteEnds;
+
+        /// <summary>Live head-and-shoulders render of the player's bean (Home avatar).</summary>
+        public RenderTexture Portrait { get; private set; }
+
+        /// <summary>Live render of the season's featured costume (Home season card).</summary>
+        public RenderTexture SeasonPortrait { get; private set; }
+
+        /// <summary>Layer the portrait cameras render (the stage beans live on it).</summary>
+        public static int PortraitLayer => LayerMask.NameToLayer("Player") >= 0 ? LayerMask.NameToLayer("Player") : 6;
 
         public static MenuBeanStage Current { get; private set; }
 
@@ -56,6 +77,57 @@ namespace KnockRush.UI.Stage
 
             Show(LocalLoadoutStore.Current);
             nextIdleEmote = Time.time + 4f;
+
+            Portrait = SetupPortrait(portraitCamera, 256);
+            SeasonPortrait = SetupPortrait(seasonCamera, 320);
+            if (seasonCosmetics != null)
+            {
+                seasonCosmetics.Apply(new Loadout { Body = seasonBody, Color = seasonColor, Pattern = seasonPattern, Hat = seasonHat, Emote = "emote_wave" });
+                SetLayer(seasonCosmetics.gameObject, PortraitLayer);
+                nextSeasonEmote = Time.time + 2f;
+            }
+        }
+
+        private static RenderTexture SetupPortrait(Camera camera, int size)
+        {
+            if (camera == null || SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null)
+            {
+                return null; // headless (tests, servers): no portraits
+            }
+
+            var texture = new RenderTexture(size, size, 16, RenderTextureFormat.ARGB32) { name = camera.name, antiAliasing = 2 };
+            texture.Create();
+            camera.targetTexture = texture;
+            camera.cullingMask = 1 << PortraitLayer;
+            return texture;
+        }
+
+        private void OnDestroy()
+        {
+            ReleasePortrait(portraitCamera, Portrait);
+            ReleasePortrait(seasonCamera, SeasonPortrait);
+        }
+
+        private static void ReleasePortrait(Camera camera, RenderTexture texture)
+        {
+            if (camera != null)
+            {
+                camera.targetTexture = null;
+            }
+
+            if (texture != null)
+            {
+                texture.Release();
+                Destroy(texture);
+            }
+        }
+
+        private static void SetLayer(GameObject root, int layer)
+        {
+            foreach (var t in root.GetComponentsInChildren<Transform>(true))
+            {
+                t.gameObject.layer = layer;
+            }
         }
 
         /// <summary>Dresses the stage bean (pass the stored loadout to end a preview).</summary>
@@ -83,6 +155,7 @@ namespace KnockRush.UI.Stage
             {
                 shown = loadout;
                 cosmetics.Apply(loadout);
+                SetLayer(cosmetics.gameObject, PortraitLayer); // hats and costume parts too
             }
         }
 
@@ -107,6 +180,7 @@ namespace KnockRush.UI.Stage
 
             UpdateDrag();
             UpdateFraming();
+            UpdatePortraits();
         }
 
         private void UpdateDrag()
@@ -119,11 +193,24 @@ namespace KnockRush.UI.Stage
 
             if (pointer.press.wasPressedThisFrame)
             {
-                dragging = !IsOverUi(pointer.position.ReadValue());
+                pressPosition = pointer.position.ReadValue();
+                pressDistance = 0f;
+                dragging = !IsOverUi(pressPosition);
             }
             else if (pointer.press.wasReleasedThisFrame)
             {
+                // A tap on the bean (not a drag) plays the equipped emote.
+                if (dragging && pressDistance < 12f && emoteEndsAt <= 0f && IsOverBean(pointer.position.ReadValue()))
+                {
+                    PlayEquippedEmote();
+                }
+
                 dragging = false;
+            }
+
+            if (dragging && pointer.press.isPressed)
+            {
+                pressDistance += pointer.delta.ReadValue().magnitude;
             }
 
             if (dragging && pointer.press.isPressed)
@@ -152,6 +239,52 @@ namespace KnockRush.UI.Stage
             var picked = app.Root.panel.Pick(panelPosition);
             // Screen backgrounds don't count: only real controls (buttons, panels, lists) block the drag.
             return picked != null && picked != app.Root && !picked.ClassListContains("kr-screen");
+        }
+
+        private bool IsOverBean(Vector2 screenPosition)
+        {
+            if (stageCamera == null || turntable == null)
+            {
+                return false;
+            }
+
+            var feet = stageCamera.WorldToScreenPoint(turntable.position);
+            var head = stageCamera.WorldToScreenPoint(turntable.position + Vector3.up * 1.6f);
+            var halfWidth = Mathf.Abs(head.y - feet.y) * 0.4f;
+            return feet.z > 0f && screenPosition.y >= feet.y && screenPosition.y <= head.y && Mathf.Abs(screenPosition.x - feet.x) <= halfWidth;
+        }
+
+        /// <summary>Portrait cameras only run while the Home screen (which shows them) is up.</summary>
+        private void UpdatePortraits()
+        {
+            var top = AppUI.Instance != null ? AppUI.Instance.Navigator?.Top : null;
+            var home = top is KnockRush.UI.Screens.HomeScreen;
+            if (portraitCamera != null && portraitCamera.enabled != home)
+            {
+                portraitCamera.enabled = home;
+            }
+
+            if (seasonCamera != null && seasonCamera.enabled != home)
+            {
+                seasonCamera.enabled = home;
+            }
+
+            if (!home || seasonAnimator == null || seasonAnimator.runtimeAnimatorController == null)
+            {
+                return;
+            }
+
+            if (seasonEmoteEnds > 0f && Time.time > seasonEmoteEnds)
+            {
+                seasonEmoteEnds = 0f;
+                seasonAnimator.CrossFadeInFixedTime(CharacterAnimationDriver.Locomotion, 0.25f);
+            }
+            else if (seasonEmoteEnds <= 0f && Time.time > nextSeasonEmote)
+            {
+                nextSeasonEmote = Time.time + 7f;
+                seasonEmoteEnds = Time.time + EmoteSeconds;
+                seasonAnimator.CrossFadeInFixedTime(EmoteStates.ForItem("emote_wave") ?? CharacterAnimationDriver.Celebrate, 0.2f);
+            }
         }
 
         private void UpdateFraming()
