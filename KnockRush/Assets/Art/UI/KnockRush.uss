@@ -1488,3 +1488,378 @@
     -unity-text-outline-width: 3px;
     -unity-text-outline-color: rgb(20, 28, 88);
 }
+
+/* =====================================================================================
+   Premium skin layer (applies the Home look to every screen). Declared last so it
+   overrides the base styles above: glossy 9-slice buttons, navy panels, card skins,
+   full-screen page backdrops and a common header (round back button + title).
+   ===================================================================================== */
+
+/* ---- Page backdrop (menu pages are their own screens) ---- */
+.kr-page-backdrop {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("Backgrounds/PageBackground.png");
+    -unity-background-scale-mode: scale-and-crop;
+}
+
+.kr-in-menu .kr-backdrop {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.kr-screen {
+    padding: 24px 32px;
+}
+
+/* ---- Display text: white with a navy outline and drop shadow everywhere ---- */
+.kr-display {
+    -unity-text-outline-width: 2px;
+    -unity-text-outline-color: rgb(16, 24, 78);
+    text-shadow: 0 3px 0 rgba(16, 24, 78, 0.8);
+}
+
+.kr-title {
+    font-size: 60px;
+    color: rgb(255, 214, 60);
+    -unity-font-definition: url("Fonts/LilitaOne-Regular.ttf");
+    -unity-text-outline-width: 3px;
+    -unity-text-outline-color: rgb(16, 24, 78);
+    text-shadow: 0 4px 0 rgba(16, 24, 78, 0.9);
+}
+
+.kr-heading {
+    font-size: 38px;
+    -unity-font-definition: url("Fonts/LilitaOne-Regular.ttf");
+    -unity-text-outline-width: 2px;
+    -unity-text-outline-color: rgb(16, 24, 78);
+    text-shadow: 0 3px 0 rgba(16, 24, 78, 0.85);
+}
+
+/* ---- Header: round back button + big title ---- */
+.kr-topbar {
+    height: 96px;
+    margin-bottom: 12px;
+}
+
+.kr-page-title {
+    font-size: 52px;
+    margin-left: 20px;
+    color: rgb(255, 255, 255);
+    -unity-text-outline-width: 3px;
+    text-shadow: 0 4px 0 rgba(16, 24, 78, 0.9);
+}
+
+.kr-btn.kr-btn--back {
+    width: 84px;
+    height: 84px;
+    margin: 0;
+    padding: 0 0 8px 0;
+    align-items: center;
+    justify-content: center;
+    background-image: url("Skins/btn_blue.png");
+    -unity-slice-left: 26;
+    -unity-slice-right: 26;
+    -unity-slice-top: 26;
+    -unity-slice-bottom: 34;
+}
+
+.kr-btn--back__icon {
+    width: 50px;
+    height: 50px;
+}
+
+/* ---- Buttons: glossy skins (blue default, yellow primary, green good, red danger, navy ghost) ---- */
+.kr-btn {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    border-radius: 0;
+    padding: 12px 30px 20px 30px;
+    margin: 6px;
+    font-size: 28px;
+    -unity-font-definition: url("Fonts/LilitaOne-Regular.ttf");
+    -unity-text-outline-width: 2px;
+    -unity-text-outline-color: rgb(16, 24, 78);
+    text-shadow: 0 3px 0 rgba(16, 24, 78, 0.8);
+    background-image: url("Skins/btn_blue.png");
+    -unity-slice-left: 26;
+    -unity-slice-right: 26;
+    -unity-slice-top: 26;
+    -unity-slice-bottom: 34;
+}
+
+.kr-btn:hover,
+.kr-btn:focus {
+    background-color: rgba(0, 0, 0, 0);
+    border-color: rgba(0, 0, 0, 0);
+}
+
+.kr-btn:active,
+.kr-btn:hover:active {
+    background-color: rgba(0, 0, 0, 0);
+    scale: 0.95 0.95;
+    border-bottom-width: 0;
+}
+
+.kr-btn--primary {
+    background-image: url("Skins/btn_yellow.png");
+    -unity-slice-left: 42;
+    -unity-slice-right: 42;
+    -unity-slice-top: 42;
+    -unity-slice-bottom: 50;
+    font-size: 44px;
+    padding: 14px 54px 24px 54px;
+    -unity-text-outline-color: rgb(120, 50, 0);
+    text-shadow: 0 4px 0 rgba(120, 50, 0, 0.85);
+}
+
+.kr-btn--good {
+    background-image: url("Skins/btn_green.png");
+    -unity-text-outline-color: rgb(10, 70, 30);
+    text-shadow: 0 3px 0 rgba(10, 70, 30, 0.8);
+}
+
+.kr-btn--danger {
+    background-image: url("Skins/btn_red.png");
+    -unity-text-outline-color: rgb(110, 10, 30);
+    text-shadow: 0 3px 0 rgba(110, 10, 30, 0.8);
+}
+
+.kr-btn--ghost {
+    background-image: url("Skins/panel_navy.png");
+    -unity-slice-left: 30;
+    -unity-slice-right: 30;
+    -unity-slice-top: 30;
+    -unity-slice-bottom: 30;
+    padding: 12px 28px 14px 28px;
+}
+
+.kr-btn--small {
+    font-size: 22px;
+    padding: 8px 20px 14px 20px;
+}
+
+.kr-btn--ghost.kr-btn--small {
+    padding: 8px 20px 10px 20px;
+}
+
+.kr-btn:disabled {
+    opacity: 0.5;
+}
+
+/* ---- Panels, cards, dialogs ---- */
+.kr-panel,
+.kr-dialog,
+.kr-locker-panel,
+.kr-season-summary,
+.kr-profile-card {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    border-radius: 0;
+    background-image: url("Skins/panel_navy.png");
+    -unity-slice-left: 30;
+    -unity-slice-right: 30;
+    -unity-slice-top: 30;
+    -unity-slice-bottom: 30;
+    padding: 22px 26px;
+}
+
+.kr-card,
+.kr-item,
+.kr-mode-card,
+.kr-bundle,
+.kr-gem-pack,
+.kr-tier,
+.kr-achievement {
+    background-color: rgba(0, 0, 0, 0);
+    border-radius: 0;
+    border-width: 0;
+    background-image: url("Skins/card_blue.png");
+    -unity-slice-left: 40;
+    -unity-slice-right: 40;
+    -unity-slice-top: 40;
+    -unity-slice-bottom: 40;
+}
+
+.kr-item:hover {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.kr-card--selected,
+.kr-achievement--unlocked,
+.kr-tier--reached {
+    background-image: url("Skins/card_blue_sel.png");
+    -unity-slice-left: 48;
+    -unity-slice-right: 48;
+    -unity-slice-top: 48;
+    -unity-slice-bottom: 48;
+}
+
+.kr-reward--premium,
+.kr-gem-pack {
+    background-image: url("Skins/card_purple.png");
+}
+
+/* Rarity: a coloured bottom strip instead of a border around the skin. */
+.kr-rarity-common,
+.kr-rarity-rare,
+.kr-rarity-epic,
+.kr-rarity-legendary {
+    border-bottom-width: 6px;
+    border-bottom-left-radius: 22px;
+    border-bottom-right-radius: 22px;
+}
+
+/* ---- Lists (leaderboard, friends) ---- */
+.kr-list-row {
+    background-color: rgba(16, 28, 96, 0.72);
+    border-radius: 18px;
+    border-width: 2px;
+    border-color: rgba(140, 180, 255, 0.35);
+    margin: 4px 0;
+    padding: 10px 18px;
+}
+
+.kr-list-row--you {
+    background-color: rgba(255, 196, 46, 0.35);
+    border-color: rgb(255, 214, 60);
+}
+
+/* ---- Currency pills (shop / season headers) ---- */
+.kr-pill {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    background-image: url("Skins/panel_navy.png");
+    -unity-slice-left: 30;
+    -unity-slice-right: 30;
+    -unity-slice-top: 30;
+    -unity-slice-bottom: 30;
+    padding: 8px 22px 8px 10px;
+    height: 64px;
+    margin-left: 14px;
+}
+
+.kr-coin,
+.kr-gem {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+    border-width: 0;
+    border-radius: 0;
+    background-color: rgba(0, 0, 0, 0);
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.kr-coin { background-image: url("Icons/coin.png"); }
+.kr-gem { background-image: url("Icons/gem.png"); rotate: 0deg; }
+
+/* ---- Tabs (shop, locker) ---- */
+.kr-tab {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    background-image: url("Skins/panel_navy.png");
+    -unity-slice-left: 30;
+    -unity-slice-right: 30;
+    -unity-slice-top: 30;
+    -unity-slice-bottom: 30;
+}
+
+.kr-tab--active {
+    background-image: url("Skins/btn_yellow.png");
+    -unity-slice-left: 26;
+    -unity-slice-right: 26;
+    -unity-slice-top: 26;
+    -unity-slice-bottom: 32;
+    -unity-text-outline-color: rgb(120, 50, 0);
+}
+
+/* ---- Progress bars ---- */
+.kr-bar {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    background-image: url("Skins/bar_track.png");
+    -unity-slice-left: 14;
+    -unity-slice-right: 14;
+    -unity-slice-top: 14;
+    -unity-slice-bottom: 14;
+    padding: 3px;
+}
+
+.kr-bar__fill {
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("Skins/bar_fill.png");
+    -unity-slice-left: 11;
+    -unity-slice-right: 11;
+    -unity-slice-top: 11;
+    -unity-slice-bottom: 11;
+}
+
+/* ---- Home: right column extras ---- */
+.kr-h-info--party {
+    background-image: url("Skins/card_purple.png");
+    -unity-slice-left: 40;
+    -unity-slice-right: 40;
+    -unity-slice-top: 40;
+    -unity-slice-bottom: 40;
+}
+
+.kr-h-more {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 84px;
+    padding-bottom: 8px;
+    background-image: url("Skins/btn_purple.png");
+    -unity-slice-left: 26;
+    -unity-slice-right: 26;
+    -unity-slice-top: 26;
+    -unity-slice-bottom: 34;
+}
+
+.kr-h-more__icon {
+    width: 54px;
+    height: 54px;
+}
+
+.kr-h-more__label {
+    font-size: 30px;
+    margin-left: 12px;
+}
+
+.kr-ico--back { background-image: url("Icons/back.png"); }
+.kr-ico--modes { background-image: url("Icons/modes.png"); }
+
+/* ---- Inputs, toggles, mode cards ---- */
+.kr-input > #unity-text-input {
+    background-color: rgb(255, 255, 255);
+    border-width: 3px;
+    border-color: rgb(16, 24, 78);
+    border-radius: 16px;
+    padding: 8px 16px;
+    color: rgb(28, 38, 110);
+    font-size: 26px;
+}
+
+.kr-toggle #unity-checkmark {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border-width: 3px;
+    border-color: rgb(16, 24, 78);
+    background-color: rgb(255, 255, 255);
+}
+
+.kr-toggle:checked #unity-checkmark {
+    background-color: rgb(60, 200, 90);
+}
+
+.kr-mode-card {
+    height: 440px;
+    padding: 24px;
+}
+
+.kr-dialog {
+    padding: 28px 36px;
+}

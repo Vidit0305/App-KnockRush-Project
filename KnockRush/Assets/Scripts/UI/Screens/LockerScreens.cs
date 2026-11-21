@@ -230,7 +230,7 @@ namespace KnockRush.UI.Screens
 
         protected override void Build(VisualElement root)
         {
-            root.Add(Ui.Header("CHOOSE YOUR BEAN", () => Nav.Pop(), Ui.Button("LOCKER", () => Nav.Push<CustomizeScreen>(), "kr-btn--small", "kr-btn--ghost")));
+            root.Add(Ui.Header("CHOOSE YOUR CHARACTER", () => Nav.Pop(), Ui.Button("LOCKER", () => Nav.Push<CustomizeScreen>(), "kr-btn--small", "kr-btn--ghost")));
             var row = Ui.Row("kr-grow");
             row.pickingMode = PickingMode.Ignore;
             row.Add(Ui.Button("<", () => Step(-1), "kr-btn--icon", "kr-arrow"));

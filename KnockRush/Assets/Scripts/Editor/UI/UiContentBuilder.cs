@@ -156,7 +156,7 @@ namespace KnockRush.EditorTools.UI
             RenderSettings.fog = false;
 
             var stageRoot = new GameObject("MenuStage");
-            MenuStageBuilder.Build(stageRoot.transform, camera);
+            var backdrop = MenuStageBuilder.Build(stageRoot.transform, camera);
 
             // The hero bean.
             var (heroRoot, animator, cosmetics) = MenuStageBuilder.SpawnBean(stageRoot.transform, beanAssets, "Turntable", Vector3.zero, 0f);
@@ -181,6 +181,9 @@ namespace KnockRush.EditorTools.UI
             EditorAssetUtility.SetField(stage, "seasonCamera", seasonCamera);
             EditorAssetUtility.SetField(stage, "seasonCosmetics", seasonCosmetics);
             EditorAssetUtility.SetField(stage, "seasonAnimator", seasonAnimator);
+            EditorAssetUtility.SetField(stage, "backdrop", backdrop);
+            EditorAssetUtility.SetField(stage, "homeBackdrop", MenuStageBuilder.HomeBackdrop);
+            EditorAssetUtility.SetField(stage, "lockerBackdrop", MenuStageBuilder.LockerBackdrop);
 
             // Editor preview of the default outfit (play mode re-applies the stored loadout).
             cosmetics.Apply(Loadout.Default);

@@ -21,7 +21,7 @@ namespace KnockRush.UI.Framework
         private UIDocument document;
         private VisualElement safeArea;
         private VisualElement keyArt;
-        private int keyArtRequests;
+        private VisualElement pageBackdrop;
         private VisualElement toastLayer;
         private Rect appliedSafeArea;
         private Vector2Int appliedScreenSize;
@@ -99,6 +99,12 @@ namespace KnockRush.UI.Framework
 
             Root.pickingMode = PickingMode.Ignore;
 
+            // Full-bleed page backdrop: menu pages are their own screens, not panels over the lobby.
+            pageBackdrop = Ui.Element("kr-page-backdrop");
+            pageBackdrop.pickingMode = PickingMode.Ignore;
+            pageBackdrop.style.display = DisplayStyle.None;
+            Root.Add(pageBackdrop);
+
             // Full-bleed key art (outside the safe area so it reaches notches and screen edges).
             keyArt = Ui.Element("kr-keyart");
             keyArt.pickingMode = PickingMode.Ignore;
@@ -127,6 +133,11 @@ namespace KnockRush.UI.Framework
             safeArea.Add(toastLayer);
 
             Navigator = new ScreenNavigator(this, screenLayer);
+            Navigator.Changed += _ =>
+            {
+                UpdatePageBackdrop();
+                UpdateKeyArt();
+            };
             Flow = new UiFlow(this);
             ApplySafeArea();
             Log.Info(Tag, "App UI ready.");
@@ -142,6 +153,7 @@ namespace KnockRush.UI.Framework
             ApplySafeArea();
             Flow.Update();
             Navigator.Tick(Time.unscaledDeltaTime);
+            UpdateKeyArt();
 
             if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
             {
@@ -159,17 +171,65 @@ namespace KnockRush.UI.Framework
             Flow?.Dispose();
         }
 
-        /// <summary>Shows or hides the full-screen key art (reference counted: splash and loading share it).</summary>
-        public void ShowKeyArt(bool show)
+        /// <summary>
+        /// The full-screen key art is up exactly while a splash / loading screen is visible (derived
+        /// from the navigator every frame, so it can never get stuck behind the menu).
+        /// </summary>
+        private void UpdateKeyArt()
         {
-            keyArtRequests = Mathf.Max(0, keyArtRequests + (show ? 1 : -1));
-            if (keyArt != null)
+            var show = false;
+            foreach (var screen in Navigator.Stack)
             {
-                keyArt.style.display = keyArtRequests > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+                if (screen.IsVisible && screen.UsesKeyArt)
+                {
+                    show = true;
+                    break;
+                }
+            }
+
+            var display = show ? DisplayStyle.Flex : DisplayStyle.None;
+            if (keyArt != null && keyArt.style.display != display)
+            {
+                keyArt.style.display = display;
             }
         }
 
         public bool IsKeyArtVisible => keyArt != null && keyArt.style.display == DisplayStyle.Flex;
+
+        /// <summary>The top-most full-screen page (overlays such as dialogs sit above it).</summary>
+        public UIScreen TopPage
+        {
+            get
+            {
+                var stack = Navigator?.Stack;
+                if (stack == null)
+                {
+                    return null;
+                }
+
+                for (var i = stack.Count - 1; i >= 0; i--)
+                {
+                    if (stack[i].Layer == ScreenLayer.Page)
+                    {
+                        return stack[i];
+                    }
+                }
+
+                return null;
+            }
+        }
+
+        /// <summary>True when a menu page covers the 3D stage completely (the stage can stop rendering).</summary>
+        public bool StageHidden => pageBackdrop != null && pageBackdrop.style.display == DisplayStyle.Flex;
+
+        private void UpdatePageBackdrop()
+        {
+            var page = TopPage;
+            var inMenu = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == Core.SceneManagement.SceneNames.MainMenu;
+            var show = inMenu && page != null && !page.ShowsStage;
+            pageBackdrop.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
+            Root.EnableInClassList("kr-in-menu", inMenu);
+        }
 
         /// <summary>Shows a short message at the top of the screen.</summary>
         public void Toast(string message, float seconds = 2.6f)

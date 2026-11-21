@@ -61,11 +61,12 @@ namespace KnockRush.UI.Framework
             var header = Row("kr-topbar");
             if (onBack != null)
             {
-                header.Add(Button("BACK", onBack, "kr-btn--ghost", "kr-btn--small"));
+                var back = Button(string.Empty, onBack, "kr-btn--back");
+                back.Add(Element("kr-ico", "kr-ico--back", "kr-btn--back__icon"));
+                header.Add(back);
             }
 
-            var label = Heading(title);
-            label.style.marginLeft = 16;
+            var label = Label(title, "kr-page-title", "kr-display");
             header.Add(label);
             header.Add(Spacer());
             if (right != null)

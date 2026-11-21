@@ -29,6 +29,9 @@ namespace KnockRush.UI.Stage
         [SerializeField] private string seasonColor = "color_bubblegum";
         [SerializeField] private string seasonPattern = "pattern_hearts";
         [SerializeField] private string seasonHat = "hat_none";
+        [SerializeField] private Renderer backdrop;
+        [SerializeField] private Texture homeBackdrop;
+        [SerializeField] private Texture lockerBackdrop;
 
         private Loadout shown;
         private bool previewing;
@@ -41,6 +44,9 @@ namespace KnockRush.UI.Stage
         private float pressDistance;
         private float nextSeasonEmote;
         private float seasonEmoteEnds;
+        private MaterialPropertyBlock backdropBlock;
+        private Texture shownBackdrop;
+        private static readonly int BaseMapId = Shader.PropertyToID("_BaseMap");
 
         /// <summary>Live head-and-shoulders render of the player's bean (Home avatar).</summary>
         public RenderTexture Portrait { get; private set; }
@@ -178,6 +184,7 @@ namespace KnockRush.UI.Stage
                 PlayEquippedEmote();
             }
 
+            UpdateStageVisibility();
             UpdateDrag();
             UpdateFraming();
             UpdatePortraits();
@@ -239,6 +246,34 @@ namespace KnockRush.UI.Stage
             var picked = app.Root.panel.Pick(panelPosition);
             // Screen backgrounds don't count: only real controls (buttons, panels, lists) block the drag.
             return picked != null && picked != app.Root && !picked.ClassListContains("kr-screen");
+        }
+
+        /// <summary>
+        /// Home shows the arena backdrop; locker screens (customize, character select) a dressing-room
+        /// backdrop; full-screen menu pages cover the stage, so it stops rendering.
+        /// </summary>
+        private void UpdateStageVisibility()
+        {
+            var app = AppUI.Instance;
+            var page = app != null ? app.TopPage : null;
+            if (stageCamera != null)
+            {
+                var visible = app == null || !app.StageHidden;
+                if (stageCamera.enabled != visible)
+                {
+                    stageCamera.enabled = visible;
+                }
+            }
+
+            var wanted = page != null && page.ShowsStage && !(page is KnockRush.UI.Screens.HomeScreen) && lockerBackdrop != null ? lockerBackdrop : homeBackdrop;
+            if (backdrop != null && wanted != null && wanted != shownBackdrop)
+            {
+                shownBackdrop = wanted;
+                backdropBlock ??= new MaterialPropertyBlock();
+                backdrop.GetPropertyBlock(backdropBlock);
+                backdropBlock.SetTexture(BaseMapId, wanted);
+                backdrop.SetPropertyBlock(backdropBlock);
+            }
         }
 
         private bool IsOverBean(Vector2 screenPosition)

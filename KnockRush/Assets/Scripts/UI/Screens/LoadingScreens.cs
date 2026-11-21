@@ -121,6 +121,8 @@ namespace KnockRush.UI.Screens
     /// <summary>1 · Splash: the key art while the app starts.</summary>
     public sealed class SplashScreen : UIScreen, ILoadingScreen
     {
+        public override bool UsesKeyArt => true;
+
         private const float MinSeconds = 2.2f;
 
         private KeyArtLoadingView view;
@@ -140,12 +142,6 @@ namespace KnockRush.UI.Screens
             sceneProgress = 0f;
             completeRequested = false;
             view.SetProgressImmediate(0f);
-            App.ShowKeyArt(true);
-        }
-
-        public override void OnHide()
-        {
-            App.ShowKeyArt(false);
         }
 
         public override void Tick(float deltaTime)
@@ -224,6 +220,8 @@ namespace KnockRush.UI.Screens
     /// <summary>2 · Loading: every scene load and round transition shows the same key-art screen.</summary>
     public sealed class LoadingScreen : UIScreen, ILoadingScreen
     {
+        public override bool UsesKeyArt => true;
+
         private KeyArtLoadingView view;
         private Label context;
 
@@ -241,12 +239,6 @@ namespace KnockRush.UI.Screens
         public override void OnShow()
         {
             view.SetProgressImmediate(0f);
-            App.ShowKeyArt(true);
-        }
-
-        public override void OnHide()
-        {
-            App.ShowKeyArt(false);
         }
 
         public void ShowScene(string sceneName)

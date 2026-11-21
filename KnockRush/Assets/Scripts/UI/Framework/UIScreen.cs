@@ -32,6 +32,9 @@ namespace KnockRush.UI.Framework
         /// <summary>True when the 3D menu stage (the player's bean) should be visible behind this screen.</summary>
         public virtual bool ShowsStage => false;
 
+        /// <summary>True for the splash and loading screens: the full-screen key art shows behind them.</summary>
+        public virtual bool UsesKeyArt => false;
+
         public bool IsVisible { get; internal set; }
 
         internal void Create(AppUI app)

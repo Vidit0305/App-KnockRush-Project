@@ -16,6 +16,8 @@ namespace KnockRush.EditorTools.UI
     {
         public const string BackdropPath = "Assets/Art/UI/Backgrounds/HomeBackground.png";
         public const string ShadowPath = "Assets/Art/World/Textures/BlobShadow.png";
+        public const string LockerBackdropPath = "Assets/Art/UI/Backgrounds/LockerBackground.png";
+        public const string PageBackgroundPath = "Assets/Art/UI/Backgrounds/PageBackground.png";
         private const float BackdropDistance = 40f;
 
         public struct BeanAssets
@@ -25,13 +27,21 @@ namespace KnockRush.EditorTools.UI
             public RuntimeAnimatorController Controller;
         }
 
-        public static void Build(Transform root, Camera camera)
+        /// <summary>Builds the stage; returns the backdrop renderer (its texture swaps per screen).</summary>
+        public static Renderer Build(Transform root, Camera camera)
         {
-            Backdrop(camera);
+            var backdrop = Backdrop(camera);
             ContactShadow(root);
+            ImportTexture(LockerBackdropPath, false, true, 2048);
+            ImportTexture(PageBackgroundPath, false, true, 2048);
+            return backdrop;
         }
 
-        private static void Backdrop(Camera camera)
+        public static Texture2D LockerBackdrop => AssetDatabase.LoadAssetAtPath<Texture2D>(LockerBackdropPath);
+
+        public static Texture2D HomeBackdrop => AssetDatabase.LoadAssetAtPath<Texture2D>(BackdropPath);
+
+        private static Renderer Backdrop(Camera camera)
         {
             var texture = ImportTexture(BackdropPath, false, true, 2048);
             if (texture == null)
@@ -48,6 +58,7 @@ namespace KnockRush.EditorTools.UI
             renderer.shadowCastingMode = ShadowCastingMode.Off;
             renderer.receiveShadows = false;
             quad.AddComponent<StageBackdrop>().Configure(camera, BackdropDistance, (float)texture.width / texture.height);
+            return renderer;
         }
 
         private static void ContactShadow(Transform root)

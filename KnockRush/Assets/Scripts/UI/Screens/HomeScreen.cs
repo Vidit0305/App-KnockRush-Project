@@ -85,15 +85,22 @@ namespace KnockRush.UI.Screens
             right.pickingMode = PickingMode.Ignore;
             right.Add(InfoCard("Daily Rewards", "kr-ico--gift", "kr-ico--clock", out dailyTime, out dailyBadge, ClaimDaily));
             right.Add(InfoCard("Missions", "kr-ico--missions", "kr-ico--coin", out missionsCount, out missionsBadge, () => Nav.Push<MissionsScreen>()));
+            var catalog = GameModeCatalog.Load();
+            var party = InfoCard("Private Party", "kr-ico--party", "kr-ico--person", out var partyPlayers, out _, () => Nav.Push<PrivateRoomScreen>());
+            party.AddToClassList("kr-h-info--party");
+            partyPlayers.text = PlayersText(catalog != null ? FindMode(catalog, "private") : null, false);
+            right.Add(party);
+            var more = HButton(() => Nav.Push<ModeSelectScreen>(), "kr-h-btn", "kr-h-more");
+            more.Add(Ui.Element("kr-ico", "kr-ico--modes", "kr-h-more__icon"));
+            more.Add(Ui.Label("More Modes", "kr-h-more__label", "kr-display"));
+            right.Add(more);
             root.Add(right);
 
             // ---- Bottom: mode cards + PLAY ----
             var bottom = Ui.Row("kr-h-bottom");
             bottom.pickingMode = PickingMode.Ignore;
-            var catalog = GameModeCatalog.Load();
-            bottom.Add(ModeCard("classic", "kr-ico--crown", catalog, false));
-            bottom.Add(ModeCard("quickrace", "kr-ico--stopwatch", catalog, false));
-            bottom.Add(ModeCard("private", "kr-ico--party", catalog, true));
+            bottom.Add(ModeCard("classic", "kr-ico--crown", catalog));
+            bottom.Add(ModeCard("quickrace", "kr-ico--stopwatch", catalog));
             bottom.Add(Ui.Spacer());
 
             var playGroup = Ui.Col("kr-h-playgroup");
@@ -217,19 +224,20 @@ namespace KnockRush.UI.Screens
             return card;
         }
 
-        private Button ModeCard(string modeId, string iconClass, GameModeCatalog catalog, bool opensRoom)
+        private static string PlayersText(GameModeDefinition mode, bool fixedCount)
+        {
+            return mode == null ? string.Empty
+                : fixedCount ? $"{mode.TargetPlayers} Players"
+                : $"{Mathf.Max(2, mode.MinPlayers)}–{mode.TargetPlayers} Players";
+        }
+
+        private Button ModeCard(string modeId, string iconClass, GameModeCatalog catalog)
         {
             var mode = catalog != null ? FindMode(catalog, modeId) : null;
             var title = mode != null ? mode.DisplayName : modeId;
-            var players = mode == null ? string.Empty
-                : modeId == "classic" ? $"{mode.TargetPlayers} Players"
-                : $"{Mathf.Max(2, mode.MinPlayers)}–{mode.TargetPlayers} Players";
+            var players = PlayersText(mode, modeId == "classic");
 
-            var card = HButton(() => OnModeCard(modeId, opensRoom), "kr-h-btn", "kr-h-mode");
-            if (opensRoom)
-            {
-                card.AddToClassList("kr-h-mode--party");
-            }
+            var card = HButton(() => OnModeCard(modeId), "kr-h-btn", "kr-h-mode");
 
             card.Add(Ui.Element("kr-ico", iconClass, "kr-h-mode__icon"));
             var col = Ui.Col("kr-h-mode__text");
@@ -243,14 +251,8 @@ namespace KnockRush.UI.Screens
             return card;
         }
 
-        private void OnModeCard(string modeId, bool opensRoom)
+        private void OnModeCard(string modeId)
         {
-            if (opensRoom)
-            {
-                Nav.Push<PrivateRoomScreen>();
-                return;
-            }
-
             if (UiData.SelectedModeId == modeId)
             {
                 Nav.Push<ModeSelectScreen>(); // second tap: details and practice toggle
