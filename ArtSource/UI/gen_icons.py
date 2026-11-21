@@ -242,7 +242,36 @@ def person():
     save(lay, "person", outline=12)
 
 
+def back():
+    lay = layer()
+    arrow = poly([(30, 128), (122, 44), (122, 92), (222, 92), (222, 164), (122, 164), (122, 212)])
+    add(lay, arrow, (255, 255, 255), (215, 228, 250))
+    gloss(lay, arrow, 0.45, 60)
+    save(lay, "back", outline=14)
+
+
+def modes():
+    lay = layer()
+    tiles = [((34, 34, 122, 122), (255, 120, 120), (220, 50, 70)), ((134, 34, 222, 122), (120, 200, 255), (40, 110, 230)),
+             ((34, 134, 122, 222), (150, 235, 120), (40, 170, 70)), ((134, 134, 222, 222), (255, 220, 90), (240, 150, 20))]
+    for box, top, bottom in tiles:
+        m = rr(box, 18)
+        add(lay, m, top, bottom)
+        gloss(lay, m, 0.45, 80)
+    d = ImageDraw.Draw(lay)
+    d.polygon(P([(64, 66), (64, 92), (92, 78)]), fill=(255, 255, 255, 255))                      # play
+    d.ellipse(P([(156, 56), (200, 100)]), outline=(255, 255, 255, 255), width=8 * SS)             # ring
+    d.rectangle(P([(56, 172), (100, 184)]), fill=(255, 255, 255, 255))                           # plus
+    d.rectangle(P([(72, 156), (84, 200)]), fill=(255, 255, 255, 255))
+    star = [(178 + math.cos(-math.pi / 2 + i * math.pi / 5) * (24 if i % 2 == 0 else 10),
+             178 + math.sin(-math.pi / 2 + i * math.pi / 5) * (24 if i % 2 == 0 else 10)) for i in range(10)]
+    d.polygon(P(star), fill=(255, 255, 255, 255))
+    save(lay, "modes")
+
+
 if __name__ == "__main__":
+    back()
+    modes()
     shop()
     hoodie()
     trophy()

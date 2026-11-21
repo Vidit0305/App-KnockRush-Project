@@ -94,3 +94,6 @@ desktop.ini
 
 # Non-secret Cloud Functions parameters
 !/Backend/firebase/functions/.env
+
+# Python
+__pycache__/
