@@ -20,14 +20,25 @@ namespace KnockRush.UI.Screens
             card.EnableInClassList("kr-card--selected", selected);
             card.EnableInClassList("kr-card--locked", !owned);
 
-            var accent = item.Slot == CosmeticSlot.Pattern && item.PatternType > 0 ? UnityEngine.Color.white : (UnityEngine.Color?)null;
-            var swatch = Ui.Swatch(UiData.PreviewColor(item), accent);
-            if (item.Slot == CosmeticSlot.Hat || item.Slot == CosmeticSlot.Emote || item.Slot == CosmeticSlot.Body && !item.OverridesBodyColor)
+            var portrait = item.Slot == CosmeticSlot.Body ? UnityEngine.Resources.Load<UnityEngine.Texture2D>($"CharacterPortraits/{item.ItemId}") : null;
+            if (portrait != null)
             {
-                swatch.Add(Ui.Label(Initials(item.DisplayName), "kr-swatch__text", "kr-display"));
+                // Characters: a rendered head-and-shoulders portrait.
+                var picture = Ui.Element("kr-portrait");
+                picture.style.backgroundImage = new StyleBackground(portrait);
+                card.Add(picture);
             }
+            else
+            {
+                var accent = item.Slot == CosmeticSlot.Pattern && item.PatternType > 0 ? UnityEngine.Color.white : (UnityEngine.Color?)null;
+                var swatch = Ui.Swatch(UiData.PreviewColor(item), accent);
+                if (item.Slot == CosmeticSlot.Hat || item.Slot == CosmeticSlot.Emote || item.Slot == CosmeticSlot.Body && !item.OverridesBodyColor)
+                {
+                    swatch.Add(Ui.Label(Initials(item.DisplayName), "kr-swatch__text", "kr-display"));
+                }
 
-            card.Add(swatch);
+                card.Add(swatch);
+            }
             card.Add(Ui.Label(item.DisplayName, "kr-item__name"));
             var price = UiData.Price(item.ItemId);
             var status = footer ?? (equipped ? "EQUIPPED" : owned ? "OWNED" : price != null ? $"{price.Price} {(price.Currency == "gems" ? "GEMS" : "COINS")}" : UiData.Online ? "SEASON" : "LOCKED");
@@ -216,55 +227,68 @@ namespace KnockRush.UI.Screens
         }
     }
 
-    /// <summary>11 · Character Selection: browse the 20 costumes on the stage bean, one at a time.</summary>
+    /// <summary>
+    /// 11 · Characters (wardrobe): pick a whole character instead of editing one. All characters
+    /// are shown as cards next to a live 3D preview; owned ones are selected with one tap, locked
+    /// ones can be unlocked right here.
+    /// </summary>
     public sealed class CharacterSelectScreen : UIScreen
     {
-        private readonly List<CosmeticDefinition> costumes = new List<CosmeticDefinition>();
+        private readonly List<CosmeticDefinition> characters = new List<CosmeticDefinition>();
+        private VisualElement grid;
         private Label name;
         private Label rarity;
-        private Label counter;
         private Button select;
-        private int index;
+        private CosmeticDefinition current;
 
         public override bool ShowsStage => true;
 
         protected override void Build(VisualElement root)
         {
-            root.Add(Ui.Header("CHOOSE YOUR CHARACTER", () => Nav.Pop(), Ui.Button("LOCKER", () => Nav.Push<CustomizeScreen>(), "kr-btn--small", "kr-btn--ghost")));
-            var row = Ui.Row("kr-grow");
-            row.pickingMode = PickingMode.Ignore;
-            row.Add(Ui.Button("<", () => Step(-1), "kr-btn--icon", "kr-arrow"));
-            row.Add(Ui.Spacer());
-            row.Add(Ui.Button(">", () => Step(1), "kr-btn--icon", "kr-arrow"));
-            root.Add(row);
+            root.AddToClassList("kr-locker");
+            root.Add(Ui.Header("CHARACTERS", () => Nav.Pop()));
+            var body = Ui.Row("kr-grow");
+            body.style.alignItems = Align.Stretch;
 
-            var info = Ui.Col("kr-center");
+            var left = Ui.Col("kr-grow");
+            left.pickingMode = PickingMode.Ignore;
+            left.Add(Ui.Spacer());
+            var info = Ui.Col("kr-center", "kr-character-info");
             name = Ui.Title(string.Empty);
             info.Add(name);
-            rarity = Ui.Label(string.Empty, "kr-display");
+            rarity = Ui.Label(string.Empty, "kr-display", "kr-character-rarity");
             info.Add(rarity);
-            counter = Ui.Label(string.Empty, "kr-subtle");
-            info.Add(counter);
-            select = Ui.Button("SELECT", Choose, "kr-btn--good");
+            select = Ui.Button("SELECT", Choose, "kr-btn--primary", "kr-character-select");
             info.Add(select);
-            root.Add(info);
+            left.Add(info);
+            body.Add(left);
+
+            var right = Ui.Panel("kr-locker-panel");
+            right.Add(Ui.Label("CHOOSE YOUR CHARACTER", "kr-section__title", "kr-display"));
+            var scroll = Ui.Scroll();
+            grid = Ui.Element("kr-wrap");
+            scroll.Add(grid);
+            right.Add(scroll);
+            body.Add(right);
+            root.Add(body);
         }
 
         public override async void OnShow()
         {
-            costumes.Clear();
+            characters.Clear();
             var catalog = CosmeticCatalog.Load();
             if (catalog != null)
             {
-                costumes.AddRange(catalog.InSlot(CosmeticSlot.Body).OrderBy(c => c.Rarity).ThenBy(c => c.DisplayName));
+                characters.AddRange(catalog.InSlot(CosmeticSlot.Body)
+                    .OrderByDescending(c => UiData.Owns(c.ItemId)).ThenBy(c => c.Rarity).ThenBy(c => c.DisplayName));
             }
 
-            index = Math.Max(0, costumes.FindIndex(c => c.ItemId == LocalLoadoutStore.Current.Body));
-            Show();
+            current = characters.FirstOrDefault(c => c.ItemId == LocalLoadoutStore.Current.Body) ?? characters.FirstOrDefault();
+            Refresh();
             await App.Run(UiData.EnsurePricesAsync);
             if (IsVisible)
             {
-                Show();
+                Refresh();
             }
         }
 
@@ -273,50 +297,61 @@ namespace KnockRush.UI.Screens
             MenuBeanStage.Current?.Preview(LocalLoadoutStore.Current);
         }
 
-        private void Step(int delta)
+        private void Refresh()
         {
-            if (costumes.Count == 0)
+            grid.Clear();
+            foreach (var character in characters)
+            {
+                var c = character;
+                var equipped = LocalLoadoutStore.Current.Body == c.ItemId;
+                grid.Add(ItemCards.Create(c, UiData.Owns(c.ItemId), equipped, c == current, () =>
+                {
+                    current = c;
+                    Refresh();
+                }));
+            }
+
+            if (current == null)
             {
                 return;
             }
 
-            index = (index + delta + costumes.Count) % costumes.Count;
-            Show();
-        }
-
-        private void Show()
-        {
-            if (costumes.Count == 0)
-            {
-                return;
-            }
-
-            var costume = costumes[index];
-            name.text = costume.DisplayName.ToUpperInvariant();
-            rarity.text = costume.Rarity.ToString().ToUpperInvariant();
-            rarity.style.color = UiData.RarityColor(costume.Rarity);
-            counter.text = $"{index + 1} / {costumes.Count}";
-            var owned = UiData.Owns(costume.ItemId);
-            var equipped = LocalLoadoutStore.Current.Body == costume.ItemId;
-            var price = UiData.Price(costume.ItemId);
-            select.text = equipped ? "SELECTED" : owned ? "SELECT" : price != null ? $"UNLOCK IN LOCKER · {price.Price} {(price.Currency == "gems" ? "GEMS" : "COINS")}" : "SEASON PASS REWARD";
-            select.SetEnabled(!equipped && (owned || price != null));
-            MenuBeanStage.Current?.Preview(UiData.With(LocalLoadoutStore.Current, CosmeticSlot.Body, costume.ItemId));
+            name.text = current.DisplayName.ToUpperInvariant();
+            rarity.text = current.Rarity.ToString().ToUpperInvariant();
+            rarity.style.color = UiData.RarityColor(current.Rarity);
+            var owned = UiData.Owns(current.ItemId);
+            var isEquipped = LocalLoadoutStore.Current.Body == current.ItemId;
+            var price = UiData.Price(current.ItemId);
+            select.text = isEquipped ? "SELECTED" : owned ? "SELECT" : price != null ? $"UNLOCK · {price.Price} {(price.Currency == "gems" ? "GEMS" : "COINS")}" : "SEASON REWARD";
+            select.SetEnabled(!isEquipped && (owned || price != null));
+            MenuBeanStage.Current?.Preview(UiData.With(LocalLoadoutStore.Current, CosmeticSlot.Body, current.ItemId));
         }
 
         private async void Choose()
         {
-            var costume = costumes[index];
-            if (!UiData.Owns(costume.ItemId))
+            var character = current;
+            if (character == null)
             {
-                var locker = Nav.Push<CustomizeScreen>();
-                locker.SelectTab(CosmeticSlot.Body);
                 return;
             }
 
-            if (await App.Run(() => UiData.EquipAsync(UiData.With(LocalLoadoutStore.Current, CosmeticSlot.Body, costume.ItemId)), $"{costume.DisplayName} selected!"))
+            if (!UiData.Owns(character.ItemId))
             {
-                Show();
+                if (!UiData.Online)
+                {
+                    App.Toast("Connect to unlock characters.");
+                    return;
+                }
+
+                if (!await App.Run(() => UiData.Backend.PurchaseAsync(character.ItemId), $"{character.DisplayName} unlocked!"))
+                {
+                    return;
+                }
+            }
+
+            if (await App.Run(() => UiData.EquipAsync(UiData.With(LocalLoadoutStore.Current, CosmeticSlot.Body, character.ItemId)), $"{character.DisplayName} selected!"))
+            {
+                Refresh();
             }
         }
     }
@@ -329,7 +364,7 @@ namespace KnockRush.UI.Screens
         protected override void Build(VisualElement root)
         {
             root.AddToClassList("kr-backdrop");
-            root.Add(Ui.Header("INVENTORY", () => Nav.Pop(), Ui.Button("OPEN LOCKER", () => Nav.Push<CustomizeScreen>(), "kr-btn--small")));
+            root.Add(Ui.Header("INVENTORY", () => Nav.Pop(), Ui.Button("CHARACTERS", () => Nav.Push<CharacterSelectScreen>(), "kr-btn--small")));
             content = Ui.Scroll();
             root.Add(content);
         }

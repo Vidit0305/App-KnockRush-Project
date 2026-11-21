@@ -238,7 +238,7 @@ namespace KnockRush.UI.Screens
             var actions = Ui.Row("kr-center");
             actions.Add(Ui.Button("CHANGE NAME", () => Nav.Push<LoginScreen>(), "kr-btn--small"));
             actions.Add(Ui.Button("ACHIEVEMENTS", () => Nav.Push<AchievementsScreen>(), "kr-btn--small", "kr-btn--good"));
-            actions.Add(Ui.Button("LOCKER", () => Nav.Push<CustomizeScreen>(), "kr-btn--small", "kr-btn--ghost"));
+            actions.Add(Ui.Button("CHARACTERS", () => Nav.Push<CharacterSelectScreen>(), "kr-btn--small", "kr-btn--ghost"));
             card.Add(actions);
             row.Add(card);
 

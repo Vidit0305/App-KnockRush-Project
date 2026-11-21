@@ -35,6 +35,10 @@ namespace KnockRush.Inventory
         [SerializeField] private Color color = Color.white;
         [SerializeField] private bool overridesBodyColor;
 
+        [Header("Character (costumes): skin tone and hair colour")]
+        [SerializeField] private Color skinColor = DefaultSkin;
+        [SerializeField] private Color hairColor = DefaultHair;
+
         [Header("Pattern (Pattern slot, or costume override; -1 = none)")]
         [SerializeField, Range(-1, 7)] private int patternType = -1;
         [SerializeField] private Color patternColor = Color.white;
@@ -47,7 +51,12 @@ namespace KnockRush.Inventory
         [Header("Emote")]
         [SerializeField] private string emoteState;
 
+        public static readonly Color DefaultSkin = new Color(1f, 0.8f, 0.66f);
+        public static readonly Color DefaultHair = new Color(0.33f, 0.19f, 0.11f);
+
         public string ItemId => itemId;
+        public Color SkinColor => skinColor;
+        public Color HairColor => hairColor;
         public string DisplayName => displayName;
         public CosmeticSlot Slot => slot;
         public CosmeticRarity Rarity => rarity;
@@ -76,6 +85,13 @@ namespace KnockRush.Inventory
             accessoryPrefab = accessory;
             attachBone = bone;
             emoteState = emote;
+        }
+
+        /// <summary>Costumes: who the character is (skin tone and hair colour).</summary>
+        public void ConfigureCharacter(Color skin, Color hair)
+        {
+            skinColor = skin;
+            hairColor = hair;
         }
     }
 }

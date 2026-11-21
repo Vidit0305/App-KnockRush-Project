@@ -15,6 +15,8 @@ namespace KnockRush.Inventory
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         private static readonly int PatternTypeId = Shader.PropertyToID("_PatternType");
         private static readonly int PatternColorId = Shader.PropertyToID("_PatternColor");
+        private static readonly int SkinColorId = Shader.PropertyToID("_SkinColor");
+        private static readonly int HairColorId = Shader.PropertyToID("_HairColor");
 
         [SerializeField] private SkinnedMeshRenderer bodyRenderer;
         [SerializeField] private CharacterAnimationDriver animationDriver;
@@ -64,6 +66,8 @@ namespace KnockRush.Inventory
             var bodyColor = body != null && body.OverridesBodyColor ? body.Color : color != null ? color.Color : Color.white;
             var patternType = pattern != null && pattern.PatternType > 0 ? pattern.PatternType : body != null && body.PatternType > 0 ? body.PatternType : 0;
             var patternColor = pattern != null && pattern.PatternType > 0 ? pattern.PatternColor : body != null ? body.PatternColor : Color.white;
+            var skinColor = body != null ? body.SkinColor : CosmeticDefinition.DefaultSkin;
+            var hairColor = body != null ? body.HairColor : CosmeticDefinition.DefaultHair;
 
             if (material == null && Application.isPlaying)
             {
@@ -75,6 +79,8 @@ namespace KnockRush.Inventory
                 material.SetColor(BaseColorId, bodyColor);
                 material.SetFloat(PatternTypeId, patternType);
                 material.SetColor(PatternColorId, patternColor);
+                material.SetColor(SkinColorId, skinColor);
+                material.SetColor(HairColorId, hairColor);
             }
             else
             {
@@ -84,6 +90,8 @@ namespace KnockRush.Inventory
                 block.SetColor(BaseColorId, bodyColor);
                 block.SetFloat(PatternTypeId, patternType);
                 block.SetColor(PatternColorId, patternColor);
+                block.SetColor(SkinColorId, skinColor);
+                block.SetColor(HairColorId, hairColor);
                 bodyRenderer.SetPropertyBlock(block);
             }
 

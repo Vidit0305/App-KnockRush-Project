@@ -1,14 +1,18 @@
 // KnockRush stylised toon shader for URP (mobile friendly, SRP Batcher compatible).
 // - Two-tone ramp lighting from the main light (with shadows) + SH ambient
 // - Rim light and a small cartoon specular highlight
-// - Optional vertex colours: RGB = albedo, A = tint mask (1 = multiply by _BaseColor)
+// - Optional vertex colours: RGB = albedo, A = material channel:
+//     1 = outfit (x _BaseColor, gets the pattern), 0.25 = skin (x _SkinColor),
+//     0.5 = hair (x _HairColor), 0 = fixed colour. Skin and hair blend across their border.
 Shader "KnockRush/Toon"
 {
     Properties
     {
         _BaseColor ("Base Color", Color) = (1, 0.42, 0.1, 1)
         _BaseMap ("Base Map", 2D) = "white" {}
-        [Toggle] _UseVertexColor ("Use Vertex Colour (RGB albedo, A tint mask)", Float) = 0
+        [Toggle] _UseVertexColor ("Use Vertex Colour (RGB albedo, A material channel)", Float) = 0
+        _SkinColor ("Skin Tone (vertex A = 0.25)", Color) = (1, 0.8, 0.66, 1)
+        _HairColor ("Hair Colour (vertex A = 0.5)", Color) = (0.33, 0.19, 0.11, 1)
         _ShadeColor ("Shade Tint", Color) = (0.62, 0.58, 0.78, 1)
         _RampThreshold ("Ramp Threshold", Range(0, 1)) = 0.5
         _RampSmoothness ("Ramp Smoothness", Range(0.001, 0.5)) = 0.06
@@ -36,6 +40,8 @@ Shader "KnockRush/Toon"
             float4 _BaseColor;
             float4 _BaseMap_ST;
             float _UseVertexColor;
+            float4 _SkinColor;
+            float4 _HairColor;
             float4 _ShadeColor;
             float _RampThreshold;
             float _RampSmoothness;
@@ -173,9 +179,14 @@ Shader "KnockRush/Toon"
                 #endif
 
                 half3 texColor = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.uv).rgb;
-                half3 vertexAlbedo = lerp(vertexRgb, vertexRgb * _BaseColor.rgb, input.color.a);
+                half channel = input.color.a;
+                half isOutfit = step(0.625h, channel);
+                half isSkinHair = step(0.125h, channel) * (1.0h - isOutfit);
+                half3 skinHair = lerp(_SkinColor.rgb, _HairColor.rgb, saturate((channel - 0.25h) * 4.0h));
+                half3 vertexAlbedo = vertexRgb * lerp(half3(1.0h, 1.0h, 1.0h), skinHair, isSkinHair);
+                vertexAlbedo = lerp(vertexAlbedo, vertexRgb * _BaseColor.rgb, isOutfit);
                 half3 albedo = lerp(_BaseColor.rgb, vertexAlbedo, _UseVertexColor) * texColor;
-                half tintMask = lerp(1.0h, input.color.a, _UseVertexColor);
+                half tintMask = lerp(1.0h, isOutfit, _UseVertexColor);
                 half pattern = PatternMask(input.positionOS, _PatternType) * tintMask;
                 albedo = lerp(albedo, _PatternColor.rgb * lerp(1.0h, vertexRgb, _UseVertexColor), pattern);
 

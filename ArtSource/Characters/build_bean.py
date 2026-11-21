@@ -48,6 +48,11 @@ SHOE = (0.97, 0.97, 1.0)
 SOLE = (0.90, 0.25, 0.22)
 OUTFIT_SHADE = (0.78, 0.78, 0.78)   # tinted, slightly darker (hem, cuffs)
 
+# Vertex alpha is a material channel: 1 = outfit colour, SKIN_CODE = skin tone, HAIR_CODE = hair
+# colour (both per character, set by the costume), 0 = fixed colour (eyes, trousers, shoes).
+SKIN_CODE = 64 / 255.0
+HAIR_CODE = 128 / 255.0
+
 
 # ---------------------------------------------------------------------------
 # Scene helpers
@@ -120,8 +125,8 @@ def head_color(co):
     if side > 0.78 and front < 0.7:
         hairline = min(hairline, -0.01)                         # sideburns over the ears
     if z > hairline:
-        return HAIR, 0.0
-    return SKIN, 0.0
+        return WHITE, HAIR_CODE
+    return WHITE, SKIN_CODE
 
 
 def build_mesh():
@@ -129,12 +134,12 @@ def build_mesh():
     parts = []
 
     # Head (skin + painted hair) and ears.
-    head = Part('Head', SKIN, 0.0, 'Chest', color_fn=head_color)
+    head = Part('Head', WHITE, SKIN_CODE, 'Chest', color_fn=head_color)
     add_ellipsoid(bm, head, HEAD_CENTER, HEAD_RADII, 56, 36, deform=head_deform)
     parts.append(head)
 
     for side, sx in (('L', 1.0), ('R', -1.0)):
-        ear = Part(f'Ear.{side}', SKIN, 0.0, 'Chest')
+        ear = Part(f'Ear.{side}', WHITE, SKIN_CODE, 'Chest')
         add_ellipsoid(bm, ear, (sx * 0.37, 0.02, 1.09), (0.05, 0.07, 0.085), 12, 8)
         parts.append(ear)
 
@@ -172,7 +177,7 @@ def build_mesh():
         add_ellipsoid(bm, cuff, shoulder + arm_dir * 0.215, (0.068, 0.068, 0.03), 14, 6,
                       rotation=Euler((0, sx * math.radians(17), 0)))
         parts.append(cuff)
-        hand = Part(f'Hand.{side}', SKIN, 0.0, f'Arm.{side}')
+        hand = Part(f'Hand.{side}', WHITE, SKIN_CODE, f'Arm.{side}')
         add_ellipsoid(bm, hand, shoulder + arm_dir * 0.29, (0.07, 0.065, 0.075), 14, 10)
         parts.append(hand)
 
@@ -195,7 +200,7 @@ def build_mesh():
     parts.append(mouth)
 
     # Outfit: little pear-shaped body with a darker hem band, plus a neck.
-    neck = Part('Neck', SKIN, 0.0, 'Chest')
+    neck = Part('Neck', WHITE, SKIN_CODE, 'Chest')
     add_ellipsoid(bm, neck, (0, 0, 0.78), (0.1, 0.09, 0.07), 12, 8)
     parts.append(neck)
     torso = Part('Torso', WHITE, 1.0, None)

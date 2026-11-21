@@ -18,6 +18,8 @@ MonoBehaviour:
   rarity: 1
   color: {r: 1, g: 0.7607843, b: 0.85490197, a: 1}
   overridesBodyColor: 1
+  skinColor: {r: 1, g: 0.84705883, b: 0.84705883, a: 1}
+  hairColor: {r: 1, g: 0.56078434, b: 0.7607843, a: 1}
   patternType: -1
   patternColor: {r: 1, g: 1, b: 1, a: 1}
   accessoryPrefab: {fileID: 4841575833048645964, guid: 4e64c01863286d24592b637fb566a628, type: 3}

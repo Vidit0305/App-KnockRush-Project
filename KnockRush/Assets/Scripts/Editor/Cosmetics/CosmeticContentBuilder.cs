@@ -331,12 +331,41 @@ namespace KnockRush.EditorTools.Cosmetics
         // ---------------------------------------------------------------------------------------
         private delegate void Builder(Transform root);
 
+        // Who each character is: skin tone and hair colour (hex). Skin tones span light to dark;
+        // fantasy characters get fantasy skin (robot steel, alien green, golden).
+        private static readonly System.Collections.Generic.Dictionary<string, (int skin, int hair)> CharacterLooks =
+            new System.Collections.Generic.Dictionary<string, (int skin, int hair)>
+            {
+                { "default_bean", (0xFFCFAE, 0x5A3420) },
+                { "body_astronaut", (0xC68A5E, 0x1E1A1A) },
+                { "body_dino", (0xF2C29A, 0x2F7D3A) },
+                { "body_chef", (0xFFE0C8, 0xF2D36B) },
+                { "body_pirate", (0xE8B48A, 0x241A14) },
+                { "body_ninja", (0xD9A27A, 0x16161E) },
+                { "body_robot", (0xB9C6D8, 0x6E7C92) },
+                { "body_knight", (0xFFD9BE, 0xE0702A) },
+                { "body_wizard", (0xFFE0CC, 0xF4F4FA) },
+                { "body_bunny", (0xFFD8D8, 0xFF8FC2) },
+                { "body_cat", (0xFFD1A8, 0xFF8A2A) },
+                { "body_pumpkin", (0xE3A97C, 0x7A2E12) },
+                { "body_snowman", (0xF4F8FF, 0xDDE8FF) },
+                { "body_superhero", (0x7A4A2E, 0x14110F) },
+                { "body_viking", (0xFFD3B6, 0xC0441C) },
+                { "body_cowboy", (0xC98F63, 0x6A4424) },
+                { "body_clown", (0xFFF3EC, 0xE8303A) },
+                { "body_alien", (0x8FE27A, 0x2C6B2E) },
+                { "body_dragon", (0xE9B78C, 0x8A1A2A) },
+                { "body_golden", (0xFFD86A, 0xFFB01F) },
+            };
+
         private static void Costume(string id, string name, CosmeticRarity rarity, Color? color, Builder build, string bone = "Chest",
             int pattern = -1, Color? patternColor = null)
         {
             var prefab = build != null ? SavePrefab(id, build) : null;
             var definition = Definition(id, name, CosmeticSlot.Body, rarity);
             definition.ConfigureLook(color ?? UnityEngine.Color.white, color.HasValue, pattern, patternColor ?? UnityEngine.Color.white, prefab, bone, null);
+            var look = CharacterLooks.TryGetValue(id, out var l) ? l : (0xFFCFAE, 0x5A3420);
+            definition.ConfigureCharacter(C(look.Item1), C(look.Item2));
         }
 
         private static void ColorItem(string id, string name, int hex, CosmeticRarity rarity)
