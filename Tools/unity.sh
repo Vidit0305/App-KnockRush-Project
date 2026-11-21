@@ -12,7 +12,8 @@
 #   Tools/unity.sh server         Build the Linux dedicated server (needs Linux Dedicated Server module)
 #   Tools/unity.sh capture <Scene.unity> [Clip]  Render PNG captures to .logs/captures
 #   Tools/unity.sh maps           Render overview captures of every map
-#   Tools/unity.sh bean           Regenerate the Bean FBX from ArtSource (needs BLENDER_EXE)
+#   Tools/unity.sh bean           Regenerate the character FBX from ArtSource (needs BLENDER_EXE)
+#   Tools/unity.sh portraits      Render character portraits for the Characters screen (needs a GPU)
 #   Tools/unity.sh exec <Method>  Run any static editor method
 #
 # Set UNITY_EXE to the Unity 6000.3.x editor executable. Logs go to .logs/.
@@ -68,7 +69,8 @@ case "${1:-}" in
   server)   run server -buildTarget Linux64 -standaloneBuildSubtarget Server -executeMethod KnockRush.EditorTools.Build.KnockRushBuild.BuildLinuxServerBatch ;;
   capture)  GRAPHICS_FLAG="" run "capture" -executeMethod KnockRush.EditorTools.Diagnostics.SceneCapture.CaptureBatch               -captureScene "${2:-Assets/Scenes/Dev/Playground.unity}" -captureOut "$LOGS/captures" -captureClip "${3:-Run}" ;;
   maps)     GRAPHICS_FLAG="" run "capture-maps" -executeMethod KnockRush.EditorTools.Diagnostics.SceneCapture.CaptureAllMapsBatch -captureOut "$LOGS/captures" ;;
+  portraits) GRAPHICS_FLAG="" run portraits -executeMethod KnockRush.EditorTools.Characters.CharacterPortraitBuilder.BuildBatch ;;
   bean)     "$BLENDER_EXE" -b --factory-startup --python "$ROOT/ArtSource/Characters/build_bean.py" --               "$PROJECT/Assets/Art/Characters/Bean/Bean.fbx" "$ROOT/ArtSource/Characters/Bean.blend" | grep build_bean ;;
   exec)     shift; run "exec-${1##*.}" -executeMethod "$1" ;;
-  *) sed -n '2,17p' "$0"; exit 2 ;;
+  *) sed -n '2,18p' "$0"; exit 2 ;;
 esac

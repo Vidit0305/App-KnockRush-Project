@@ -140,9 +140,10 @@ namespace KnockRush.EditorTools.UI
             var camera = Object.FindFirstObjectByType<Camera>();
             var rig = new GameObject("StageCameraRig").transform;
             camera.transform.SetParent(rig, false);
+            // The character fills ~60% of the screen height, centred.
             camera.transform.localPosition = new Vector3(0f, 0.95f, 4.9f);
-            camera.transform.localRotation = Quaternion.LookRotation(new Vector3(0f, 1.02f, 0f) - camera.transform.localPosition);
-            camera.fieldOfView = 38f;
+            camera.transform.localRotation = Quaternion.LookRotation(new Vector3(0f, 0.92f, 0f) - camera.transform.localPosition);
+            camera.fieldOfView = 29f;
             Scenes.WorldLookBuilder.ConfigureCamera(camera);
             // The painted backdrop is final art: no post-processing tint, no sky behind it.
             camera.GetUniversalAdditionalCameraData().renderPostProcessing = false;
@@ -166,11 +167,6 @@ namespace KnockRush.EditorTools.UI
             // Live portrait: head and shoulders of the hero (Home avatar).
             var portrait = PortraitCamera("PortraitCamera", heroRoot, new Vector3(0f, 1.2f, 1.55f), new Vector3(0f, 1.12f, 0f), 30f);
 
-            // Season showcase bean far behind the main camera, filmed for the Home season card.
-            var (seasonRoot, seasonAnimator, seasonCosmetics) = MenuStageBuilder.SpawnBean(stageRoot.transform, beanAssets, "SeasonModel", new Vector3(40f, 0f, 40f), 0f);
-            seasonAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
-            EditorAssetUtility.SetLayerRecursively(seasonRoot.gameObject, MenuBeanStage.PortraitLayer);
-            var seasonCamera = PortraitCamera("SeasonCamera", seasonRoot, new Vector3(0f, 1.05f, 3.9f), new Vector3(0f, 0.98f, 0f), 32f);
 
             var stage = stageRoot.AddComponent<MenuBeanStage>();
             EditorAssetUtility.SetField(stage, "turntable", heroRoot);
@@ -178,9 +174,6 @@ namespace KnockRush.EditorTools.UI
             EditorAssetUtility.SetField(stage, "cosmetics", cosmetics);
             EditorAssetUtility.SetField(stage, "stageCamera", camera);
             EditorAssetUtility.SetField(stage, "portraitCamera", portrait);
-            EditorAssetUtility.SetField(stage, "seasonCamera", seasonCamera);
-            EditorAssetUtility.SetField(stage, "seasonCosmetics", seasonCosmetics);
-            EditorAssetUtility.SetField(stage, "seasonAnimator", seasonAnimator);
             EditorAssetUtility.SetField(stage, "backdrop", backdrop);
             EditorAssetUtility.SetField(stage, "homeBackdrop", MenuStageBuilder.HomeBackdrop);
             EditorAssetUtility.SetField(stage, "lockerBackdrop", MenuStageBuilder.LockerBackdrop);

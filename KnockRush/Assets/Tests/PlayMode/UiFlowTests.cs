@@ -71,7 +71,7 @@ namespace KnockRush.Tests.PlayMode
             Assert.IsNotNull(playButton, "Home has a PLAY button.");
             var playLabel = playButton.Q<Label>(className: "kr-h-play__text");
             Assert.IsNotNull(playLabel, "PLAY button has its label.");
-            Assert.AreEqual("PLAY", playLabel.text);
+            Assert.AreEqual("PLAY!", playLabel.text);
             Assert.IsNotNull(playLabel.resolvedStyle.unityFontDefinition.font ?? (UnityEngine.Object)playLabel.resolvedStyle.unityFontDefinition.fontAsset, "Display font resolved.");
         }
 

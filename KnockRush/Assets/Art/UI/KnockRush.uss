@@ -492,34 +492,15 @@
     background-color: rgb(34, 197, 139);
 }
 
-/* ---------- Home ----------
-   Layout grid (1920×1080 reference): 24px screen margin, 16px gaps, 112px top bar,
-   left column 440px, right column 360px, 132px bottom row. The painted arena backdrop and
-   the 3D bean come from the MainMenu stage camera behind the UI. */
+/* ---------- Home (lobby) ----------
+   Floating icon buttons with slanted labels around the big character (1920×1080 reference,
+   24 px margins). Slanted plates are 9-sliced horizontally only (their textures are drawn at
+   the display height). */
 .kr-home .kr-display {
     color: rgb(255, 255, 255);
-    -unity-text-outline-width: 2px;
+    -unity-text-outline-width: 2.5px;
     -unity-text-outline-color: rgb(16, 24, 78);
     text-shadow: 0 3px 0 rgba(16, 24, 78, 0.85);
-}
-
-/* Card text reads left-aligned next to its icon (display text is centred elsewhere). */
-.kr-h-name,
-.kr-h-level,
-.kr-h-season__number,
-.kr-h-season__name,
-.kr-h-season__time,
-.kr-h-info__title,
-.kr-h-info__sub,
-.kr-h-mode__title,
-.kr-h-mode__players {
-    -unity-text-align: middle-left;
-}
-
-.kr-h-season__text,
-.kr-h-info__text,
-.kr-h-mode__text {
-    align-items: flex-start;
 }
 
 /* Bare skinned button: no default Unity / .kr-btn look, a quick squash when pressed. */
@@ -542,7 +523,7 @@
 .kr-h-btn:active,
 .kr-h-btn:hover:active {
     background-color: rgba(0, 0, 0, 0);
-    scale: 0.95 0.95;
+    scale: 0.93 0.93;
 }
 
 /* Icons */
@@ -552,6 +533,7 @@
 }
 
 .kr-ico--alert { background-image: url("Icons/alert.png"); }
+.kr-ico--back { background-image: url("Icons/back.png"); }
 .kr-ico--cart { background-image: url("Icons/cart.png"); }
 .kr-ico--clock { background-image: url("Icons/clock.png"); }
 .kr-ico--coin { background-image: url("Icons/coin.png"); }
@@ -561,9 +543,11 @@
 .kr-ico--gem { background-image: url("Icons/gem.png"); }
 .kr-ico--gift { background-image: url("Icons/gift.png"); }
 .kr-ico--hanger { background-image: url("Icons/hanger.png"); }
-.kr-ico--mail { background-image: url("Icons/mail.png"); }
+.kr-ico--medal { background-image: url("Icons/medal.png"); }
 .kr-ico--missions { background-image: url("Icons/missions.png"); }
+.kr-ico--modes { background-image: url("Icons/modes.png"); }
 .kr-ico--party { background-image: url("Icons/party.png"); }
+.kr-ico--pass { background-image: url("Icons/pass_star.png"); }
 .kr-ico--person { background-image: url("Icons/person.png"); }
 .kr-ico--play { background-image: url("Icons/play_arrows.png"); }
 .kr-ico--plus { background-image: url("Icons/plus.png"); }
@@ -571,77 +555,35 @@
 .kr-ico--stopwatch { background-image: url("Icons/stopwatch.png"); }
 .kr-ico--trophy { background-image: url("Icons/trophy.png"); }
 
-/* 9-slice skins */
-.kr-h-profile,
-.kr-h-wallet,
-.kr-h-info {
-    background-image: url("Skins/panel_navy.png");
-    -unity-slice-left: 30;
-    -unity-slice-right: 30;
-    -unity-slice-top: 30;
-    -unity-slice-bottom: 30;
-}
-
-.kr-h-season {
-    background-image: url("Skins/card_season.png");
-    -unity-slice-left: 40;
-    -unity-slice-right: 40;
-    -unity-slice-top: 40;
-    -unity-slice-bottom: 40;
-}
-
-.kr-h-nav__btn,
-.kr-h-mode {
-    background-image: url("Skins/card_blue.png");
-    -unity-slice-left: 40;
-    -unity-slice-right: 40;
-    -unity-slice-top: 40;
-    -unity-slice-bottom: 40;
-}
-
-.kr-h-nav--shop,
-.kr-h-play,
-.kr-h-plus--yellow {
-    background-image: url("Skins/btn_yellow.png");
-    -unity-slice-left: 42;
-    -unity-slice-right: 42;
-    -unity-slice-top: 42;
-    -unity-slice-bottom: 50;
-}
-
-.kr-h-square,
-.kr-h-plus--green {
-    -unity-slice-left: 26;
-    -unity-slice-right: 26;
-    -unity-slice-top: 26;
-    -unity-slice-bottom: 34;
-}
-
-.kr-h-square { background-image: url("Skins/btn_blue.png"); }
-.kr-h-plus--green { background-image: url("Skins/btn_green.png"); }
-
-/* ---- Top bar ---- */
-.kr-h-top {
+.kr-h-offline {
     position: absolute;
-    top: 24px;
-    left: 24px;
-    right: 24px;
-    height: 112px;
-    flex-direction: row;
-    align-items: center;
+    top: 28px;
+    left: 50%;
+    translate: -50% 0;
+    padding: 4px 18px;
+    border-radius: 16px;
+    background-color: rgba(232, 58, 58, 0.92);
+    border-width: 2px;
+    border-color: rgb(255, 255, 255);
 }
 
-.kr-h-profile {
+.kr-h-offline .kr-display {
+    font-size: 20px;
+}
+
+/* ---- Profile: avatar, level hexagon, slanted name plate, XP ---- */
+.kr-h2-profile {
+    position: absolute;
+    top: 20px;
+    left: 24px;
     flex-direction: row;
     align-items: center;
-    height: 112px;
-    padding: 0 28px 0 12px;
 }
 
 .kr-h-avatar {
-    width: 88px;
-    height: 88px;
-    padding: 6px;
+    width: 108px;
+    height: 108px;
+    padding: 7px;
     background-image: url("Skins/frame_gold.png");
     -unity-slice-left: 30;
     -unity-slice-right: 30;
@@ -665,427 +607,296 @@
     -unity-background-scale-mode: scale-and-crop;
 }
 
-.kr-h-profile__info {
-    margin-left: 16px;
-    justify-content: center;
-}
-
-.kr-h-namerow {
-    flex-direction: row;
-    align-items: center;
-}
-
-.kr-h-name {
-    font-size: 32px;
-}
-
-.kr-h-name__edit {
-    width: 32px;
-    height: 32px;
-    margin-left: 10px;
-}
-
-.kr-h-levelrow {
-    flex-direction: row;
-    align-items: center;
-    margin-top: 6px;
-}
-
-.kr-home .kr-h-level {
-    font-size: 26px;
-    color: rgb(255, 214, 60);
-    min-width: 72px;
-}
-
-.kr-h-xp {
-    width: 200px;
-    height: 28px;
-    margin-left: 8px;
-    background-image: url("Skins/bar_track.png");
-    -unity-slice-left: 14;
-    -unity-slice-right: 14;
-    -unity-slice-top: 14;
-    -unity-slice-bottom: 14;
-}
-
-.kr-h-xp__fill {
-    position: absolute;
-    left: 3px;
-    top: 3px;
-    bottom: 3px;
-    width: 0;
-    max-width: 194px;
-    background-image: url("Skins/bar_fill.png");
-    -unity-slice-left: 11;
-    -unity-slice-right: 11;
-    -unity-slice-top: 11;
-    -unity-slice-bottom: 11;
-}
-
-.kr-home .kr-h-xp__text {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    font-size: 17px;
-    -unity-text-align: middle-center;
-    -unity-text-outline-width: 1.5px;
-    text-shadow: 0 1px 0 rgba(16, 24, 78, 0.85);
-}
-
-.kr-h-wallet {
-    flex-direction: row;
-    align-items: center;
-    width: 236px;
+.kr-h2-hex {
+    width: 64px;
     height: 64px;
-    margin-left: 40px;
-    padding: 0 6px 0 56px;
-}
-
-.kr-h-wallet__icon {
-    position: absolute;
-    left: -24px;
-    top: -6px;
-    width: 76px;
-    height: 76px;
-}
-
-.kr-h-wallet__value {
-    flex-grow: 1;
-    font-size: 32px;
-    -unity-text-align: middle-center;
-}
-
-.kr-h-plus {
-    width: 52px;
-    height: 52px;
     align-items: center;
     justify-content: center;
-    padding-bottom: 5px;
-}
-
-.kr-h-plus__icon {
-    width: 28px;
-    height: 28px;
-}
-
-.kr-h-square {
-    width: 72px;
-    height: 72px;
-    margin-left: 16px;
-    align-items: center;
-    justify-content: center;
-    padding-bottom: 6px;
-}
-
-.kr-h-square__icon {
-    width: 46px;
-    height: 46px;
-}
-
-.kr-h-badge {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    width: 34px;
-    height: 34px;
-}
-
-.kr-h-logo {
-    position: absolute;
-    top: 6px;
-    left: 50%;
-    width: 500px;
-    height: 245px;
-    translate: -50% 0;
-    background-image: url("project://database/Assets/Art/Branding/Logo.png");
+    background-image: url("Skins/hex_level.png");
     -unity-background-scale-mode: scale-to-fit;
 }
 
-.kr-h-offline {
+.kr-h2-profile > .kr-h2-hex {
     position: absolute;
-    top: 250px;
-    left: 50%;
-    translate: -50% 0;
-    padding: 4px 18px;
-    border-radius: 16px;
-    background-color: rgba(232, 58, 58, 0.92);
-    border-width: 2px;
-    border-color: rgb(255, 255, 255);
+    left: 74px;
+    top: 66px;
 }
 
-.kr-h-offline .kr-display {
-    font-size: 20px;
-}
-
-/* ---- Left column: season card + navigation ---- */
-.kr-h-left {
-    position: absolute;
-    left: 24px;
-    top: 160px;
-    width: 440px;
-}
-
-.kr-h-season {
-    flex-direction: row;
-    align-items: center;
-    height: 150px;
-    padding: 0 20px 0 10px;
-}
-
-.kr-h-season__image {
-    width: 130px;
-    height: 130px;
-    -unity-background-scale-mode: scale-and-crop;
-}
-
-.kr-h-season__text {
-    flex-grow: 1;
-    flex-shrink: 1;
-    margin-left: 10px;
-    justify-content: center;
-}
-
-.kr-h-season__number {
-    font-size: 24px;
-}
-
-.kr-home .kr-h-season__name {
-    font-size: 40px;
-    color: rgb(255, 222, 70);
-    -unity-text-outline-width: 3px;
-    margin-top: -4px;
-}
-
-.kr-h-season__timer {
-    flex-direction: row;
-    align-items: center;
-    align-self: flex-start;
-    margin-top: 6px;
-    padding: 3px 14px 3px 6px;
-    border-radius: 16px;
-    background-color: rgba(30, 16, 90, 0.6);
-}
-
-.kr-h-season__clock {
-    width: 26px;
-    height: 26px;
-}
-
-.kr-h-season__time {
-    font-size: 21px;
-    margin-left: 6px;
-}
-
-.kr-h-nav {
-    margin-top: 18px;
-    width: 200px;
-}
-
-.kr-h-nav__btn {
-    height: 92px;
-    margin-bottom: 14px;
-    align-items: center;
-    justify-content: center;
-}
-
-.kr-h-nav__icon {
-    width: 50px;
-    height: 50px;
-}
-
-.kr-h-nav__label {
-    font-size: 22px;
-    margin-top: -2px;
-}
-
-.kr-h-nav--shop {
-    height: 118px;
-    padding-bottom: 8px;
-}
-
-.kr-h-nav--shop .kr-h-nav__icon {
-    width: 68px;
-    height: 68px;
-}
-
-.kr-h-nav--shop .kr-h-nav__label {
+.kr-home .kr-h2-hex__text {
     font-size: 30px;
+    -unity-text-align: middle-center;
 }
 
-/* ---- Right column: daily rewards + missions ---- */
-.kr-h-right {
-    position: absolute;
-    right: 24px;
-    top: 160px;
-    width: 360px;
+.kr-h2-profile__info {
+    margin-left: 22px;
 }
 
-.kr-h-info {
-    flex-direction: row;
-    align-items: center;
-    height: 104px;
-    margin-bottom: 16px;
-    padding: 0 20px 0 14px;
-}
-
-.kr-h-info__icon {
-    width: 76px;
-    height: 76px;
-}
-
-.kr-h-info__text {
-    flex-grow: 1;
-    margin-left: 14px;
-    justify-content: center;
-}
-
-.kr-h-info__title {
-    font-size: 28px;
-}
-
-.kr-h-info__row {
-    flex-direction: row;
-    align-items: center;
-    margin-top: 4px;
-}
-
-.kr-h-info__subicon {
-    width: 26px;
-    height: 26px;
-}
-
-.kr-home .kr-h-info__sub {
-    font-size: 23px;
-    margin-left: 8px;
-    color: rgb(255, 222, 90);
-}
-
-/* ---- Bottom row: mode cards + PLAY ---- */
-.kr-h-bottom {
-    position: absolute;
-    left: 24px;
-    right: 24px;
-    bottom: 24px;
-    height: 132px;
-    flex-direction: row;
-    align-items: flex-end;
-}
-
-.kr-h-mode {
-    flex-direction: row;
-    align-items: center;
-    width: 360px;
+.kr-h2-nameplate {
+    height: 64px;
     min-width: 280px;
-    flex-shrink: 1;
-    height: 132px;
-    margin-right: 16px;
-    padding: 0 18px 0 14px;
-}
-
-.kr-h-mode--party {
-    background-image: url("Skins/card_purple.png");
-}
-
-.kr-h-mode--selected {
-    background-image: url("Skins/card_blue_sel.png");
-    -unity-slice-left: 48;
-    -unity-slice-right: 48;
-    -unity-slice-top: 48;
-    -unity-slice-bottom: 48;
-}
-
-.kr-h-mode__icon {
-    width: 84px;
-    height: 84px;
-}
-
-.kr-h-mode__text {
-    flex-grow: 1;
-    flex-shrink: 1;
-    margin-left: 12px;
-    align-items: flex-start;
-    justify-content: center;
-}
-
-.kr-h-mode__title {
-    font-size: 28px;
-    white-space: normal;
-    -unity-text-align: middle-left;
-}
-
-.kr-h-mode__row {
-    flex-direction: row;
+    padding: 0 40px 0 30px;
     align-items: center;
-    margin-top: 6px;
+    background-image: url("Skins/plate_name.png");
+    -unity-slice-left: 30;
+    -unity-slice-right: 30;
+    -unity-slice-top: 0;
+    -unity-slice-bottom: 0;
 }
 
-.kr-h-mode__people {
-    width: 28px;
-    height: 28px;
-}
-
-.kr-h-mode__players {
-    font-size: 21px;
-    margin-left: 6px;
-}
-
-.kr-h-playgroup {
-    width: 500px;
-    height: 132px;
-}
-
-.kr-h-tag {
-    position: absolute;
-    right: 40px;
-    top: -44px;
-    flex-direction: row;
-    align-items: center;
-    padding: 4px 20px 8px 20px;
-    background-image: url("Skins/tag_white.png");
-    -unity-slice-left: 22;
-    -unity-slice-right: 22;
-    -unity-slice-top: 22;
-    -unity-slice-bottom: 22;
-    rotate: -3deg;
-}
-
-.kr-home .kr-h-tag__text {
-    font-size: 24px;
+.kr-home .kr-h2-nameplate__text {
+    font-size: 32px;
     color: rgb(28, 38, 110);
+    -unity-font-style: italic;
     -unity-text-outline-width: 0;
     text-shadow: 0 0 0 rgba(0, 0, 0, 0);
 }
 
-.kr-h-tag__crown {
-    width: 44px;
-    height: 44px;
-    margin-left: 6px;
-    margin-top: -20px;
-    margin-right: -26px;
-    rotate: 14deg;
+.kr-h2-xp {
+    width: 240px;
+    height: 18px;
+    margin: 8px 0 0 14px;
+    padding: 3px;
+    background-image: url("Skins/bar_track.png");
+    -unity-slice-left: 8;
+    -unity-slice-right: 8;
+    -unity-slice-top: 8;
+    -unity-slice-bottom: 8;
 }
 
-.kr-h-play {
-    flex-grow: 1;
+.kr-h2-xp__fill {
+    height: 100%;
+    background-image: url("Skins/bar_fill.png");
+    -unity-slice-left: 6;
+    -unity-slice-right: 6;
+    -unity-slice-top: 6;
+    -unity-slice-bottom: 6;
+}
+
+/* ---- Top-right: wallet plates + settings gear ---- */
+.kr-h2-topright {
+    position: absolute;
+    top: 30px;
+    right: 24px;
     flex-direction: row;
     align-items: center;
+}
+
+.kr-h2-wallet {
+    flex-direction: row;
+    align-items: center;
+    width: 250px;
+    height: 64px;
+    margin-left: 26px;
+    padding: 0 26px 0 64px;
+    background-image: url("Skins/plate_navy.png");
+    -unity-slice-left: 30;
+    -unity-slice-right: 30;
+    -unity-slice-top: 0;
+    -unity-slice-bottom: 0;
+}
+
+.kr-h2-wallet__icon {
+    position: absolute;
+    left: -14px;
+    top: -8px;
+    width: 78px;
+    height: 78px;
+}
+
+.kr-home .kr-h2-wallet__value {
+    flex-grow: 1;
+    font-size: 32px;
+    -unity-font-style: italic;
+    -unity-text-align: middle-left;
+}
+
+.kr-h2-wallet__plus {
+    width: 44px;
+    height: 44px;
+    align-items: center;
     justify-content: center;
-    padding-bottom: 10px;
+    padding-bottom: 4px;
+    background-image: url("Skins/btn_green.png");
+    -unity-slice-left: 18;
+    -unity-slice-right: 18;
+    -unity-slice-top: 18;
+    -unity-slice-bottom: 24;
 }
 
-.kr-home .kr-h-play__text {
-    font-size: 88px;
-    -unity-text-outline-width: 4px;
+.kr-h2-wallet__plusicon {
+    width: 24px;
+    height: 24px;
+}
+
+.kr-h2-gear {
+    width: 88px;
+    height: 88px;
+    margin-left: 22px;
+}
+
+.kr-h2-gear__icon {
+    flex-grow: 1;
+}
+
+/* ---- Floating icon tiles ---- */
+.kr-h2-left,
+.kr-h2-right {
+    position: absolute;
+    top: 160px;
+    align-items: center;
+}
+
+.kr-h2-left {
+    left: 16px;
+}
+
+.kr-h2-right {
+    right: 16px;
+}
+
+.kr-h2-bottomtiles {
+    position: absolute;
+    left: 490px;
+    bottom: 14px;
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.kr-h2-tile {
+    width: 150px;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.kr-h2-tile__icon {
+    width: 104px;
+    height: 104px;
+}
+
+.kr-home .kr-h2-tile__label {
+    font-size: 27px;
+    margin-top: -16px;
+    -unity-font-style: italic;
+    -unity-text-outline-width: 3px;
+    rotate: -4deg;
+}
+
+.kr-home .kr-h2-tile__sub {
+    font-size: 20px;
+    margin-top: -2px;
+    color: rgb(255, 222, 90);
+    -unity-font-style: italic;
+}
+
+.kr-h2-tile__badge {
+    position: absolute;
+    top: 0;
+    right: 18px;
+    width: 36px;
+    height: 36px;
+}
+
+/* ---- Rush Pass banner ---- */
+.kr-h2-pass {
+    position: absolute;
+    left: 24px;
+    bottom: 24px;
+    width: 440px;
+    height: 110px;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 22px 8px 104px;
+    background-image: url("Skins/pass_banner.png");
+    -unity-slice-left: 44;
+    -unity-slice-right: 44;
+    -unity-slice-top: 0;
+    -unity-slice-bottom: 0;
+}
+
+.kr-h2-pass__star {
+    position: absolute;
+    left: -10px;
+    top: -26px;
+    width: 124px;
+    height: 124px;
+    rotate: -10deg;
+}
+
+.kr-h2-pass__text {
+    flex-grow: 1;
+}
+
+.kr-home .kr-h2-pass__title {
+    font-size: 42px;
+    -unity-font-style: italic;
+    -unity-text-outline-width: 3px;
+}
+
+.kr-home .kr-h2-pass__time {
+    font-size: 20px;
+    margin-top: -6px;
+    color: rgb(255, 236, 140);
+    -unity-font-style: italic;
+}
+
+.kr-h2-pass__hex {
+    width: 78px;
+    height: 78px;
+}
+
+/* ---- PLAY + selected mode ---- */
+.kr-h2-playgroup {
+    position: absolute;
+    right: 24px;
+    bottom: 24px;
+    align-items: flex-end;
+}
+
+.kr-h2-modeplate {
+    flex-direction: row;
+    align-items: center;
+    height: 64px;
+    margin: 0 36px 10px 0;
+    padding: 0 40px 0 74px;
+    background-image: url("Skins/plate_navy.png");
+    -unity-slice-left: 30;
+    -unity-slice-right: 30;
+    -unity-slice-top: 0;
+    -unity-slice-bottom: 0;
+}
+
+.kr-h2-modeplate__icon {
+    position: absolute;
+    left: 14px;
+    top: 2px;
+    width: 58px;
+    height: 58px;
+}
+
+.kr-home .kr-h2-modeplate__text {
+    font-size: 26px;
+    -unity-font-style: italic;
+}
+
+.kr-h2-play {
+    width: 520px;
+    height: 150px;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 6px;
+    background-image: url("Skins/play_slanted.png");
+    -unity-slice-left: 56;
+    -unity-slice-right: 56;
+    -unity-slice-top: 0;
+    -unity-slice-bottom: 0;
+}
+
+.kr-home .kr-h2-play__text {
+    font-size: 104px;
+    -unity-font-style: italic;
+    -unity-text-outline-width: 5px;
     -unity-text-outline-color: rgb(120, 50, 0);
-    text-shadow: 0 5px 0 rgba(120, 50, 0, 0.9);
-}
-
-.kr-h-play__arrows {
-    width: 72px;
-    height: 72px;
-    margin-left: 16px;
+    text-shadow: 0 6px 0 rgba(120, 50, 0, 0.9);
 }
 
 .kr-missions {
@@ -1382,7 +1193,11 @@
     right: 0;
     bottom: 0;
     background-color: rgb(45, 139, 240);
-    -unity-background-scale-mode: scale-and-crop;
+    /* Fill the screen, anchored to the top: on tall/wide phones the logo stays fully visible
+       and only the (blurred) bottom band under the loading bar is cropped. */
+    background-size: cover;
+    background-position-x: center;
+    background-position-y: top;
 }
 
 .kr-keyart-screen {
@@ -1796,41 +1611,6 @@
     -unity-slice-bottom: 11;
 }
 
-/* ---- Home: right column extras ---- */
-.kr-h-info--party {
-    background-image: url("Skins/card_purple.png");
-    -unity-slice-left: 40;
-    -unity-slice-right: 40;
-    -unity-slice-top: 40;
-    -unity-slice-bottom: 40;
-}
-
-.kr-h-more {
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    height: 84px;
-    padding-bottom: 8px;
-    background-image: url("Skins/btn_purple.png");
-    -unity-slice-left: 26;
-    -unity-slice-right: 26;
-    -unity-slice-top: 26;
-    -unity-slice-bottom: 34;
-}
-
-.kr-h-more__icon {
-    width: 54px;
-    height: 54px;
-}
-
-.kr-h-more__label {
-    font-size: 30px;
-    margin-left: 12px;
-}
-
-.kr-ico--back { background-image: url("Icons/back.png"); }
-.kr-ico--modes { background-image: url("Icons/modes.png"); }
-
 /* ---- Inputs, toggles, mode cards ---- */
 .kr-input > #unity-text-input {
     background-color: rgb(255, 255, 255);
@@ -1862,4 +1642,25 @@
 
 .kr-dialog {
     padding: 28px 36px;
+}
+
+/* ---- Characters (wardrobe) ---- */
+.kr-portrait {
+    width: 132px;
+    height: 132px;
+    margin-bottom: 4px;
+    border-radius: 66px;
+    background-color: rgba(160, 215, 255, 0.55);
+    border-width: 4px;
+    border-color: rgba(255, 255, 255, 0.85);
+    -unity-background-scale-mode: scale-and-crop;
+}
+
+.kr-character-info {
+    margin-bottom: 12px;
+}
+
+.kr-character-rarity {
+    font-size: 26px;
+    margin-bottom: 8px;
 }

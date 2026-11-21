@@ -11,34 +11,29 @@ using UnityEngine.UIElements;
 namespace KnockRush.UI.Screens
 {
     /// <summary>
-    /// 4 · Home: the player's bean on the festival stage, framed by the profile card (live avatar,
-    /// level, XP), the logo, wallet, settings and inbox; the season card and main navigation on the
-    /// left; daily rewards and missions on the right; the mode cards and the big PLAY button below.
+    /// 4 · Home (lobby): the player's character large in the middle of the arena, framed by
+    /// floating icon buttons — profile plate and wallet on top, Shop / Characters / Friends / Party
+    /// on the left, Missions / Rewards / Modes on the right, the Rush Pass banner, Leaderboard and
+    /// Achievements along the bottom, and the big slanted PLAY button with the selected mode.
     /// </summary>
     public sealed class HomeScreen : UIScreen
     {
-        private const string InboxReadKey = "knockrush.inbox.s1";
-
-        private static SeasonInfo season;
+        private static SeasonResponse season;
 
         private VisualElement avatarImage;
         private Label nameLabel;
         private Label levelLabel;
-        private Label xpLabel;
         private VisualElement xpFill;
         private Label coins;
         private Label gems;
-        private VisualElement mailBadge;
-        private Label seasonNumber;
-        private Label seasonName;
-        private Label seasonTime;
-        private VisualElement seasonImage;
-        private Label dailyTime;
-        private VisualElement dailyBadge;
+        private Label rewardsTime;
+        private VisualElement rewardsBadge;
         private Label missionsCount;
         private VisualElement missionsBadge;
+        private Label passTier;
+        private Label passTime;
+        private Label modeLabel;
         private VisualElement offline;
-        private readonly System.Collections.Generic.Dictionary<string, Button> modeCards = new System.Collections.Generic.Dictionary<string, Button>();
         private bool subscribed;
         private float clock;
 
@@ -48,219 +43,140 @@ namespace KnockRush.UI.Screens
         {
             root.AddToClassList("kr-home");
 
-            // ---- Top: profile card | logo | wallet, settings, inbox ----
-            var top = Ui.Row("kr-h-top");
-            top.pickingMode = PickingMode.Ignore;
-            top.Add(ProfileCard());
-            top.Add(Ui.Spacer());
-            top.Add(Wallet("kr-ico--coin", "kr-h-plus--yellow", out coins, () => Nav.Push<ShopScreen>()));
-            top.Add(Wallet("kr-ico--gem", "kr-h-plus--green", out gems, () => Nav.Push<ShopScreen>()));
-            top.Add(IconButton("kr-ico--settings", () => Nav.Push<SettingsScreen>(), out _));
-            top.Add(IconButton("kr-ico--mail", OpenInbox, out mailBadge));
-            root.Add(top);
+            // ---- Top-left: avatar, level hexagon, name plate, XP ----
+            root.Add(ProfilePlate());
 
-            var logo = Ui.Element("kr-h-logo");
-            logo.pickingMode = PickingMode.Ignore;
-            root.Add(logo);
+            // ---- Top-right: wallet + settings ----
+            var top = Ui.Row("kr-h2-topright");
+            top.pickingMode = PickingMode.Ignore;
+            top.Add(Wallet("kr-ico--coin", out coins));
+            top.Add(Wallet("kr-ico--gem", out gems));
+            var settings = HButton(() => Nav.Push<SettingsScreen>(), "kr-h-btn", "kr-h2-gear");
+            settings.Add(Ui.Element("kr-ico", "kr-ico--settings", "kr-h2-gear__icon"));
+            top.Add(settings);
+            root.Add(top);
 
             offline = Ui.Row("kr-h-offline");
             offline.Add(Ui.Label("OFFLINE  ·  PRACTICE MODES", "kr-display"));
             root.Add(offline);
 
-            // ---- Left: season card + main navigation ----
-            var left = Ui.Col("kr-h-left");
+            // ---- Left column ----
+            var left = Ui.Col("kr-h2-left");
             left.pickingMode = PickingMode.Ignore;
-            left.Add(SeasonCard());
-            var nav = Ui.Col("kr-h-nav");
-            nav.pickingMode = PickingMode.Ignore;
-            nav.Add(NavButton("Shop", "kr-ico--cart", "kr-h-nav--shop", () => Nav.Push<ShopScreen>()));
-            nav.Add(NavButton("Customize", "kr-ico--hanger", null, () => Nav.Push<CustomizeScreen>()));
-            nav.Add(NavButton("Leaderboard", "kr-ico--trophy", null, () => Nav.Push<LeaderboardScreen>()));
-            nav.Add(NavButton("Friends", "kr-ico--friends", null, () => Nav.Push<FriendsScreen>()));
-            left.Add(nav);
+            left.Add(Tile("Shop", "kr-ico--cart", () => Nav.Push<ShopScreen>(), out _, out _));
+            left.Add(Tile("Characters", "kr-ico--hanger", () => Nav.Push<CharacterSelectScreen>(), out _, out _));
+            left.Add(Tile("Friends", "kr-ico--friends", () => Nav.Push<FriendsScreen>(), out _, out _));
+            left.Add(Tile("Party", "kr-ico--party", () => Nav.Push<PrivateRoomScreen>(), out _, out _));
             root.Add(left);
 
-            // ---- Right: daily rewards + missions ----
-            var right = Ui.Col("kr-h-right");
+            // ---- Right column ----
+            var right = Ui.Col("kr-h2-right");
             right.pickingMode = PickingMode.Ignore;
-            right.Add(InfoCard("Daily Rewards", "kr-ico--gift", "kr-ico--clock", out dailyTime, out dailyBadge, ClaimDaily));
-            right.Add(InfoCard("Missions", "kr-ico--missions", "kr-ico--coin", out missionsCount, out missionsBadge, () => Nav.Push<MissionsScreen>()));
-            var catalog = GameModeCatalog.Load();
-            var party = InfoCard("Private Party", "kr-ico--party", "kr-ico--person", out var partyPlayers, out _, () => Nav.Push<PrivateRoomScreen>());
-            party.AddToClassList("kr-h-info--party");
-            partyPlayers.text = PlayersText(catalog != null ? FindMode(catalog, "private") : null, false);
-            right.Add(party);
-            var more = HButton(() => Nav.Push<ModeSelectScreen>(), "kr-h-btn", "kr-h-more");
-            more.Add(Ui.Element("kr-ico", "kr-ico--modes", "kr-h-more__icon"));
-            more.Add(Ui.Label("More Modes", "kr-h-more__label", "kr-display"));
-            right.Add(more);
+            right.Add(Tile("Missions", "kr-ico--missions", () => Nav.Push<MissionsScreen>(), out missionsCount, out missionsBadge));
+            right.Add(Tile("Rewards", "kr-ico--gift", ClaimDaily, out rewardsTime, out rewardsBadge));
+            right.Add(Tile("Modes", "kr-ico--modes", () => Nav.Push<ModeSelectScreen>(), out _, out _));
             root.Add(right);
 
-            // ---- Bottom: mode cards + PLAY ----
-            var bottom = Ui.Row("kr-h-bottom");
-            bottom.pickingMode = PickingMode.Ignore;
-            bottom.Add(ModeCard("classic", "kr-ico--crown", catalog));
-            bottom.Add(ModeCard("quickrace", "kr-ico--stopwatch", catalog));
-            bottom.Add(Ui.Spacer());
+            // ---- Bottom: Rush Pass banner, leaderboard + achievements, PLAY ----
+            root.Add(PassBanner());
 
-            var playGroup = Ui.Col("kr-h-playgroup");
+            var middle = Ui.Row("kr-h2-bottomtiles");
+            middle.pickingMode = PickingMode.Ignore;
+            middle.Add(Tile("Ranks", "kr-ico--trophy", () => Nav.Push<LeaderboardScreen>(), out _, out _));
+            middle.Add(Tile("Awards", "kr-ico--medal", () => Nav.Push<AchievementsScreen>(), out _, out _));
+            root.Add(middle);
+
+            var playGroup = Ui.Col("kr-h2-playgroup");
             playGroup.pickingMode = PickingMode.Ignore;
-            var tag = Ui.Row("kr-h-tag");
-            tag.pickingMode = PickingMode.Ignore;
-            tag.Add(Ui.Label("Let's Knock it Out!", "kr-h-tag__text", "kr-display"));
-            tag.Add(Ui.Element("kr-ico", "kr-ico--crown", "kr-h-tag__crown"));
-            playGroup.Add(tag);
-            var play = HButton(() => MatchmakingScreen.Start(App, UiData.SelectedModeId, UiData.PracticeMode), "kr-h-btn", "kr-h-play", "kr-btn--play");
-            play.Add(Ui.Label("PLAY", "kr-h-play__text", "kr-display"));
-            play.Add(Ui.Element("kr-ico", "kr-ico--play", "kr-h-play__arrows"));
+            var modePlate = HButton(() => Nav.Push<ModeSelectScreen>(), "kr-h-btn", "kr-h2-modeplate");
+            modePlate.Add(Ui.Element("kr-ico", "kr-ico--crown", "kr-h2-modeplate__icon"));
+            modeLabel = Ui.Label("Classic Knockout", "kr-h2-modeplate__text", "kr-display");
+            modePlate.Add(modeLabel);
+            playGroup.Add(modePlate);
+            var play = HButton(() => MatchmakingScreen.Start(App, UiData.SelectedModeId, UiData.PracticeMode), "kr-h-btn", "kr-h2-play", "kr-btn--play");
+            play.Add(Ui.Label("PLAY!", "kr-h2-play__text", "kr-h-play__text", "kr-display"));
             playGroup.Add(play);
-            bottom.Add(playGroup);
-            root.Add(bottom);
+            root.Add(playGroup);
         }
 
         // -----------------------------------------------------------------------------------------
         // Building blocks
         // -----------------------------------------------------------------------------------------
-        private VisualElement ProfileCard()
+        private VisualElement ProfilePlate()
         {
-            var card = HButton(() => Nav.Push<ProfileScreen>(), "kr-h-btn", "kr-h-profile");
-            var frame = Ui.Element("kr-h-avatar");
+            var plate = HButton(() => Nav.Push<ProfileScreen>(), "kr-h-btn", "kr-h2-profile");
+            var frame = Ui.Element("kr-h-avatar", "kr-h2-avatar");
             var inner = Ui.Element("kr-h-avatar__inner");
             avatarImage = Ui.Element("kr-h-avatar__image");
             inner.Add(avatarImage);
             frame.Add(inner);
-            card.Add(frame);
+            plate.Add(frame);
 
-            var info = Ui.Col("kr-h-profile__info");
-            var nameRow = Ui.Row("kr-h-namerow");
-            nameLabel = Ui.Label("Player", "kr-h-name", "kr-display");
-            nameRow.Add(nameLabel);
-            nameRow.Add(Ui.Element("kr-ico", "kr-ico--edit", "kr-h-name__edit"));
-            info.Add(nameRow);
+            var hex = Ui.Element("kr-h2-hex");
+            levelLabel = Ui.Label("1", "kr-h2-hex__text", "kr-display");
+            hex.Add(levelLabel);
+            plate.Add(hex);
 
-            var levelRow = Ui.Row("kr-h-levelrow");
-            levelLabel = Ui.Label("Lv. 1", "kr-h-level", "kr-display");
-            levelRow.Add(levelLabel);
-            var bar = Ui.Element("kr-h-xp");
-            xpFill = Ui.Element("kr-h-xp__fill");
+            var info = Ui.Col("kr-h2-profile__info");
+            var namePlate = Ui.Row("kr-h2-nameplate");
+            nameLabel = Ui.Label("Player", "kr-h2-nameplate__text", "kr-display");
+            namePlate.Add(nameLabel);
+            info.Add(namePlate);
+            var bar = Ui.Element("kr-h2-xp");
+            xpFill = Ui.Element("kr-h2-xp__fill");
             bar.Add(xpFill);
-            xpLabel = Ui.Label("0 / 0", "kr-h-xp__text", "kr-display");
-            bar.Add(xpLabel);
-            levelRow.Add(bar);
-            info.Add(levelRow);
-            card.Add(info);
-            return card;
+            info.Add(bar);
+            plate.Add(info);
+            return plate;
         }
 
-        private static VisualElement Wallet(string iconClass, string plusClass, out Label value, Action onAdd)
+        private VisualElement Wallet(string iconClass, out Label value)
         {
-            var pill = Ui.Row("kr-h-wallet");
-            pill.Add(Ui.Element("kr-ico", iconClass, "kr-h-wallet__icon"));
-            value = Ui.Label("0", "kr-h-wallet__value", "kr-display");
-            pill.Add(value);
-            var plus = HButton(onAdd, "kr-h-btn", "kr-h-plus", plusClass);
-            plus.Add(Ui.Element("kr-ico", "kr-ico--plus", "kr-h-plus__icon"));
-            pill.Add(plus);
-            return pill;
+            var plate = HButton(() => Nav.Push<ShopScreen>(), "kr-h-btn", "kr-h2-wallet");
+            plate.Add(Ui.Element("kr-ico", iconClass, "kr-h2-wallet__icon"));
+            value = Ui.Label("0", "kr-h2-wallet__value", "kr-display");
+            plate.Add(value);
+            var plus = Ui.Element("kr-h2-wallet__plus");
+            plus.Add(Ui.Element("kr-ico", "kr-ico--plus", "kr-h2-wallet__plusicon"));
+            plate.Add(plus);
+            return plate;
         }
 
-        private static Button IconButton(string iconClass, Action onClick, out VisualElement badge)
+        /// <summary>A floating icon with a slanted label (and an optional sub line / alert badge).</summary>
+        private static Button Tile(string title, string iconClass, Action onClick, out Label sub, out VisualElement badge)
         {
-            var button = HButton(onClick, "kr-h-btn", "kr-h-square");
-            button.Add(Ui.Element("kr-ico", iconClass, "kr-h-square__icon"));
-            badge = Ui.Element("kr-ico", "kr-ico--alert", "kr-h-badge");
+            var tile = HButton(onClick, "kr-h-btn", "kr-h2-tile");
+            tile.Add(Ui.Element("kr-ico", iconClass, "kr-h2-tile__icon"));
+            tile.Add(Ui.Label(title, "kr-h2-tile__label", "kr-display"));
+            sub = Ui.Label(string.Empty, "kr-h2-tile__sub", "kr-display");
+            sub.style.display = DisplayStyle.None;
+            tile.Add(sub);
+            badge = Ui.Element("kr-ico", "kr-ico--alert", "kr-h2-tile__badge");
             badge.style.display = DisplayStyle.None;
-            button.Add(badge);
-            return button;
+            tile.Add(badge);
+            return tile;
         }
 
-        private VisualElement SeasonCard()
+        private VisualElement PassBanner()
         {
-            var card = HButton(() => Nav.Push<SeasonPassScreen>(), "kr-h-btn", "kr-h-season");
-            seasonImage = Ui.Element("kr-h-season__image");
-            card.Add(seasonImage);
-            var text = Ui.Col("kr-h-season__text");
-            seasonNumber = Ui.Label("Season 1", "kr-h-season__number", "kr-display");
-            seasonName = Ui.Label("Rush Hour", "kr-h-season__name", "kr-display");
-            text.Add(seasonNumber);
-            text.Add(seasonName);
-            var timeRow = Ui.Row("kr-h-season__timer");
-            timeRow.Add(Ui.Element("kr-ico", "kr-ico--clock", "kr-h-season__clock"));
-            seasonTime = Ui.Label("--", "kr-h-season__time", "kr-display");
-            timeRow.Add(seasonTime);
-            text.Add(timeRow);
-            card.Add(text);
-            return card;
+            var banner = HButton(() => Nav.Push<SeasonPassScreen>(), "kr-h-btn", "kr-h2-pass");
+            banner.Add(Ui.Element("kr-ico", "kr-ico--pass", "kr-h2-pass__star"));
+            var text = Ui.Col("kr-h2-pass__text");
+            text.Add(Ui.Label("Rush Pass", "kr-h2-pass__title", "kr-display"));
+            passTime = Ui.Label("Season 1", "kr-h2-pass__time", "kr-display");
+            text.Add(passTime);
+            banner.Add(text);
+            var hex = Ui.Element("kr-h2-hex", "kr-h2-pass__hex");
+            passTier = Ui.Label("1", "kr-h2-hex__text", "kr-display");
+            hex.Add(passTier);
+            banner.Add(hex);
+            return banner;
         }
 
-        private static Button NavButton(string title, string iconClass, string variant, Action onClick)
+        private static void SetSub(Label label, string text)
         {
-            var button = HButton(onClick, "kr-h-btn", "kr-h-nav__btn");
-            if (variant != null)
-            {
-                button.AddToClassList(variant);
-            }
-
-            button.Add(Ui.Element("kr-ico", iconClass, "kr-h-nav__icon"));
-            button.Add(Ui.Label(title, "kr-h-nav__label", "kr-display"));
-            return button;
-        }
-
-        private static Button InfoCard(string title, string iconClass, string subIconClass, out Label sub, out VisualElement badge, Action onClick)
-        {
-            var card = HButton(onClick, "kr-h-btn", "kr-h-info");
-            card.Add(Ui.Element("kr-ico", iconClass, "kr-h-info__icon"));
-            var col = Ui.Col("kr-h-info__text");
-            col.Add(Ui.Label(title, "kr-h-info__title", "kr-display"));
-            var row = Ui.Row("kr-h-info__row");
-            row.Add(Ui.Element("kr-ico", subIconClass, "kr-h-info__subicon"));
-            sub = Ui.Label("--", "kr-h-info__sub", "kr-display");
-            row.Add(sub);
-            col.Add(row);
-            card.Add(col);
-            badge = Ui.Element("kr-ico", "kr-ico--alert", "kr-h-badge");
-            badge.style.display = DisplayStyle.None;
-            card.Add(badge);
-            return card;
-        }
-
-        private static string PlayersText(GameModeDefinition mode, bool fixedCount)
-        {
-            return mode == null ? string.Empty
-                : fixedCount ? $"{mode.TargetPlayers} Players"
-                : $"{Mathf.Max(2, mode.MinPlayers)}–{mode.TargetPlayers} Players";
-        }
-
-        private Button ModeCard(string modeId, string iconClass, GameModeCatalog catalog)
-        {
-            var mode = catalog != null ? FindMode(catalog, modeId) : null;
-            var title = mode != null ? mode.DisplayName : modeId;
-            var players = PlayersText(mode, modeId == "classic");
-
-            var card = HButton(() => OnModeCard(modeId), "kr-h-btn", "kr-h-mode");
-
-            card.Add(Ui.Element("kr-ico", iconClass, "kr-h-mode__icon"));
-            var col = Ui.Col("kr-h-mode__text");
-            col.Add(Ui.Label(title, "kr-h-mode__title", "kr-display"));
-            var row = Ui.Row("kr-h-mode__row");
-            row.Add(Ui.Element("kr-ico", "kr-ico--person", "kr-h-mode__people"));
-            row.Add(Ui.Label(players, "kr-h-mode__players", "kr-display"));
-            col.Add(row);
-            card.Add(col);
-            modeCards[modeId] = card;
-            return card;
-        }
-
-        private void OnModeCard(string modeId)
-        {
-            if (UiData.SelectedModeId == modeId)
-            {
-                Nav.Push<ModeSelectScreen>(); // second tap: details and practice toggle
-                return;
-            }
-
-            UiData.SelectedModeId = modeId;
-            RefreshModes();
+            label.text = text;
+            label.style.display = string.IsNullOrEmpty(text) ? DisplayStyle.None : DisplayStyle.Flex;
         }
 
         // -----------------------------------------------------------------------------------------
@@ -284,60 +200,38 @@ namespace KnockRush.UI.Screens
             var profile = UiData.Profile;
             Ui.SetVisible(offline, profile == null);
             nameLabel.text = UiData.DisplayName;
-            levelLabel.text = profile != null ? $"Lv. {profile.Level}" : "Lv. 1";
+            levelLabel.text = profile != null ? profile.Level.ToString(CultureInfo.InvariantCulture) : "1";
             var xpNeeded = profile != null ? profile.XpForNextLevel : 0;
             Ui.SetProgress(xpFill, profile != null && xpNeeded > 0 ? (float)profile.Xp / xpNeeded : 0f);
-            xpLabel.text = profile != null && xpNeeded > 0 ? $"{Ui.FormatNumber(profile.Xp)} / {Ui.FormatNumber(xpNeeded)}" : "0 / 100";
             coins.text = profile != null ? Ui.FormatNumber(profile.Coins) : "0";
             gems.text = profile != null ? Ui.FormatNumber(profile.Gems) : "0";
-            mailBadge.style.display = PlayerPrefs.GetInt(InboxReadKey, 0) == 0 ? DisplayStyle.Flex : DisplayStyle.None;
-            dailyBadge.style.display = profile != null && profile.DailyClaimable ? DisplayStyle.Flex : DisplayStyle.None;
+            rewardsBadge.style.display = profile != null && profile.DailyClaimable ? DisplayStyle.Flex : DisplayStyle.None;
             if (profile == null)
             {
-                missionsCount.text = "Go online";
+                SetSub(missionsCount, string.Empty);
             }
 
-            RefreshSeason();
+            var catalog = GameModeCatalog.Load();
+            var mode = catalog != null ? FindMode(catalog, UiData.SelectedModeId) : null;
+            modeLabel.text = (mode != null ? mode.DisplayName : "Classic Knockout") + (UiData.PracticeMode ? " · Practice" : string.Empty);
+            RefreshPass();
             RefreshTimers();
-            RefreshModes();
         }
 
-        private void RefreshModes()
+        private void RefreshPass()
         {
-            foreach (var pair in modeCards)
-            {
-                pair.Value.EnableInClassList("kr-h-mode--selected", pair.Key == UiData.SelectedModeId);
-            }
-        }
-
-        private void RefreshSeason()
-        {
-            var name = season != null && !string.IsNullOrEmpty(season.Name) ? season.Name : "Season 1: Rush Hour";
-            var split = name.IndexOf(": ", StringComparison.Ordinal);
-            seasonNumber.text = split > 0 ? name.Substring(0, split) : "Season 1";
-            seasonName.text = split > 0 ? name.Substring(split + 2) : name;
+            passTier.text = season != null ? Mathf.Max(1, season.Player.Tier).ToString(CultureInfo.InvariantCulture) : "1";
         }
 
         private void RefreshTimers()
         {
             var now = DateTime.UtcNow;
-            seasonTime.text = season != null && DateTime.TryParse(season.EndsAt, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out var ends)
+            passTime.text = season != null && DateTime.TryParse(season.Season.EndsAt, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out var ends)
                 ? FormatSpan(ends - now, true)
-                : "Play to level up!";
+                : "Season 1";
 
             var profile = UiData.Profile;
-            if (profile == null)
-            {
-                dailyTime.text = "Go online";
-            }
-            else if (profile.DailyClaimable)
-            {
-                dailyTime.text = "Claim now!";
-            }
-            else
-            {
-                dailyTime.text = FormatSpan(now.Date.AddDays(1) - now, false);
-            }
+            SetSub(rewardsTime, profile == null ? string.Empty : profile.DailyClaimable ? "Claim!" : FormatSpan(now.Date.AddDays(1) - now, false));
         }
 
         /// <summary>"34d 12h" for long spans, "12h 45m" for short ones.</summary>
@@ -362,8 +256,8 @@ namespace KnockRush.UI.Screens
             {
                 if (season == null)
                 {
-                    season = (await UiData.Backend.GetSeasonAsync())?.Season;
-                    RefreshSeason();
+                    season = await UiData.Backend.GetSeasonAsync();
+                    RefreshPass();
                     RefreshTimers();
                 }
 
@@ -382,7 +276,7 @@ namespace KnockRush.UI.Screens
                         claimable |= mission.Complete && !mission.Claimed;
                     }
 
-                    missionsCount.text = $"{done}/{missions.Missions.Count}";
+                    SetSub(missionsCount, $"{done}/{missions.Missions.Count}");
                     missionsBadge.style.display = claimable ? DisplayStyle.Flex : DisplayStyle.None;
                 }
             }
@@ -394,18 +288,10 @@ namespace KnockRush.UI.Screens
 
         public override void Tick(float deltaTime)
         {
-            // The stage creates its portrait textures on Start (after the screen may be built).
-            if (avatarImage.style.backgroundImage.value.renderTexture == null && MenuBeanStage.Current != null)
+            // The stage creates its portrait texture on Start (after the screen may be built).
+            if (avatarImage.style.backgroundImage.value.renderTexture == null && MenuBeanStage.Current != null && MenuBeanStage.Current.Portrait != null)
             {
-                if (MenuBeanStage.Current.Portrait != null)
-                {
-                    avatarImage.style.backgroundImage = new StyleBackground(Background.FromRenderTexture(MenuBeanStage.Current.Portrait));
-                }
-
-                if (MenuBeanStage.Current.SeasonPortrait != null)
-                {
-                    seasonImage.style.backgroundImage = new StyleBackground(Background.FromRenderTexture(MenuBeanStage.Current.SeasonPortrait));
-                }
+                avatarImage.style.backgroundImage = new StyleBackground(Background.FromRenderTexture(MenuBeanStage.Current.Portrait));
             }
 
             clock += deltaTime;
@@ -418,9 +304,8 @@ namespace KnockRush.UI.Screens
 
         public override void OnHide()
         {
-            // Portrait textures belong to the menu scene; re-bind on the next show.
+            // The portrait texture belongs to the menu scene; re-bind on the next show.
             avatarImage.style.backgroundImage = StyleKeyword.Null;
-            seasonImage.style.backgroundImage = StyleKeyword.Null;
         }
 
         /// <summary>A bare button skinned only by its classes (no default .kr-btn look).</summary>
@@ -452,7 +337,7 @@ namespace KnockRush.UI.Screens
 
             if (!profile.DailyClaimable)
             {
-                App.Toast($"Day {profile.DailyStreak} claimed! Next reward in {dailyTime.text}.");
+                App.Toast($"Day {profile.DailyStreak} claimed! Next reward in {rewardsTime.text}.");
                 return;
             }
 
@@ -461,14 +346,6 @@ namespace KnockRush.UI.Screens
             {
                 App.Toast(result.Gems > 0 ? $"Day {result.Streak}: +{result.Coins} coins, +{result.Gems} gems!" : $"Day {result.Streak}: +{result.Coins} coins!");
             }
-        }
-
-        private void OpenInbox()
-        {
-            PlayerPrefs.SetInt(InboxReadKey, 1);
-            mailBadge.style.display = DisplayStyle.None;
-            DialogScreen.Show(App, "INBOX",
-                "Welcome to KnockRush Season 1: Rush Hour!\n\nRace, dodge and knock your way to the crown. Finish daily missions for coins and gems, and level up the season pass for new costumes.");
         }
 
         public override bool OnBack()
