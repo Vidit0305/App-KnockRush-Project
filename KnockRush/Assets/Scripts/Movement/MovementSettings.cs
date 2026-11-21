@@ -27,34 +27,34 @@ namespace KnockRush.Movement
 
         [Header("Ground Movement")]
         [SerializeField, Min(0f)] private float maxSpeed = 6.5f;
-        [SerializeField, Min(0f)] private float groundAcceleration = 45f;
-        [SerializeField, Min(0f)] private float groundDeceleration = 38f;
+        [SerializeField, Min(0f)] private float groundAcceleration = 60f;
+        [SerializeField, Min(0f)] private float groundDeceleration = 50f;
 
         [Tooltip("Degrees per second the character turns towards its move direction.")]
-        [SerializeField, Min(0f)] private float turnSpeed = 900f;
+        [SerializeField, Min(0f)] private float turnSpeed = 720f;
 
         [Header("Air Movement")]
-        [SerializeField, Min(0f)] private float airAcceleration = 20f;
-        [SerializeField, Min(0f)] private float airDeceleration = 4f;
+        [SerializeField, Min(0f)] private float airAcceleration = 26f;
+        [SerializeField, Min(0f)] private float airDeceleration = 7f;
 
         [Header("Jump & Gravity")]
         [Tooltip("Apex height of a full jump in metres.")]
         [SerializeField, Min(0.1f)] private float jumpHeight = 1.6f;
-        [SerializeField, Min(0.1f)] private float gravity = 28f;
+        [SerializeField, Min(0.1f)] private float gravity = 30f;
 
         [Tooltip("Gravity multiplier while falling (snappier landings).")]
-        [SerializeField, Min(1f)] private float fallGravityMultiplier = 1.5f;
+        [SerializeField, Min(1f)] private float fallGravityMultiplier = 1.7f;
 
         [Tooltip("Gravity multiplier while rising after the jump button is released (variable jump height).")]
         [SerializeField, Min(1f)] private float jumpCutGravityMultiplier = 2.2f;
 
-        [SerializeField, Min(1f)] private float maxFallSpeed = 30f;
+        [SerializeField, Min(1f)] private float maxFallSpeed = 26f;
 
         [Tooltip("Seconds after leaving a ledge during which a jump is still allowed.")]
-        [SerializeField, Range(0f, 0.5f)] private float coyoteTime = 0.12f;
+        [SerializeField, Range(0f, 0.5f)] private float coyoteTime = 0.14f;
 
         [Tooltip("Seconds a jump press is remembered before landing.")]
-        [SerializeField, Range(0f, 0.5f)] private float jumpBufferTime = 0.12f;
+        [SerializeField, Range(0f, 0.5f)] private float jumpBufferTime = 0.15f;
 
         [Header("Dive & Slide")]
         [SerializeField] private bool allowGroundDive = true;
@@ -72,7 +72,7 @@ namespace KnockRush.Movement
         [SerializeField, Min(0f)] private float stumbleDuration = 0.8f;
 
         [Tooltip("Fraction of normal acceleration available while stumbling.")]
-        [SerializeField, Range(0f, 1f)] private float stumbleControl = 0.15f;
+        [SerializeField, Range(0f, 1f)] private float stumbleControl = 0.25f;
 
         [Header("Grab")]
         [SerializeField, Range(0f, 1f)] private float grabSpeedMultiplier = 0.45f;

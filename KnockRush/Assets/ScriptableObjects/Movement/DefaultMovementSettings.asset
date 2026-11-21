@@ -20,18 +20,18 @@ MonoBehaviour:
     m_Bits: 129
   maxSlopeAngle: 50
   maxSpeed: 6.5
-  groundAcceleration: 45
-  groundDeceleration: 38
-  turnSpeed: 900
-  airAcceleration: 20
-  airDeceleration: 4
+  groundAcceleration: 60
+  groundDeceleration: 50
+  turnSpeed: 720
+  airAcceleration: 26
+  airDeceleration: 7
   jumpHeight: 1.6
-  gravity: 28
-  fallGravityMultiplier: 1.5
+  gravity: 30
+  fallGravityMultiplier: 1.7
   jumpCutGravityMultiplier: 2.2
-  maxFallSpeed: 30
-  coyoteTime: 0.12
-  jumpBufferTime: 0.12
+  maxFallSpeed: 26
+  coyoteTime: 0.14
+  jumpBufferTime: 0.15
   allowGroundDive: 1
   diveHorizontalSpeed: 9.5
   diveUpVelocity: 4.5
@@ -42,7 +42,7 @@ MonoBehaviour:
   recoverDuration: 0.35
   stumbleImpulseThreshold: 5
   stumbleDuration: 0.8
-  stumbleControl: 0.15
+  stumbleControl: 0.25
   grabSpeedMultiplier: 0.45
   groundProbeDistance: 0.08
   groundSnapDistance: 0.35
