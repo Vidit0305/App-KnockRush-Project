@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: body_chef
   m_EditorClassIdentifier: KnockRush.Inventory::KnockRush.Inventory.CosmeticDefinition
   itemId: body_chef
-  displayName: Chef Bean
+  displayName: Chef Rusher
   slot: 0
   rarity: 1
   color: {r: 1, g: 1, b: 1, a: 1}

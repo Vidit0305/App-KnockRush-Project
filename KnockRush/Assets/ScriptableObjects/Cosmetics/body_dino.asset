@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: body_dino
   m_EditorClassIdentifier: KnockRush.Inventory::KnockRush.Inventory.CosmeticDefinition
   itemId: body_dino
-  displayName: Dino Bean
+  displayName: Dino Rusher
   slot: 0
   rarity: 3
   color: {r: 0.29803923, g: 0.76862746, b: 0.41568628, a: 1}

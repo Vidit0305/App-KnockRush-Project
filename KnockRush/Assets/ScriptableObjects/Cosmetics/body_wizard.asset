@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: body_wizard
   m_EditorClassIdentifier: KnockRush.Inventory::KnockRush.Inventory.CosmeticDefinition
   itemId: body_wizard
-  displayName: Wizard Bean
+  displayName: Wizard Rusher
   slot: 0
   rarity: 2
   color: {r: 0.41568628, g: 0.29803923, b: 0.8784314, a: 1}

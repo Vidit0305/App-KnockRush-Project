@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: body_dragon
   m_EditorClassIdentifier: KnockRush.Inventory::KnockRush.Inventory.CosmeticDefinition
   itemId: body_dragon
-  displayName: Dragon Bean
+  displayName: Dragon Rusher
   slot: 0
   rarity: 3
   color: {r: 0.84705883, g: 0.20392157, b: 0.22745098, a: 1}

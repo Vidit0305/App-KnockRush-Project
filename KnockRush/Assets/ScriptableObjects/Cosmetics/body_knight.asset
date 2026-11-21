@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: body_knight
   m_EditorClassIdentifier: KnockRush.Inventory::KnockRush.Inventory.CosmeticDefinition
   itemId: body_knight
-  displayName: Knight Bean
+  displayName: Knight Rusher
   slot: 0
   rarity: 3
   color: {r: 0.7882353, g: 0.81960785, b: 0.87058824, a: 1}

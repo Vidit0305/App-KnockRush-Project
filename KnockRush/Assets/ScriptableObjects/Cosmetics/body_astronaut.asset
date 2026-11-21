@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: body_astronaut
   m_EditorClassIdentifier: KnockRush.Inventory::KnockRush.Inventory.CosmeticDefinition
   itemId: body_astronaut
-  displayName: Astro Bean
+  displayName: Astro Rusher
   slot: 0
   rarity: 2
   color: {r: 0.9490196, g: 0.95686275, b: 0.972549, a: 1}

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: body_golden
   m_EditorClassIdentifier: KnockRush.Inventory::KnockRush.Inventory.CosmeticDefinition
   itemId: body_golden
-  displayName: Golden Bean
+  displayName: Golden Rusher
   slot: 0
   rarity: 3
   color: {r: 1, g: 0.78431374, b: 0.22745098, a: 1}

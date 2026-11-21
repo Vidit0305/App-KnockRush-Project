@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: body_alien
   m_EditorClassIdentifier: KnockRush.Inventory::KnockRush.Inventory.CosmeticDefinition
   itemId: body_alien
-  displayName: Alien Bean
+  displayName: Alien Rusher
   slot: 0
   rarity: 2
   color: {r: 0.49803922, g: 0.8784314, b: 0.47843137, a: 1}

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: body_cowboy
   m_EditorClassIdentifier: KnockRush.Inventory::KnockRush.Inventory.CosmeticDefinition
   itemId: body_cowboy
-  displayName: Cowboy Bean
+  displayName: Cowboy Rusher
   slot: 0
   rarity: 0
   color: {r: 1, g: 1, b: 1, a: 1}

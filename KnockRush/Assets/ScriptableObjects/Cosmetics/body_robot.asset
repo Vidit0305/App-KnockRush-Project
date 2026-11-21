@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: body_robot
   m_EditorClassIdentifier: KnockRush.Inventory::KnockRush.Inventory.CosmeticDefinition
   itemId: body_robot
-  displayName: Robo Bean
+  displayName: Robo Rusher
   slot: 0
   rarity: 2
   color: {r: 0.6039216, g: 0.6431373, b: 0.72156864, a: 1}

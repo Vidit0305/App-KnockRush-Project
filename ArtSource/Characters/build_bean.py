@@ -1,8 +1,9 @@
 """
-KnockRush - procedural "Bean" character builder (Blender 4.5 LTS).
+KnockRush - procedural character builder (Blender 4.5 LTS).
 
-Builds the original KnockRush bean character entirely from code so it is reproducible:
-  * rounded bean body, big expressive eyes, short arms and stubby feet (one mesh)
+Builds the original KnockRush "Rusher" character entirely from code so it is reproducible:
+  * chibi proportions: big round head (skin, painted hair, big eyes, brows, cheeks, smile),
+    small outfit torso with sleeves, hands, trousers and sneakers (one mesh)
   * vertex colours: RGB = albedo for untinted parts, A = tint mask (1 = player colour)
   * shared skeleton "BeanRig" (Root, Hips, Chest, Arm.L/R, Leg.L/R) used by every costume
   * 13 animations: Idle, Walk, Run, Jump, Fall, Land, Dive, Hit, Stumble, Grab,
@@ -24,18 +25,28 @@ from mathutils import Euler, Matrix, Quaternion, Vector
 FPS = 30
 
 # Character faces -Y in Blender (=> +Z in Unity). Its LEFT side is +X.
-BODY_CENTER_Z = 0.86
-BODY_RADII = (0.44, 0.40, 0.66)       # x (width), y (depth), z (half height)
-EYE_Z = 1.14
-EYE_X = 0.15
-SHOULDER = (0.41, 0.0, 0.98)
+# The head occupies the same space as the old bean's upper body, so hats and face cosmetics
+# (built around head top 1.5, eyes 1.14, face depth 0.38) still fit.
+HEAD_CENTER = (0.0, 0.0, 1.12)
+HEAD_RADII = (0.385, 0.37, 0.37)
+EYE_Z = 1.13
+EYE_X = 0.135
+SHOULDER = (0.235, 0.0, 0.735)
 HIP_Z = 0.45
-FOOT = (0.17, -0.04, 0.10)
+FOOT = (0.11, -0.03, 0.07)
+TORSO_CENTER = (0.0, 0.0, 0.59)
+TORSO_RADII = (0.245, 0.19, 0.215)
 
 WHITE = (1.0, 1.0, 1.0)
 PUPIL = (0.04, 0.04, 0.07)
-FEET_SHADE = (0.72, 0.72, 0.72)
-HAND_SHADE = (0.92, 0.92, 0.92)
+SKIN = (1.0, 0.80, 0.66)
+CHEEK = (1.0, 0.56, 0.56)
+HAIR = (0.33, 0.19, 0.11)
+BROW = (0.24, 0.13, 0.08)
+TROUSERS = (0.18, 0.22, 0.40)
+SHOE = (0.97, 0.97, 1.0)
+SOLE = (0.90, 0.25, 0.22)
+OUTFIT_SHADE = (0.78, 0.78, 0.78)   # tinted, slightly darker (hem, cuffs)
 
 
 # ---------------------------------------------------------------------------
@@ -58,11 +69,12 @@ def smoothstep(edge0, edge1, x):
 # Mesh construction (single bmesh, parts tagged with vertex groups + colours)
 # ---------------------------------------------------------------------------
 class Part:
-    def __init__(self, name, color, alpha, group):
+    def __init__(self, name, color, alpha, group, color_fn=None):
         self.name = name
         self.color = color
         self.alpha = alpha
         self.group = group
+        self.color_fn = color_fn  # optional (position) -> (rgb, alpha) per vertex
         self.verts = []
 
 
@@ -79,63 +91,119 @@ def add_ellipsoid(bm, part, center, radii, segments=32, rings=16, rotation=None,
     return verts
 
 
-def body_deform(local):
-    # Bean silhouette: slightly narrower top, fuller belly, flatter bottom.
-    t = local.z / BODY_RADII[2]  # -1..1
-    width = 1.0 - 0.10 * max(0.0, t) + 0.05 * max(0.0, -t) * (1.0 - abs(t))
-    belly = 1.0 + 0.06 * math.exp(-((t + 0.15) ** 2) / 0.18)
-    out = Vector((local.x * width * belly, local.y * width * belly, local.z))
-    if t < -0.75:
-        out.z = -BODY_RADII[2] * (0.75 + (abs(t) - 0.75) * 0.6)
+def head_deform(local):
+    # Slightly fuller cheeks and a softer, narrower jaw.
+    t = local.z / HEAD_RADII[2]
+    jaw = 1.0 - 0.07 * max(0.0, -t) ** 2
+    return Vector((local.x * jaw, local.y * jaw, local.z * (0.96 if t < 0 else 1.0)))
+
+
+def torso_deform(local):
+    # Pear-shaped little body: narrower shoulders, rounder belly, flat bottom.
+    t = local.z / TORSO_RADII[2]
+    width = 0.86 + 0.14 * (1.0 - max(0.0, t))
+    out = Vector((local.x * width, local.y * width, local.z))
+    if t < -0.6:
+        out.z = -TORSO_RADII[2] * (0.6 + (abs(t) - 0.6) * 0.5)
     return out
+
+
+def head_color(co):
+    """Skin face with painted hair: a cap over the top and back with a side-swept fringe."""
+    x, y, z = co.x - HEAD_CENTER[0], co.y - HEAD_CENTER[1], co.z - HEAD_CENTER[2]
+    front = -y / HEAD_RADII[1]                    # 1 = face centre, -1 = back of the head
+    side = abs(x) / HEAD_RADII[0]
+    hairline = 0.105 + 0.022 * math.sin(x * 16.0 + 0.6) + 0.05 * side * side   # soft fringe over the brow
+    if front < 0.45:
+        blend = min(1.0, (0.45 - front) / 0.6)
+        hairline = hairline * (1.0 - blend) + (-0.2) * blend   # down to the nape at the back
+    if side > 0.78 and front < 0.7:
+        hairline = min(hairline, -0.01)                         # sideburns over the ears
+    if z > hairline:
+        return HAIR, 0.0
+    return SKIN, 0.0
 
 
 def build_mesh():
     bm = bmesh.new()
     parts = []
 
-    body = Part('Body', WHITE, 1.0, None)
-    add_ellipsoid(bm, body, (0, 0, BODY_CENTER_Z), BODY_RADII, 40, 24, deform=body_deform)
-    parts.append(body)
+    # Head (skin + painted hair) and ears.
+    head = Part('Head', SKIN, 0.0, 'Chest', color_fn=head_color)
+    add_ellipsoid(bm, head, HEAD_CENTER, HEAD_RADII, 56, 36, deform=head_deform)
+    parts.append(head)
 
     for side, sx in (('L', 1.0), ('R', -1.0)):
-        # Eyes: big white ovals slightly embedded in the face, black pupils in front.
-        eye = Part(f'Eye.{side}', WHITE, 0.0, 'Chest')
+        ear = Part(f'Ear.{side}', SKIN, 0.0, 'Chest')
+        add_ellipsoid(bm, ear, (sx * 0.37, 0.02, 1.09), (0.05, 0.07, 0.085), 12, 8)
+        parts.append(ear)
+
+        # Eyes: big glossy dark ovals with two highlights; a brow above each.
         eye_center = (sx * EYE_X, -0.335, EYE_Z)
-        add_ellipsoid(bm, eye, eye_center, (0.115, 0.07, 0.145), 24, 12,
-                      rotation=Euler((0, 0, -sx * math.radians(14))))
+        eye = Part(f'Eye.{side}', PUPIL, 0.0, 'Chest')
+        add_ellipsoid(bm, eye, eye_center, (0.058, 0.04, 0.088), 20, 12,
+                      rotation=Euler((math.radians(-12), 0, -sx * math.radians(10))))
         parts.append(eye)
+        hi = Part(f'Highlight.{side}', WHITE, 0.0, 'Chest')
+        add_ellipsoid(bm, hi, (sx * (EYE_X - 0.018), -0.371, EYE_Z + 0.035), (0.02, 0.01, 0.026), 8, 6)
+        parts.append(hi)
+        hi2 = Part(f'Highlight2.{side}', WHITE, 0.0, 'Chest')
+        add_ellipsoid(bm, hi2, (sx * (EYE_X + 0.02), -0.37, EYE_Z - 0.035), (0.01, 0.008, 0.012), 6, 4)
+        parts.append(hi2)
 
-        pupil = Part(f'Pupil.{side}', PUPIL, 0.0, 'Chest')
-        add_ellipsoid(bm, pupil, (sx * (EYE_X - 0.01), -0.392, EYE_Z - 0.01), (0.055, 0.03, 0.07), 16, 8,
-                      rotation=Euler((0, 0, -sx * math.radians(14))))
-        parts.append(pupil)
+        brow = Part(f'Brow.{side}', BROW, 0.0, 'Chest')
+        add_ellipsoid(bm, brow, (sx * (EYE_X + 0.005), -0.33, EYE_Z + 0.135), (0.05, 0.02, 0.014), 10, 6,
+                      rotation=Euler((math.radians(-20), sx * math.radians(-8), 0)))
+        parts.append(brow)
 
-        highlight = Part(f'Highlight.{side}', WHITE, 0.0, 'Chest')
-        add_ellipsoid(bm, highlight, (sx * (EYE_X - 0.03), -0.418, EYE_Z + 0.025), (0.018, 0.01, 0.022), 8, 6)
-        parts.append(highlight)
+        cheek = Part(f'Cheek.{side}', CHEEK, 0.0, 'Chest')
+        add_ellipsoid(bm, cheek, (sx * 0.215, -0.285, 1.035), (0.055, 0.03, 0.035), 12, 8,
+                      rotation=Euler((0, 0, -sx * math.radians(35))))
+        parts.append(cheek)
 
-        # Arms: short rounded stubs hanging from the shoulders.
-        arm = Part(f'Arm.{side}', HAND_SHADE, 1.0, f'Arm.{side}')
+        # Sleeve (outfit colour) with a darker cuff, then a skin hand.
         shoulder = Vector((sx * SHOULDER[0], SHOULDER[1], SHOULDER[2]))
-        arm_center = shoulder + Vector((sx * 0.10, 0.0, -0.17))
-        add_ellipsoid(bm, arm, arm_center, (0.09, 0.09, 0.23), 16, 10,
-                      rotation=Euler((0, sx * math.radians(22), 0)))
-        parts.append(arm)
+        arm_dir = Vector((sx * 0.30, 0.0, -0.95)).normalized()
+        sleeve = Part(f'Sleeve.{side}', WHITE, 1.0, f'Arm.{side}')
+        add_ellipsoid(bm, sleeve, shoulder + arm_dir * 0.11, (0.072, 0.072, 0.13), 16, 10,
+                      rotation=Euler((0, sx * math.radians(17), 0)))
+        parts.append(sleeve)
+        cuff = Part(f'Cuff.{side}', OUTFIT_SHADE, 1.0, f'Arm.{side}')
+        add_ellipsoid(bm, cuff, shoulder + arm_dir * 0.215, (0.068, 0.068, 0.03), 14, 6,
+                      rotation=Euler((0, sx * math.radians(17), 0)))
+        parts.append(cuff)
+        hand = Part(f'Hand.{side}', SKIN, 0.0, f'Arm.{side}')
+        add_ellipsoid(bm, hand, shoulder + arm_dir * 0.29, (0.07, 0.065, 0.075), 14, 10)
+        parts.append(hand)
 
-        # Feet: stubby rounded feet pointing forward.
-        foot = Part(f'Foot.{side}', FEET_SHADE, 1.0, f'Leg.{side}')
-        add_ellipsoid(bm, foot, (sx * FOOT[0], FOOT[1], FOOT[2]), (0.12, 0.17, 0.10), 16, 10)
-        parts.append(foot)
+        # Trousers and chunky sneakers.
+        leg = Part(f'Leg.{side}', TROUSERS, 0.0, f'Leg.{side}')
+        add_ellipsoid(bm, leg, (sx * FOOT[0], 0.0, 0.25), (0.085, 0.085, 0.17), 14, 10)
+        parts.append(leg)
+        shoe = Part(f'Shoe.{side}', SHOE, 0.0, f'Leg.{side}')
+        add_ellipsoid(bm, shoe, (sx * FOOT[0], FOOT[1], FOOT[2] + 0.01), (0.095, 0.14, 0.07), 16, 10)
+        parts.append(shoe)
+        sole = Part(f'Sole.{side}', SOLE, 0.0, f'Leg.{side}')
+        add_ellipsoid(bm, sole, (sx * FOOT[0], FOOT[1], 0.025), (0.1, 0.145, 0.028), 16, 6)
+        parts.append(sole)
 
-    # Smile: a thin curved capsule under the eyes.
+    # Smile: a short curve of small capsules.
     mouth = Part('Mouth', PUPIL, 0.0, 'Chest')
-    for i in range(7):
-        t = (i - 3) / 3.0
-        x = t * 0.075
-        z = 0.965 + 0.02 * (t * t)
-        add_ellipsoid(bm, mouth, (x, -0.378 + 0.01 * abs(t), z), (0.018, 0.012, 0.014), 8, 6)
+    for i in range(13):
+        t = (i - 6) / 6.0
+        add_ellipsoid(bm, mouth, (t * 0.052, -0.353 + 0.008 * abs(t), 0.995 + 0.018 * t * t), (0.011, 0.009, 0.009), 8, 6)
     parts.append(mouth)
+
+    # Outfit: little pear-shaped body with a darker hem band, plus a neck.
+    neck = Part('Neck', SKIN, 0.0, 'Chest')
+    add_ellipsoid(bm, neck, (0, 0, 0.78), (0.1, 0.09, 0.07), 12, 8)
+    parts.append(neck)
+    torso = Part('Torso', WHITE, 1.0, None)
+    add_ellipsoid(bm, torso, TORSO_CENTER, TORSO_RADII, 32, 20, deform=torso_deform)
+    parts.append(torso)
+    hem = Part('Hem', OUTFIT_SHADE, 1.0, 'Hips')
+    add_ellipsoid(bm, hem, (0, 0, 0.42), (0.225, 0.18, 0.04), 28, 8)
+    parts.append(hem)
 
     bm.normal_update()
     mesh = bpy.data.meshes.new('BeanMesh')
@@ -158,9 +226,12 @@ def build_mesh():
     color_attr = mesh.color_attributes.new(name='Col', type='BYTE_COLOR', domain='POINT')
     mesh.color_attributes.active_color = color_attr
     for part, indices in index_parts:
-        rgba = (part.color[0], part.color[1], part.color[2], part.alpha)
         for i in indices:
-            color_attr.data[i].color_srgb = rgba
+            if part.color_fn is not None:
+                rgb, alpha = part.color_fn(mesh.vertices[i].co)
+            else:
+                rgb, alpha = part.color, part.alpha
+            color_attr.data[i].color_srgb = (rgb[0], rgb[1], rgb[2], alpha)
 
     return obj, index_parts
 
@@ -171,10 +242,10 @@ def build_mesh():
 BONES = {
     # name: (head, tail, parent, deform)
     'Root': ((0, 0, 0), (0, 0, 0.25), None, False),
-    'Hips': ((0, 0, HIP_Z), (0, 0, 0.84), 'Root', True),
-    'Chest': ((0, 0, 0.84), (0, 0, 1.42), 'Hips', True),
-    'Arm.L': ((SHOULDER[0], 0, SHOULDER[2]), (SHOULDER[0] + 0.12, 0, SHOULDER[2] - 0.34), 'Chest', True),
-    'Arm.R': ((-SHOULDER[0], 0, SHOULDER[2]), (-SHOULDER[0] - 0.12, 0, SHOULDER[2] - 0.34), 'Chest', True),
+    'Hips': ((0, 0, HIP_Z), (0, 0, 0.66), 'Root', True),
+    'Chest': ((0, 0, 0.66), (0, 0, 1.42), 'Hips', True),
+    'Arm.L': ((SHOULDER[0], 0, SHOULDER[2]), (SHOULDER[0] + 0.09, 0, SHOULDER[2] - 0.29), 'Chest', True),
+    'Arm.R': ((-SHOULDER[0], 0, SHOULDER[2]), (-SHOULDER[0] - 0.09, 0, SHOULDER[2] - 0.29), 'Chest', True),
     'Leg.L': ((FOOT[0], 0, HIP_Z), (FOOT[0], 0, 0.06), 'Hips', True),
     'Leg.R': ((-FOOT[0], 0, HIP_Z), (-FOOT[0], 0, 0.06), 'Hips', True),
 }
@@ -216,10 +287,10 @@ def skin(mesh_obj, rig, index_parts):
         if part.group is not None:
             groups[part.group].add(indices, 1.0, 'REPLACE')
             continue
-        # Body: blend Hips -> Chest by height.
+        # Torso: blend Hips -> Chest by height.
         for i in indices:
             z = mesh.vertices[i].co.z
-            w_chest = smoothstep(0.70, 1.02, z)
+            w_chest = smoothstep(0.50, 0.74, z)
             if w_chest < 0.999:
                 groups['Hips'].add([i], 1.0 - w_chest, 'REPLACE')
             if w_chest > 0.001:

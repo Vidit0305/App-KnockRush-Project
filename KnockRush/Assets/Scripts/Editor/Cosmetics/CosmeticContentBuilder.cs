@@ -27,6 +27,15 @@ namespace KnockRush.EditorTools.Cosmetics
         private const float FaceZ = -0.38f;
         private const float BackZ = 0.38f;
 
+        // The character's small body under the big head (outfit torso, neck, shoulders).
+        private const float NeckY = 0.78f;
+        private const float ChestY = 0.6f;
+        private const float ChestFrontZ = -0.21f;
+        private const float ChestBackZ = 0.2f;
+        private const float ShoulderX = 0.27f;
+        private const float ChinY = 0.86f;
+        private const float ChinZ = -0.28f;
+
         private static readonly Dictionary<string, Material> Materials = new Dictionary<string, Material>();
         private static Mesh cone;
         private static Mesh torus;
@@ -62,108 +71,108 @@ namespace KnockRush.EditorTools.Cosmetics
         // ---------------------------------------------------------------------------------------
         private static void BuildCostumes()
         {
-            Costume("default_bean", "Classic Bean", CosmeticRarity.Common, null, null);
-            Costume("body_astronaut", "Astro Bean", CosmeticRarity.Epic, C(0xF2F4F8), root =>
+            Costume("default_bean", "Classic Rusher", CosmeticRarity.Common, null, null);
+            Costume("body_astronaut", "Astro Rusher", CosmeticRarity.Epic, C(0xF2F4F8), root =>
             {
                 Sphere(root, new Vector3(0f, EyeY, FaceZ + 0.03f), new Vector3(0.62f, 0.34f, 0.14f), C(0x1E2A5A));
-                Box(root, new Vector3(0f, 0.95f, BackZ + 0.1f), new Vector3(0.5f, 0.5f, 0.22f), C(0xB8C0CC));
-                Cyl(root, new Vector3(0.18f, 1.22f, BackZ + 0.16f), new Vector3(0.08f, 0.12f, 0.08f), C(0xE83A3A));
+                Box(root, new Vector3(0f, ChestY + 0.04f, ChestBackZ + 0.08f), new Vector3(0.36f, 0.36f, 0.16f), C(0xB8C0CC));
+                Cyl(root, new Vector3(0.12f, ChestY + 0.26f, ChestBackZ + 0.12f), new Vector3(0.06f, 0.08f, 0.06f), C(0xE83A3A));
             });
-            Costume("body_dino", "Dino Bean", CosmeticRarity.Legendary, C(0x4CC46A), root =>
+            Costume("body_dino", "Dino Rusher", CosmeticRarity.Legendary, C(0x4CC46A), root =>
             {
                 for (var i = 0; i < 5; i++)
                 {
-                    var y = 0.55f + i * 0.2f;
-                    Cone(root, new Vector3(0f, y, BackZ + 0.02f - Mathf.Abs(i - 2) * 0.01f), Quaternion.Euler(-80f, 0f, 0f), new Vector3(0.16f, 0.2f, 0.16f), C(0xFFD12B));
+                    var y = 0.5f + i * 0.22f;
+                    Cone(root, new Vector3(0f, y, (y < 0.8f ? ChestBackZ : BackZ) + 0.02f - Mathf.Abs(i - 2) * 0.01f), Quaternion.Euler(-80f, 0f, 0f), new Vector3(0.16f, 0.2f, 0.16f), C(0xFFD12B));
                 }
-                Cone(root, new Vector3(0f, 0.35f, BackZ + 0.15f), Quaternion.Euler(-100f, 0f, 0f), new Vector3(0.28f, 0.6f, 0.28f), C(0x3BA458));
+                Cone(root, new Vector3(0f, 0.4f, ChestBackZ + 0.08f), Quaternion.Euler(-100f, 0f, 0f), new Vector3(0.22f, 0.48f, 0.22f), C(0x3BA458));
             }, "Hips");
-            Costume("body_chef", "Chef Bean", CosmeticRarity.Rare, C(0xFFFFFF), root =>
+            Costume("body_chef", "Chef Rusher", CosmeticRarity.Rare, C(0xFFFFFF), root =>
             {
                 Cyl(root, new Vector3(0f, HeadTop + 0.1f, 0f), new Vector3(0.42f, 0.14f, 0.42f), C(0xFFFFFF));
                 for (var i = 0; i < 4; i++)
                 {
                     Sphere(root, new Vector3(Mathf.Cos(i * 1.57f) * 0.12f, HeadTop + 0.3f, Mathf.Sin(i * 1.57f) * 0.12f), Vector3.one * 0.26f, C(0xFFFFFF));
                 }
-                Torus(root, new Vector3(0f, 0.82f, 0f), Quaternion.identity, new Vector3(0.95f, 0.5f, 0.85f), C(0xE83A3A));
+                Torus(root, new Vector3(0f, NeckY, 0f), Quaternion.identity, new Vector3(0.42f, 0.45f, 0.4f), C(0xE83A3A));
             });
-            Costume("body_pirate", "Pirate Bean", CosmeticRarity.Rare, null, root =>
+            Costume("body_pirate", "Pirate Rusher", CosmeticRarity.Rare, null, root =>
             {
                 Sphere(root, new Vector3(0f, HeadTop - 0.08f, 0f), new Vector3(0.82f, 0.3f, 0.76f), C(0xE83A3A));
                 Cyl(root, new Vector3(0.15f, EyeY, FaceZ - 0.04f), new Vector3(0.16f, 0.02f, 0.16f), C(0x111111), Quaternion.Euler(90f, 0f, 0f));
                 Torus(root, new Vector3(-0.42f, 1.0f, 0f), Quaternion.Euler(0f, 0f, 90f), Vector3.one * 0.12f, C(0xFFD12B));
             });
-            Costume("body_ninja", "Ninja Bean", CosmeticRarity.Epic, C(0x2B2B3A), root =>
+            Costume("body_ninja", "Ninja Rusher", CosmeticRarity.Epic, C(0x2B2B3A), root =>
             {
-                Torus(root, new Vector3(0f, 1.3f, 0f), Quaternion.identity, new Vector3(0.9f, 0.6f, 0.82f), C(0xE83A3A));
+                Torus(root, new Vector3(0f, 1.3f, 0f), Quaternion.identity, new Vector3(0.74f, 0.6f, 0.7f), C(0xE83A3A));
                 Box(root, new Vector3(0.08f, 1.25f, BackZ + 0.08f), new Vector3(0.06f, 0.25f, 0.04f), C(0xE83A3A), Quaternion.Euler(20f, 0f, 20f));
                 Box(root, new Vector3(-0.08f, 1.22f, BackZ + 0.08f), new Vector3(0.06f, 0.25f, 0.04f), C(0xE83A3A), Quaternion.Euler(20f, 0f, -20f));
             });
-            Costume("body_robot", "Robo Bean", CosmeticRarity.Epic, C(0x9AA4B8), root =>
+            Costume("body_robot", "Robo Rusher", CosmeticRarity.Epic, C(0x9AA4B8), root =>
             {
                 Cyl(root, new Vector3(0f, HeadTop + 0.12f, 0f), new Vector3(0.04f, 0.14f, 0.04f), C(0x2B2B3A));
                 Sphere(root, new Vector3(0f, HeadTop + 0.3f, 0f), Vector3.one * 0.12f, C(0xE83A3A));
-                Box(root, new Vector3(0f, 0.86f, FaceZ - 0.02f), new Vector3(0.36f, 0.26f, 0.06f), C(0x2D9CFF));
+                Box(root, new Vector3(0f, ChestY, ChestFrontZ - 0.01f), new Vector3(0.24f, 0.18f, 0.05f), C(0x2D9CFF));
                 Sphere(root, new Vector3(0.44f, 1.0f, 0f), Vector3.one * 0.1f, C(0xFFD12B));
                 Sphere(root, new Vector3(-0.44f, 1.0f, 0f), Vector3.one * 0.1f, C(0xFFD12B));
             });
-            Costume("body_knight", "Knight Bean", CosmeticRarity.Legendary, C(0xC9D1DE), root =>
+            Costume("body_knight", "Knight Rusher", CosmeticRarity.Legendary, C(0xC9D1DE), root =>
             {
                 Box(root, new Vector3(0f, EyeY + 0.12f, FaceZ - 0.02f), new Vector3(0.62f, 0.05f, 0.08f), C(0x2B2B3A));
                 Cone(root, new Vector3(0f, HeadTop + 0.15f, 0.05f), Quaternion.Euler(-20f, 0f, 0f), new Vector3(0.14f, 0.4f, 0.14f), C(0xE83A3A));
-                Sphere(root, new Vector3(0.42f, 1.02f, 0f), new Vector3(0.24f, 0.18f, 0.24f), C(0x9AA4B8));
-                Sphere(root, new Vector3(-0.42f, 1.02f, 0f), new Vector3(0.24f, 0.18f, 0.24f), C(0x9AA4B8));
+                Sphere(root, new Vector3(ShoulderX, NeckY - 0.02f, 0f), new Vector3(0.2f, 0.14f, 0.2f), C(0x9AA4B8));
+                Sphere(root, new Vector3(-ShoulderX, NeckY - 0.02f, 0f), new Vector3(0.2f, 0.14f, 0.2f), C(0x9AA4B8));
             });
-            Costume("body_wizard", "Wizard Bean", CosmeticRarity.Epic, C(0x6A4CE0), root =>
+            Costume("body_wizard", "Wizard Rusher", CosmeticRarity.Epic, C(0x6A4CE0), root =>
             {
                 Cyl(root, new Vector3(0f, HeadTop - 0.02f, 0f), new Vector3(0.95f, 0.02f, 0.95f), C(0x3B2A8A));
                 Cone(root, new Vector3(0f, HeadTop, 0f), Quaternion.Euler(-8f, 0f, 0f), new Vector3(0.6f, 0.75f, 0.6f), C(0x3B2A8A));
-                Sphere(root, new Vector3(0f, 0.86f, FaceZ + 0.02f), new Vector3(0.34f, 0.36f, 0.16f), C(0xFFFFFF));
+                Sphere(root, new Vector3(0f, ChinY - 0.04f, ChinZ), new Vector3(0.3f, 0.34f, 0.14f), C(0xFFFFFF));
             });
-            Costume("body_bunny", "Bunny Bean", CosmeticRarity.Rare, C(0xFFC2DA), root =>
+            Costume("body_bunny", "Bunny Rusher", CosmeticRarity.Rare, C(0xFFC2DA), root =>
             {
                 BunnyEars(root);
-                Sphere(root, new Vector3(0f, 0.55f, BackZ + 0.06f), Vector3.one * 0.2f, C(0xFFFFFF));
+                Sphere(root, new Vector3(0f, 0.46f, ChestBackZ + 0.04f), Vector3.one * 0.16f, C(0xFFFFFF));
             });
-            Costume("body_cat", "Kitty Bean", CosmeticRarity.Rare, C(0xFF9A3C), root =>
+            Costume("body_cat", "Kitty Rusher", CosmeticRarity.Rare, C(0xFF9A3C), root =>
             {
                 Cone(root, new Vector3(0.2f, HeadTop - 0.06f, 0f), Quaternion.Euler(0f, 0f, -15f), new Vector3(0.18f, 0.22f, 0.12f), C(0xFF9A3C));
                 Cone(root, new Vector3(-0.2f, HeadTop - 0.06f, 0f), Quaternion.Euler(0f, 0f, 15f), new Vector3(0.18f, 0.22f, 0.12f), C(0xFF9A3C));
-                Sphere(root, new Vector3(0f, 0.98f, FaceZ - 0.02f), Vector3.one * 0.06f, C(0xFF4F9A));
+                Sphere(root, new Vector3(0f, 1.03f, FaceZ + 0.03f), Vector3.one * 0.06f, C(0xFF4F9A));
                 for (var side = -1; side <= 1; side += 2)
                 {
-                    Box(root, new Vector3(side * 0.12f, 0.96f, FaceZ - 0.02f), new Vector3(0.18f, 0.01f, 0.01f), C(0x2B2B3A), Quaternion.Euler(0f, 0f, side * 8f));
+                    Box(root, new Vector3(side * 0.16f, 1.02f, FaceZ + 0.04f), new Vector3(0.18f, 0.01f, 0.01f), C(0x2B2B3A), Quaternion.Euler(0f, 0f, side * 8f));
                 }
             });
-            Costume("body_pumpkin", "Pumpkin Bean", CosmeticRarity.Rare, C(0xFF7A1A), root =>
+            Costume("body_pumpkin", "Pumpkin Rusher", CosmeticRarity.Rare, C(0xFF7A1A), root =>
             {
                 Cyl(root, new Vector3(0f, HeadTop + 0.06f, 0f), new Vector3(0.08f, 0.1f, 0.08f), C(0x4C8A3A));
                 Sphere(root, new Vector3(0.08f, HeadTop + 0.1f, 0f), new Vector3(0.18f, 0.04f, 0.1f), C(0x4CC46A));
             }, pattern: 1, patternColor: C(0xE8601A));
-            Costume("body_snowman", "Snow Bean", CosmeticRarity.Rare, C(0xF6FAFF), root =>
+            Costume("body_snowman", "Snow Rusher", CosmeticRarity.Rare, C(0xF6FAFF), root =>
             {
                 Cone(root, new Vector3(0f, 1.0f, FaceZ - 0.02f), Quaternion.Euler(-90f, 0f, 0f), new Vector3(0.1f, 0.24f, 0.1f), C(0xFF7A1A));
                 TopHat(root, C(0x1E1E28), C(0xE83A3A));
-                Torus(root, new Vector3(0f, 0.8f, 0f), Quaternion.identity, new Vector3(0.95f, 0.6f, 0.85f), C(0xE83A3A));
+                Torus(root, new Vector3(0f, NeckY, 0f), Quaternion.identity, new Vector3(0.42f, 0.5f, 0.4f), C(0xE83A3A));
             });
-            Costume("body_superhero", "Super Bean", CosmeticRarity.Legendary, C(0x2D6BFF), root =>
+            Costume("body_superhero", "Super Rusher", CosmeticRarity.Legendary, C(0x2D6BFF), root =>
             {
-                Box(root, new Vector3(0f, 0.85f, BackZ + 0.08f), new Vector3(0.7f, 0.9f, 0.04f), C(0xE83A3A), Quaternion.Euler(12f, 0f, 0f));
-                Torus(root, new Vector3(0f, EyeY, 0f), Quaternion.identity, new Vector3(0.88f, 0.5f, 0.82f), C(0x1E1E28));
+                Box(root, new Vector3(0f, ChestY - 0.06f, ChestBackZ + 0.05f), new Vector3(0.46f, 0.6f, 0.03f), C(0xE83A3A), Quaternion.Euler(12f, 0f, 0f));
+                Torus(root, new Vector3(0f, EyeY, 0f), Quaternion.identity, new Vector3(0.82f, 0.5f, 0.78f), C(0x1E1E28));
             }, pattern: 4, patternColor: C(0xFFD12B));
-            Costume("body_viking", "Viking Bean", CosmeticRarity.Epic, C(0xE0B080), root =>
+            Costume("body_viking", "Viking Rusher", CosmeticRarity.Epic, C(0xE0B080), root =>
             {
                 Sphere(root, new Vector3(0f, HeadTop - 0.08f, 0f), new Vector3(0.84f, 0.36f, 0.78f), C(0x9AA4B8));
                 Horns(root, C(0xFFF4E0));
-                Sphere(root, new Vector3(0f, 0.86f, FaceZ + 0.02f), new Vector3(0.34f, 0.3f, 0.14f), C(0xE8A23A));
+                Sphere(root, new Vector3(0f, ChinY - 0.04f, ChinZ), new Vector3(0.3f, 0.28f, 0.14f), C(0xE8A23A));
             });
-            Costume("body_cowboy", "Cowboy Bean", CosmeticRarity.Common, null, root =>
+            Costume("body_cowboy", "Cowboy Rusher", CosmeticRarity.Common, null, root =>
             {
                 Cyl(root, new Vector3(0f, HeadTop - 0.02f, 0f), new Vector3(1.0f, 0.02f, 1.0f), C(0x8A5A3B));
                 Cyl(root, new Vector3(0f, HeadTop + 0.1f, 0f), new Vector3(0.42f, 0.12f, 0.42f), C(0x8A5A3B));
-                Torus(root, new Vector3(0f, 0.8f, 0f), Quaternion.identity, new Vector3(0.95f, 0.6f, 0.85f), C(0xE83A3A));
+                Torus(root, new Vector3(0f, NeckY, 0f), Quaternion.identity, new Vector3(0.42f, 0.5f, 0.4f), C(0xE83A3A));
             });
-            Costume("body_clown", "Clown Bean", CosmeticRarity.Common, C(0xFFFFFF), root =>
+            Costume("body_clown", "Clown Rusher", CosmeticRarity.Common, C(0xFFFFFF), root =>
             {
                 Sphere(root, new Vector3(0f, 1.0f, FaceZ - 0.04f), Vector3.one * 0.14f, C(0xE83A3A));
                 var wig = new[] { C(0xFF4F9A), C(0x2D9CFF), C(0xFFD12B), C(0x22C58B) };
@@ -173,7 +182,7 @@ namespace KnockRush.EditorTools.Cosmetics
                     Sphere(root, new Vector3(Mathf.Cos(a) * 0.28f, HeadTop - 0.08f, Mathf.Sin(a) * 0.26f), Vector3.one * 0.22f, wig[i % wig.Length]);
                 }
             }, pattern: 2, patternColor: C(0xFF4F9A));
-            Costume("body_alien", "Alien Bean", CosmeticRarity.Epic, C(0x7FE07A), root =>
+            Costume("body_alien", "Alien Rusher", CosmeticRarity.Epic, C(0x7FE07A), root =>
             {
                 for (var side = -1; side <= 1; side += 2)
                 {
@@ -181,19 +190,19 @@ namespace KnockRush.EditorTools.Cosmetics
                     Sphere(root, new Vector3(side * 0.22f, HeadTop + 0.3f, 0f), Vector3.one * 0.1f, C(0xFF4F9A));
                 }
             });
-            Costume("body_dragon", "Dragon Bean", CosmeticRarity.Legendary, C(0xD8343A), root =>
+            Costume("body_dragon", "Dragon Rusher", CosmeticRarity.Legendary, C(0xD8343A), root =>
             {
                 for (var side = -1; side <= 1; side += 2)
                 {
-                    Box(root, new Vector3(side * 0.42f, 1.15f, BackZ + 0.1f), new Vector3(0.6f, 0.36f, 0.03f), C(0x8A1A2A), Quaternion.Euler(10f, side * -30f, side * 25f));
+                    Box(root, new Vector3(side * 0.24f, ChestY + 0.12f, ChestBackZ + 0.08f), new Vector3(0.42f, 0.26f, 0.03f), C(0x8A1A2A), Quaternion.Euler(10f, side * -30f, side * 25f));
                 }
                 Horns(root, C(0xFFD12B));
                 for (var i = 0; i < 4; i++)
                 {
-                    Cone(root, new Vector3(0f, 0.6f + i * 0.2f, BackZ + 0.02f), Quaternion.Euler(-80f, 0f, 0f), new Vector3(0.12f, 0.16f, 0.12f), C(0xFFD12B));
+                    Cone(root, new Vector3(0f, 0.5f + i * 0.22f, (i < 2 ? ChestBackZ : BackZ) + 0.02f), Quaternion.Euler(-80f, 0f, 0f), new Vector3(0.12f, 0.16f, 0.12f), C(0xFFD12B));
                 }
             }, pattern: 7, patternColor: C(0xFFB23F));
-            Costume("body_golden", "Golden Bean", CosmeticRarity.Legendary, C(0xFFC83A), root => Crown(root), pattern: 6, patternColor: C(0xFFE08A));
+            Costume("body_golden", "Golden Rusher", CosmeticRarity.Legendary, C(0xFFC83A), root => Crown(root), pattern: 6, patternColor: C(0xFFE08A));
         }
 
         // ---------------------------------------------------------------------------------------

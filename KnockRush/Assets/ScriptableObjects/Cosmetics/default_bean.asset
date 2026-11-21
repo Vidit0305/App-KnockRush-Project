@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: default_bean
   m_EditorClassIdentifier: KnockRush.Inventory::KnockRush.Inventory.CosmeticDefinition
   itemId: default_bean
-  displayName: Classic Bean
+  displayName: Classic Rusher
   slot: 0
   rarity: 0
   color: {r: 1, g: 1, b: 1, a: 1}

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: body_ninja
   m_EditorClassIdentifier: KnockRush.Inventory::KnockRush.Inventory.CosmeticDefinition
   itemId: body_ninja
-  displayName: Ninja Bean
+  displayName: Ninja Rusher
   slot: 0
   rarity: 2
   color: {r: 0.16862746, g: 0.16862746, b: 0.22745098, a: 1}
